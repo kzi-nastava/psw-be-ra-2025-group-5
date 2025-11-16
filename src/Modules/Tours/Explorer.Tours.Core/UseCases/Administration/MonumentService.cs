@@ -1,0 +1,47 @@
+﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Public.Administration;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.Core.Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Explorer.Tours.Core.UseCases.Administration
+{
+    public class MonumentService: IMonumentService
+    {
+        private readonly IMonumentRepository _monumentRepository;
+        private readonly IMapper _mapper;
+
+        public MonumentService(IMonumentRepository monumentRepository, IMapper mapper)
+        {
+            _monumentRepository = monumentRepository;
+            _mapper = mapper;
+        }
+
+        public PagedResult<MonumentDto> GetPaged(int page, int pageSize) { 
+            var result = _monumentRepository.GetPaged(page, pageSize);
+            var items = result.Results.Select(_mapper.Map<MonumentDto>).ToList();
+            return new PagedResult<MonumentDto>(items, result.TotalCount);
+        }
+
+        public MonumentDto Create(MonumentDto entity) {
+            var result = _monumentRepository.Create(_mapper.Map<Monument>(entity));
+            return _mapper.Map<MonumentDto>(result);
+        }
+
+        public MonumentDto Update(MonumentDto entity)
+        {
+            var result = _monumentRepository.Update(_mapper.Map<Monument>(entity));
+            return _mapper.Map<MonumentDto>(result);
+        }
+
+        public void Delete(int id) {
+            _monumentRepository.Delete(id);
+        }
+    }
+}

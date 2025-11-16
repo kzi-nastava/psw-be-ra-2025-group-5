@@ -11,11 +11,11 @@ namespace Explorer.Tours.Core.Domain
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public DateOnly Year { get; set; }
+        public int Year { get; set; }
         public MonumentStatus Status { get; set; }
         public MonumentLocation Location { get; set; }
 
-        public Monument(string Name, string? Description, DateOnly Year, MonumentStatus status, MonumentLocation location)
+        public Monument(string Name, string? Description, int Year, MonumentStatus status, MonumentLocation location)
         {
             this.Name = Name;
             this.Description = Description;

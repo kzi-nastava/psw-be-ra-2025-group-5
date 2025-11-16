@@ -4,17 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Explorer.Tours.Core.Domain
+namespace Explorer.Tours.API.Dtos
 {
-    public class MonumentLocation
+    public class MonumentLocationDto
     {
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-
-        public MonumentLocation(double latitude, double longitude)
-        {
-            Latitude = latitude;
-            Longitude = longitude;
-        }
     }
 }
