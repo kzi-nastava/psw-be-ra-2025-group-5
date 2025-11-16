@@ -1,15 +1,18 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Stakeholders.Infrastructure.Database.Repositories;
 
 public class UserDbRepository : IUserRepository
 {
     private readonly StakeholdersContext _dbContext;
+    private readonly DbSet<User> _dbSet;
 
     public UserDbRepository(StakeholdersContext dbContext)
     {
         _dbContext = dbContext;
+        _dbSet = _dbContext.Set<User>();
     }
 
     public bool Exists(string username)
