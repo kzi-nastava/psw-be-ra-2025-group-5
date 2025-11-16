@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
+using Explorer.Tours.Core.Domain.Shared;
 
 namespace Explorer.Tours.Core.Domain;
 
@@ -16,6 +17,10 @@ public class Tour : Entity
 
     public Tour(string name, string? description, TourDifficulty difficulty, List<string> tags)
     {
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
+        Guard.AgainstInvalidEnum(difficulty, nameof(difficulty));
+        Guard.AgainstDuplicateStrings(tags, nameof(tags));
+
         Name = name;
         Description = description;
         Difficulty = difficulty;
