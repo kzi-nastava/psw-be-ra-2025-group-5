@@ -9,5 +9,14 @@ public class StakeholderProfile : Profile
     public StakeholderProfile()
     {
         CreateMap<UserDto, User>().ReverseMap();
+
+        CreateMap<CreateUserDto, User>()
+            .ConstructUsing(dto => new User(
+                dto.Username,
+                dto.Password,
+                dto.Email,
+                Enum.Parse<UserRole>(dto.Role, true),
+                true
+            ));
     }
 }

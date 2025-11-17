@@ -8,7 +8,9 @@ public class User : Entity
     public string Password { get; private set; }
     public string Email { get; private set; }   // Svaki nalog obuhvata i Email
     public UserRole Role { get; private set; }
-    public bool IsActive { get; set; }
+    public bool IsActive { get; private set; }
+
+    public User() { }
 
     public User(string username, string password, string email, UserRole role, bool isActive)
     {
@@ -29,8 +31,21 @@ public class User : Entity
 
     public string GetPrimaryRoleName()
     {
-        return Role.ToString().ToLower();
+        return Role.ToString();
     }
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        if (Role == UserRole.Administrator)
+            throw new InvalidOperationException("Cannot block an Administrator account.");
+        IsActive = false;
+    }
+
 }
 
 public enum UserRole

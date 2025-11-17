@@ -28,8 +28,13 @@ namespace Explorer.Stakeholders.Core.UseCases
             if (_userRepository.Exists(dto.Username))
                 throw new Exception("Username already exists.");
 
+            if (!Enum.TryParse(dto.Role, true, out UserRole role) || role == UserRole.Tourist)
+            {
+                throw new ArgumentException("Administrator can only create 'Administrator' or 'Author' accounts.");
+            }
+
             User user = _mapper.Map<User>(dto);
-            user.IsActive = true;
+            user.Activate();
 
             User created = _userRepository.Create(user);
 
@@ -48,7 +53,12 @@ namespace Explorer.Stakeholders.Core.UseCases
             if (user == null)
                 throw new Exception("User not found.");
 
-            user.IsActive = false;
+            if (user.Role == UserRole.Administrator)
+            {
+                throw new InvalidOperationException("Cannot block an Administrator account.");
+            }
+
+            user.Deactivate();
 
             User updated = _userRepository.Update(user);
             return _mapper.Map<UserDto>(updated);

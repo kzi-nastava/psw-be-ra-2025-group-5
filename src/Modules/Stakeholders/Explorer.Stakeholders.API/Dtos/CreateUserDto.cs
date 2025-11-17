@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 // Ovde ne može da pronađe Core, već samo API
-//using Explorer.Stakeholders.Core.Domain;
+// using Explorer.Stakeholders.Core.Domain;
 
 namespace Explorer.Stakeholders.API.Dtos
 {
