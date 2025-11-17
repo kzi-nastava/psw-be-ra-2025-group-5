@@ -9,9 +9,19 @@ public class TouristPreferences : Entity
     public Dictionary<TransportationType, int> TransportationRatings { get; private set; }
     public List<string> PreferredTags { get; private set; }
 
+    public TouristPreferences() { }
+
     public TouristPreferences(long userId, TourDifficulty preferredDifficulty, Dictionary<TransportationType, int> transportationRatings, List<string> preferredTags)
     {
         UserId = userId;
+        PreferredDifficulty = preferredDifficulty;
+        TransportationRatings = transportationRatings ?? new Dictionary<TransportationType, int>();
+        PreferredTags = preferredTags ?? new List<string>();
+        Validate();
+    }
+
+    public void Update(TourDifficulty preferredDifficulty, Dictionary<TransportationType, int> transportationRatings, List<string> preferredTags)
+    {
         PreferredDifficulty = preferredDifficulty;
         TransportationRatings = transportationRatings ?? new Dictionary<TransportationType, int>();
         PreferredTags = preferredTags ?? new List<string>();
