@@ -32,6 +32,12 @@ public class TourDbRepository : ITourRepository
         return task.Result;
     }
 
+    public List<Tour> GetAll()
+    {
+        return _dbSet.ToList();
+    }
+
+
     public Tour Get(long id)
     {
         var entity = _dbSet.Find(id);
