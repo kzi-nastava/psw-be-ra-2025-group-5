@@ -26,6 +26,14 @@ public class TourService : ITourService
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
+    public PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize)
+    {
+        var result = _TourRepository.GetPagedByAuthor(authorId, page, pageSize);
+
+        var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
+        return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+
     public TourDto Create(TourDto entity)
     {
         var result = _TourRepository.Create(_mapper.Map<Tour>(entity));

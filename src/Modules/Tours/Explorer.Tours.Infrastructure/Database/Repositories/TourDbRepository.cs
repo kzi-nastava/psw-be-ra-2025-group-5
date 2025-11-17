@@ -25,6 +25,13 @@ public class TourDbRepository : ITourRepository
         return task.Result;
     }
 
+    public PagedResult<Tour> GetPagedByAuthor(long authorId, int page, int pageSize)
+    {
+        var task = _dbSet.Where(t => t.AuthorId == authorId).GetPagedById(page, pageSize);
+        task.Wait();
+        return task.Result;
+    }
+
     public Tour Get(long id)
     {
         var entity = _dbSet.Find(id);

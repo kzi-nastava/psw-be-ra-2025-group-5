@@ -19,9 +19,9 @@ public class TourController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<PagedResult<TourDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
+    public ActionResult<PagedResult<TourDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] long? authorId)
     {
-        return Ok(_TourService.GetPaged(page, pageSize));
+        return authorId.HasValue ? Ok(_TourService.GetPagedByAuthor((long)authorId, page, pageSize)) : Ok(_TourService.GetPaged(page, pageSize));
     }
 
     [HttpPost]
