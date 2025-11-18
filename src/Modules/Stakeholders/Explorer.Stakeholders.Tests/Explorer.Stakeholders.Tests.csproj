@@ -14,19 +14,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		    <Content Include="TestData\d-preferences-delete.sql">
-  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-</Content><Content Include="TestData\a-delete.sql">
-			      <CopyToOutputDirectory>Always</CopyToOutputDirectory>  
+		<Content Include="TestData\a-delete.sql">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>  
 		</Content>
-		    <Content Include="TestData\b-users.sql">
-			      <CopyToOutputDirectory>Always</CopyToOutputDirectory>  
-		</Content><Content Include="TestData\e-preferences.sql">
-  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-</Content>
-		    <Content Include="TestData\c-people.sql">
-			      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		<Content Include="TestData\b-users.sql">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>  
 		</Content>
+		<Content Include="TestData\c-people.sql">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="TestData\d-preferences.sql">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		    
 		    
 		    
 	</ItemGroup>
