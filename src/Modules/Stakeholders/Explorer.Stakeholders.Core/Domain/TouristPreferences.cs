@@ -30,7 +30,7 @@ public class TouristPreferences : Entity
 
     private void Validate()
     {
-        if (UserId <= 0) throw new ArgumentException("Invalid UserId");
+        if (UserId == 0) throw new ArgumentException("Invalid UserId");
         foreach (var rating in TransportationRatings.Values)
         {
             if (rating < 0 || rating > 3) throw new ArgumentException("Transportation rating must be between 0 and 3");
