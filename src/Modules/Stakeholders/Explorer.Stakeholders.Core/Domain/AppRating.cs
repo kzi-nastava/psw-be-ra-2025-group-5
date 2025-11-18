@@ -1,0 +1,34 @@
+﻿using Explorer.BuildingBlocks.Core.Domain;
+
+namespace Explorer.Stakeholders.Core.Domain;
+
+public class AppRating : Entity
+{
+    public long UserId { get; private set; }
+    public int Rating { get; private set; }
+    public string? Comment { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+
+    public AppRating(long userId, int rating, string? comment)
+    {
+        if (rating < 1 || rating > 5)
+            throw new ArgumentException("Rating must be 1–5.");
+
+        if (userId <= 0)
+            throw new ArgumentException("Invalid UserId.");
+
+        UserId = userId;
+        Rating = rating;
+        Comment = comment;
+        CreatedAt = DateTime.UtcNow;
+    }
+
+    public void Update(int rating, string? comment)
+    {
+        if (rating < 1 || rating > 5)
+            throw new ArgumentException("Rating must be 1–5.");
+
+        Rating = rating;
+        Comment = comment;
+    }
+}

@@ -1,10 +1,14 @@
 using AutoMapper;
+using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.Core.Domain;
 
-namespace Explorer.Stakeholders.Core.Mappers;
-
-public class StakeholderProfile : Profile
+namespace Explorer.Stakeholders.Core.Mappers
 {
-    public StakeholderProfile()
+    public class StakeholderProfile : Profile
     {
+        public StakeholderProfile()
+        {
+            CreateMap<AppRatingDto, AppRating>().ReverseMap();
+        }
     }
 }
