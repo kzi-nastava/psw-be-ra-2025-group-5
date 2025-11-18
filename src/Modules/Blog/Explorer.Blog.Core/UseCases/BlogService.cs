@@ -21,6 +21,12 @@ namespace Explorer.Blog.Core.UseCases
             _mapper = mapper;
         }
 
+        public List<BlogPostDto> GetAll()
+        {
+            var result = _blogRepository.GetAll();
+            return _mapper.Map<List<BlogPostDto>>(result);
+        }
+
         public BlogPostDto GetById(long id)
         {
             var result = _blogRepository.GetById(id);
@@ -33,18 +39,59 @@ namespace Explorer.Blog.Core.UseCases
             return _mapper.Map<List<BlogPostDto>>(result);
         }
 
-        public BlogPostDto Create(BlogPostDto dto)
+        public BlogPostDto Create(CreateBlogPostDto dto, long authorId)
         {
-            var domain = _mapper.Map<BlogPost>(dto);
-            var result = _blogRepository.Create(domain);
-            return _mapper.Map<BlogPostDto>(result);
+            var post = new BlogPost(
+                authorId: authorId, 
+                title: dto.Title,
+                description: dto.Description,
+                createdAt: DateTime.UtcNow
+            );
+
+            _blogRepository.Create(post); 
+
+            return _mapper.Map<BlogPostDto>(post);
         }
 
-        public BlogPostDto Update(BlogPostDto dto)
+        public BlogPostDto Update(long id, UpdateBlogPostDto dto, long authorId)
         {
-            var domain = _mapper.Map<BlogPost>(dto);
-            var result = _blogRepository.Update(domain);
-            return _mapper.Map<BlogPostDto>(result);
+            var post = _blogRepository.GetById(id);
+            if (post == null) return null;
+
+            if (post.AuthorId != authorId)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            post.Title = dto.Title;
+            post.Description = dto.Description;
+
+            _blogRepository.Update(post);
+            return _mapper.Map<BlogPostDto>(post);
+        }
+        public BlogImageDto AddImage(long postId, BlogImageDto dto)
+        {
+            var image = _mapper.Map<BlogImage>(dto);
+            image.BlogPostId = postId;
+
+            _blogRepository.AddImage(image);
+            return _mapper.Map<BlogImageDto>(image);
+        }
+
+        public BlogImageDto UpdateImage(BlogImageDto dto)
+        {
+            var domain = _mapper.Map<BlogImage>(dto);
+
+            var updated = _blogRepository.UpdateImage(domain);
+            if (updated == null) return null;
+
+            return _mapper.Map<BlogImageDto>(updated);
+        }
+
+        public BlogImageDto GetImage(long id)
+        {
+            var img = _blogRepository.GetImage(id);
+            if (img == null) return null;
+
+            return _mapper.Map<BlogImageDto>(img);
         }
     }
 }

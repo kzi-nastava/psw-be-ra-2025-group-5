@@ -10,7 +10,7 @@ namespace Explorer.Blog.API.Dtos
     {
         public long Id { get; set; }
         public int Order { get; set; }
-        public string FileName { get; set; }
+        public string Base64 { get; set; }
         public string ContentType { get; set; }
     }
 }

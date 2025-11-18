@@ -20,7 +20,7 @@ namespace Explorer.Blog.Core.Domain
             AuthorId = authorId;
             Title = title;
             Description = description;
-            CreatedAt = createdAt;
+            CreatedAt = createdAt; 
             Validate(); 
         }
 
