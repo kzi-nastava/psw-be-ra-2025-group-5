@@ -18,9 +18,9 @@ namespace Explorer.Tours.Core.UseCases.Administration
             _mapper = mapper;
         }
 
-        public PagedResult<TouristEquipmentDto> GetPaged(int page, int pageSize)
+        public PagedResult<TouristEquipmentDto> GetPaged(long touristId, int page, int pageSize)
         {
-            var result = _touristEquipmentRepository.GetPaged(page, pageSize);
+            var result = _touristEquipmentRepository.GetPagedByTouristId(touristId, page, pageSize);
 
             var items = result.Results.Select(_mapper.Map<TouristEquipmentDto>).ToList();
             return new PagedResult<TouristEquipmentDto>(items, result.TotalCount);

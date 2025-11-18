@@ -9,10 +9,10 @@ namespace Explorer.Tours.Core.Domain
 {
     public class TouristEquipment : Entity
     {
-        public int TouristId { get; init; }
-        public int EquipmentId { get; init; }
+        public long TouristId { get; init; }
+        public long EquipmentId { get; init; }
 
-        public TouristEquipment(int touristId, int equipmentId)
+        public TouristEquipment(long touristId, long equipmentId)
         {
             if (touristId == 0) throw new ArgumentException("Invalid TouristId.");
             if (equipmentId == 0) throw new ArgumentException("Invalid EquipmentId.");

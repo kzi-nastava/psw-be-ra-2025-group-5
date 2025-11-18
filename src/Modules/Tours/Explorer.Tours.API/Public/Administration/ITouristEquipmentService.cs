@@ -10,7 +10,7 @@ namespace Explorer.Tours.API.Public.Administration
 {
     public interface ITouristEquipmentService
     {
-        PagedResult<TouristEquipmentDto> GetPaged(int page, int pageSize);
+        PagedResult<TouristEquipmentDto> GetPaged(long touristId, int page, int pageSize);
         TouristEquipmentDto Create(TouristEquipmentDto touristEquipment);
         TouristEquipmentDto Update(TouristEquipmentDto touristEquipment);
         void Delete(long id);

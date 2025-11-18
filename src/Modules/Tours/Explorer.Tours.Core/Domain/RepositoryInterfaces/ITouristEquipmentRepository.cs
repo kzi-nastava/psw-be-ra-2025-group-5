@@ -9,7 +9,7 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
 {
     public interface ITouristEquipmentRepository
     {
-        PagedResult<TouristEquipment> GetPaged(int page, int pageSize);
+        PagedResult<TouristEquipment> GetPagedByTouristId(long touristId, int page, int pageSize);
         TouristEquipment Create(TouristEquipment map);
         TouristEquipment Update(TouristEquipment map);
         void Delete(long id);
