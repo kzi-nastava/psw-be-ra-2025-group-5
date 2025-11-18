@@ -16,11 +16,13 @@ public class Tour : Entity
     public double Price { get; init; }
     public TourStatus Status { get; init; }
 
-    public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags)
+    public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0, TourStatus status = TourStatus.Draft)
     {
         Guard.AgainstNull(authorId, nameof(authorId));
+        Guard.AgainstNegative(price, nameof(price));
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstInvalidEnum(difficulty, nameof(difficulty));
+        Guard.AgainstInvalidEnum(status, nameof(status));
         Guard.AgainstDuplicateStrings(tags, nameof(tags));
 
         AuthorId = authorId;
@@ -28,7 +30,7 @@ public class Tour : Entity
         Description = description;
         Difficulty = difficulty;
         Tags = tags;
-        Price = 0.0;
-        Status = TourStatus.Draft;
+        Price = price;
+        Status = status;
     }
 }
