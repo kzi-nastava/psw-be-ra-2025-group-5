@@ -35,7 +35,7 @@ namespace Explorer.API.Controllers.Administrator.Administration
         }
 
         [HttpDelete("{id:long}")]
-        public ActionResult Delete([FromBody] int id) { 
+        public ActionResult Delete([FromBody] long id) { 
             _monumentService.Delete(id);
             return Ok();
         }

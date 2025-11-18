@@ -14,6 +14,6 @@ namespace Explorer.Tours.API.Public.Administration
         public PagedResult<MonumentDto> GetPaged(int  page, int pageSize);
         public MonumentDto Create(MonumentDto monumentDto);
         public MonumentDto Update(MonumentDto monumentDto);
-        public void Delete(int id);
+        public void Delete(long id);
     }
 }

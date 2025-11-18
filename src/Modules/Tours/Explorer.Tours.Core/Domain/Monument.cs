@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Explorer.BuildingBlocks.Core.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Explorer.BuildingBlocks.Core.Domain;
+using System.Xml.Linq;
 
 namespace Explorer.Tours.Core.Domain
 {
@@ -15,8 +16,10 @@ namespace Explorer.Tours.Core.Domain
         public MonumentStatus Status { get; set; }
         public MonumentLocation Location { get; set; }
 
+        public Monument() { }
         public Monument(string Name, string? Description, int Year, MonumentStatus status, MonumentLocation location)
         {
+            if (string.IsNullOrWhiteSpace(Name)) throw new ArgumentException("Invalid Name.");
             this.Name = Name;
             this.Description = Description;
             this.Year = Year;

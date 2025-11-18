@@ -11,6 +11,7 @@ namespace Explorer.Tours.Core.Domain
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
+        public MonumentLocation() { }
         public MonumentLocation(double latitude, double longitude)
         {
             Latitude = latitude;

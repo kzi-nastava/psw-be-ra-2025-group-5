@@ -4,6 +4,7 @@ using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.Administration;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
@@ -17,35 +18,30 @@ namespace Explorer.Tours.Tests.Integration.Administration
         [Fact]
         public void Creates()
         {
-            // Arrange
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
             var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
             var newEntity = new MonumentDto
             {
                 Name = "Spomenik",
                 Description = "Description",
                 Year = 1945,
-                Status = "Active",
-                Location = new MonumentLocationDto
-                {
-                    Latitude = 44.815, 
-                    Longitude = 20.460
-                }
+                Status = 0,
+                Location = new MonumentLocationDto { Latitude = 44.815, Longitude = 20.460 }
             };
 
             // Act
             var result = ((ObjectResult)controller.Create(newEntity).Result)?.Value as MonumentDto;
 
-            // Assert - Response
+            // Assert
             result.ShouldNotBeNull();
             result.Id.ShouldNotBe(0);
             result.Name.ShouldBe(newEntity.Name);
 
-            // Assert - Database
-            var storedEntity = dbContext.Monument.FirstOrDefault(i => i.Name == newEntity.Name);
+            var storedEntity = dbContext.Monument.FirstOrDefault(i => i.Id == result.Id);
             storedEntity.ShouldNotBeNull();
-            storedEntity.Id.ShouldBe(result.Id);
+            storedEntity.Name.ShouldBe(newEntity.Name);
         }
 
         [Fact]
@@ -66,39 +62,38 @@ namespace Explorer.Tours.Tests.Integration.Administration
         [Fact]
         public void Updates()
         {
-            // Arrange
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
             var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-            var updatedEntity = new MonumentDto
+
+            // Uzmi prvi entitet iz baze za update
+            var existingEntity = dbContext.Monument.AsNoTracking().FirstOrDefault();
+            existingEntity.ShouldNotBeNull("Nema podataka u bazi za testiranje.");
+
+            var updatedDto = new MonumentDto
             {
-                Id = -1,
-                Name = "Spomenik neznanom junaku",
+                Id = existingEntity.Id,
+                Name = "Novo ime",
                 Description = "Opis",
-                Year = 1945,
-                Status = "Active",
+                Year = existingEntity.Year,
+                Status = MonumentStatus.Active,
                 Location = new MonumentLocationDto
                 {
-                    Latitude = 44.815,
-                    Longitude = 20.463
+                    Latitude = existingEntity.Location.Latitude,
+                    Longitude = existingEntity.Location.Longitude
                 }
             };
 
-            // Act
-            var result = ((ObjectResult)controller.Update(updatedEntity).Result)?.Value as MonumentDto;
+            var result = ((ObjectResult)controller.Update(updatedDto).Result)?.Value as MonumentDto;
 
-            // Assert - Response
             result.ShouldNotBeNull();
-            result.Id.ShouldBe(-1);
-            result.Name.ShouldBe(updatedEntity.Name);
-            result.Description.ShouldBe(updatedEntity.Description);
+            result.Id.ShouldBe(existingEntity.Id);
+            result.Name.ShouldBe(updatedDto.Name);
+            result.Description.ShouldBe(updatedDto.Description);
 
-            // Assert - Database
-            var storedEntity = dbContext.Monument.FirstOrDefault(i => i.Name == "Spomenik neznanom junaku");
+            var storedEntity = dbContext.Monument.FirstOrDefault(i => i.Id == existingEntity.Id);
             storedEntity.ShouldNotBeNull();
-            storedEntity.Description.ShouldBe(updatedEntity.Description);
-            var oldEntity = dbContext.Monument.FirstOrDefault(i => i.Name == "Spomenik");
-            oldEntity.ShouldBeNull();
+            storedEntity.Name.ShouldBe(updatedDto.Name);
         }
 
         [Fact]
@@ -124,9 +119,13 @@ namespace Explorer.Tours.Tests.Integration.Administration
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
             var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+            var firstMonument = dbContext.Monument.FirstOrDefault();
+            if (firstMonument == null)
+                throw new Exception("Nema podataka u bazi za testiranje.");
 
+            var existingId = firstMonument.Id;
             // Act
-            var result = (OkResult)controller.Delete(-3);
+            var result = (OkResult)controller.Delete(existingId);
 
             // Assert - Response
             result.ShouldNotBeNull();

@@ -40,7 +40,7 @@ namespace Explorer.Tours.Core.UseCases.Administration
             return _mapper.Map<MonumentDto>(result);
         }
 
-        public void Delete(int id) {
+        public void Delete(long id) {
             _monumentRepository.Delete(id);
         }
     }
