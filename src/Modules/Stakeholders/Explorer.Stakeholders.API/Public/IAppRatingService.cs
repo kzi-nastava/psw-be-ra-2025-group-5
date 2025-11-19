@@ -1,12 +1,15 @@
-﻿using Explorer.Stakeholders.API.Dtos;
+﻿    using Explorer.Stakeholders.API.Dtos;
 
-namespace Explorer.Stakeholders.API.Public
-{
-    public interface IAppRatingService
+    namespace Explorer.Stakeholders.API.Public
     {
-        AppRatingDto Create(AppRatingDto dto);
-        AppRatingDto Update(AppRatingDto dto);
-        void Delete(long id);
-        IEnumerable<AppRatingDto> GetAll();
+        public interface IAppRatingService
+        {
+            AppRatingDto Create(AppRatingDto dto);
+            AppRatingDto Update(AppRatingDto dto);
+            void Delete(long id);
+            IEnumerable<AppRatingDto> GetAll();
+            AppRatingDto Get(long id);
+           IEnumerable<AppRatingDto> GetByUserId(long userId);
+
     }
 }

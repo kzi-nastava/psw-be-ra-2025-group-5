@@ -7,8 +7,9 @@ public class StakeholdersContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Person> People { get; set; }
+    public DbSet<AppRating> AppRatings { get; set; }
 
-    public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) {}
+    public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -17,6 +18,7 @@ public class StakeholdersContext : DbContext
         modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
 
         ConfigureStakeholder(modelBuilder);
+        ConfigureAppRating(modelBuilder);   
     }
 
     private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -25,5 +27,23 @@ public class StakeholdersContext : DbContext
             .HasOne<User>()
             .WithOne()
             .HasForeignKey<Person>(s => s.UserId);
+    }
+
+    private static void ConfigureAppRating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AppRating>()
+            .Property(x => x.CreatedAt)
+            .HasConversion(
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+        modelBuilder.Entity<AppRating>()
+            .Property(x => x.Rating)
+            .IsRequired();
+
+        modelBuilder.Entity<AppRating>()
+            .Property(x => x.UserId)
+            .IsRequired();
     }
 }

@@ -8,7 +8,10 @@ namespace Explorer.Stakeholders.Core.Mappers
     {
         public StakeholderProfile()
         {
-            CreateMap<AppRatingDto, AppRating>().ReverseMap();
+
+            CreateMap<AppRating, AppRatingDto>().ReverseMap();
+            CreateMap<AppRatingDto, AppRating>()
+                .ConstructUsing(dto => new AppRating(dto.UserId, dto.Rating, dto.Comment));
         }
     }
 }

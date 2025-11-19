@@ -9,13 +9,13 @@ public class AppRating : Entity
     public string? Comment { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+    protected AppRating() { }
     public AppRating(long userId, int rating, string? comment)
     {
         if (rating < 1 || rating > 5)
             throw new ArgumentException("Rating must be 1–5.");
 
-        if (userId <= 0)
-            throw new ArgumentException("Invalid UserId.");
+    
 
         UserId = userId;
         Rating = rating;

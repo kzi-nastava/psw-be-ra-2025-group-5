@@ -26,24 +26,34 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
 
         public AppRating Update(AppRating rating)
         {
-            _dbSet.Update(rating);
+            // Attach i označi kao Modified
+            _dbContext.Entry(rating).State = EntityState.Modified;
             _dbContext.SaveChanges();
             return rating;
         }
 
         public void Delete(long id)
         {
+            // Koristimo Find da direktno dohvatimo entitet po primary key
             var entity = _dbSet.Find(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
-                _dbContext.SaveChanges();
-            }
+
+            if (entity == null)
+                throw new KeyNotFoundException($"AppRating sa Id={id} ne postoji.");
+
+            // Označavamo entitet kao Deleted
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+
+            // Sačuvaj promene
+            _dbContext.SaveChanges();
         }
 
         public IEnumerable<AppRating> GetAll()
         {
-            return _dbSet.AsNoTracking().ToList();
+            return _dbSet.ToList();
+        }
+        public AppRating Get(long id)
+        {
+            return _dbSet.FirstOrDefault(x => x.Id == id);
         }
     }
 }
