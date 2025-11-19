@@ -5,9 +5,11 @@ using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Public.Administration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Explorer.API.Controllers.Blog;
 
+[Authorize(Policy = "authorOrTouristPolicy")]
 [ApiController]
 [Route("api/blog")]
 public class BlogController : ControllerBase
