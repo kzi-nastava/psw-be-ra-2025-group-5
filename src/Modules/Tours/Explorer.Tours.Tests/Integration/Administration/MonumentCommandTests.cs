@@ -132,7 +132,7 @@ namespace Explorer.Tours.Tests.Integration.Administration
             result.StatusCode.ShouldBe(200);
 
             // Assert - Database
-            var storedCourse = dbContext.Monument.FirstOrDefault(i => i.Id == -3);
+            var storedCourse = dbContext.Monument.FirstOrDefault(i => i.Id == existingId);
             storedCourse.ShouldBeNull();
         }
 
