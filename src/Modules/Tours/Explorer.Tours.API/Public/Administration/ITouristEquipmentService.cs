@@ -1,10 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Tours.API.Public.Administration
 {
@@ -12,7 +7,7 @@ namespace Explorer.Tours.API.Public.Administration
     {
         PagedResult<TouristEquipmentDto> GetPaged(long touristId, int page, int pageSize);
         TouristEquipmentDto Create(TouristEquipmentDto touristEquipment);
-        TouristEquipmentDto Update(TouristEquipmentDto touristEquipment);
-        void Delete(long id);
+        TouristEquipmentDto Update(TouristEquipmentDto touristEquipment, long touristId);
+        void Delete(long id, long touristId);
     }
 }

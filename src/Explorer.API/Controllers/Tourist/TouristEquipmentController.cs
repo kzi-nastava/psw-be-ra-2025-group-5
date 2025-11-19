@@ -20,32 +20,35 @@ public class TouristEquipmentController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<PagedResult<TouristEquipmentDto>> GetOwnedEquipment([FromQuery] long touristId,[FromQuery] int  page, [FromQuery]int pageSize)
+    public ActionResult<PagedResult<TouristEquipmentDto>> GetOwnedEquipment([FromQuery] int page, [FromQuery] int pageSize)
     {
-        //var touristId = User.PersonId();
-
+        var touristId = User.PersonId();
         return Ok(_touristEquipmentService.GetPaged(touristId, page, pageSize));
     }
 
     [HttpPost]
     public ActionResult<TouristEquipmentDto> Create([FromBody] TouristEquipmentDto touristEquipment)
     {
-        //touristEquipment.TouristId = User.PersonId();
+        touristEquipment.TouristId = User.PersonId();
         return Ok(_touristEquipmentService.Create(touristEquipment));
     }
 
     [HttpPut("{id:long}")]
     public ActionResult<TouristEquipmentDto> Update([FromBody] TouristEquipmentDto touristEquipment)
     {
-        //touristEquipment.TouristId = User.PersonId();
-        return Ok(_touristEquipmentService.Update(touristEquipment));
+        var touristId = User.PersonId();
+
+        touristEquipment.TouristId = touristId;
+
+        return Ok(_touristEquipmentService.Update(touristEquipment, touristId));
     }
 
     [HttpDelete("{id:long}")]
     public ActionResult Delete(long id)
     {
-        _touristEquipmentService.Delete(id);
+        var touristId = User.PersonId();
+
+        _touristEquipmentService.Delete(id, touristId);
         return Ok();
     }
-
 }
