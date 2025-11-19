@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Explorer.Tours.Core.Domain;
+using Explorer.Tours;
 
 namespace Explorer.Tours.API.Dtos;
 
@@ -27,4 +27,21 @@ public class TourProblemDto
     public DateTimeOffset OccurredAt { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+}
+
+public enum ProblemCategory
+{
+    Safety,
+    Navigation,
+    Content,
+    Accessibility,
+    Other
+}
+
+public enum ProblemPriority
+{
+    Low,
+    Medium,
+    High,
+    Critical
 }
