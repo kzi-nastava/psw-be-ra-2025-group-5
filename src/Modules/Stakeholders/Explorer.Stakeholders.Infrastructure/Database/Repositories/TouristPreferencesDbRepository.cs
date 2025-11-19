@@ -16,11 +16,16 @@ public class TouristPreferencesDbRepository : ITouristPreferencesRepository
         _dbSet = DbContext.Set<TouristPreferences>();
     }
 
-    public TouristPreferences Get(long userId)
+    //public TouristPreferences Get(long userId)
+    //{
+    //    var entity = _dbSet.FirstOrDefault(tp => tp.UserId == userId);
+    //    if (entity == null) throw new NotFoundException("Not found: " + userId);
+    //    return entity;
+    //}
+
+    public TouristPreferences? Get(long userId)
     {
-        var entity = _dbSet.FirstOrDefault(tp => tp.UserId == userId);
-        if (entity == null) throw new NotFoundException("Not found: " + userId);
-        return entity;
+        return _dbSet.FirstOrDefault(tp => tp.UserId == userId);
     }
 
     public TouristPreferences Create(TouristPreferences entity)
@@ -51,6 +56,7 @@ public class TouristPreferencesDbRepository : ITouristPreferencesRepository
     public void Delete(long userId)
     {
         var entity = Get(userId);
+        if (entity == null) throw new NotFoundException("Not found: " + userId);
         _dbSet.Remove(entity);
         DbContext.SaveChanges();
     }
