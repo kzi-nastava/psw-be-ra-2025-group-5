@@ -7,8 +7,6 @@ using Explorer.Stakeholders.Core.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Explorer.Stakeholders.API.Dtos;
 
 namespace Explorer.Stakeholders.Core.UseCases
@@ -19,7 +17,7 @@ namespace Explorer.Stakeholders.Core.UseCases
         private readonly IMapper _mapper;
 
         public ClubService(IClubRepository clubRepository, IMapper mapper)
-        { 
+        {
             _clubRepository = clubRepository;
             _mapper = mapper;
         }
@@ -28,10 +26,15 @@ namespace Explorer.Stakeholders.Core.UseCases
         {
             try
             {
+                // Konvertuj Base64 stringove u byte[]
+                var imageBytes = clubDto.Images
+                    .Select(base64 => Convert.FromBase64String(base64))
+                    .ToList();
+
                 var club = new Club(
                     clubDto.Name,
                     clubDto.Description,
-                    clubDto.Images,
+                    imageBytes,
                     clubDto.CreatorId
                 );
 
@@ -41,6 +44,10 @@ namespace Explorer.Stakeholders.Core.UseCases
             catch (ArgumentException ex)
             {
                 throw new EntityValidationException(ex.Message);
+            }
+            catch (FormatException ex)
+            {
+                throw new EntityValidationException("Invalid image format: " + ex.Message);
             }
         }
 
@@ -59,10 +66,22 @@ namespace Explorer.Stakeholders.Core.UseCases
 
             try
             {
+                List<byte[]> imageBytes;
+                if (clubDto.Images != null && clubDto.Images.Count > 0)
+                {
+                    imageBytes = clubDto.Images
+                        .Select(base64 => Convert.FromBase64String(base64))
+                        .ToList();
+                }
+                else
+                {
+                    imageBytes = existingClub.Images;
+                }
+
                 var updatedClub = new Club(
                     clubDto.Name,
                     clubDto.Description,
-                    clubDto.Images,
+                    imageBytes,
                     clubDto.CreatorId
                 );
 
@@ -76,19 +95,18 @@ namespace Explorer.Stakeholders.Core.UseCases
             {
                 throw new EntityValidationException(ex.Message);
             }
+            catch (FormatException ex)
+            {
+                throw new EntityValidationException("Invalid image format: " + ex.Message);
+            }
         }
 
-        public void Delete(long id, long userId)
+        public void Delete(long id)
         {
             var club = _clubRepository.GetById(id);
             if (club == null)
             {
                 throw new KeyNotFoundException($"Club with ID {id} not found.");
-            }
-
-            if (club.CreatorId != userId)
-            {
-                throw new UnauthorizedAccessException("You can only delete your own clubs.");
             }
 
             _clubRepository.Delete(id);
@@ -101,12 +119,12 @@ namespace Explorer.Stakeholders.Core.UseCases
             {
                 throw new KeyNotFoundException($"Club with ID {id} not found.");
             }
-
             return _mapper.Map<ClubDto>(club);
         }
+
         public List<ClubDto> GetAll()
         {
-            var clubs = _clubRepository.GetAll(); 
+            var clubs = _clubRepository.GetAll();
             return _mapper.Map<List<ClubDto>>(clubs);
         }
     }

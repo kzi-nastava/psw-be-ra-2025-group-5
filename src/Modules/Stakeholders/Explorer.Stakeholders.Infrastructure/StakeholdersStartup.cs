@@ -17,6 +17,7 @@ public static class StakeholdersStartup
     public static IServiceCollection ConfigureStakeholdersModule(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(StakeholderProfile).Assembly);
+        services.AddAutoMapper(typeof(ClubProfile).Assembly);
         SetupCore(services);
         SetupInfrastructure(services);
         return services;
@@ -26,12 +27,14 @@ public static class StakeholdersStartup
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ITokenGenerator, JwtGenerator>();
+        services.AddScoped<IClubService, ClubService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
     {
         services.AddScoped<IPersonRepository, PersonDbRepository>();
         services.AddScoped<IUserRepository, UserDbRepository>();
+        services.AddScoped<IClubRepository, ClubDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
         dataSourceBuilder.EnableDynamicJson();
