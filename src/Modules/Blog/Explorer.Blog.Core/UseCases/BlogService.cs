@@ -29,8 +29,15 @@ namespace Explorer.Blog.Core.UseCases
 
         public BlogPostDto GetById(long id)
         {
-            var result = _blogRepository.GetById(id);
-            return _mapper.Map<BlogPostDto>(result);
+            var post = _blogRepository.GetById(id);
+            if (post == null) return null;
+
+            var images = _blogRepository.GetImagesByPostId(id);
+
+            var dto = _mapper.Map<BlogPostDto>(post);
+            dto.Images = _mapper.Map<List<BlogImageDto>>(images);
+
+            return dto;
         }
 
         public List<BlogPostDto> GetByAuthor(long authorId)
@@ -69,12 +76,40 @@ namespace Explorer.Blog.Core.UseCases
         }
         public BlogImageDto AddImage(long postId, BlogImageDto dto)
         {
-            var image = _mapper.Map<BlogImage>(dto);
-            image.BlogPostId = postId;
+            try
+            {
+                byte[] bytes = null;
 
-            _blogRepository.AddImage(image);
-            return _mapper.Map<BlogImageDto>(image);
+                if (!string.IsNullOrWhiteSpace(dto.Base64))
+                {
+                    var base64 = dto.Base64.Contains(",")
+                        ? dto.Base64.Split(',')[1]
+                        : dto.Base64;
+
+                    bytes = Convert.FromBase64String(base64);
+                }
+                else
+                {
+                    throw new Exception("Base64 data missing");
+                }
+
+                var image = new BlogImage(
+                    blogPostId: postId,
+                    data: bytes,
+                    contentType: dto.ContentType,
+                    order: dto.Order
+                );
+
+                _blogRepository.AddImage(image);
+
+                return _mapper.Map<BlogImageDto>(image);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AddImage FAILED: " + ex.Message);
+            }
         }
+
 
         public BlogImageDto UpdateImage(BlogImageDto dto)
         {
@@ -91,7 +126,38 @@ namespace Explorer.Blog.Core.UseCases
             var img = _blogRepository.GetImage(id);
             if (img == null) return null;
 
-            return _mapper.Map<BlogImageDto>(img);
+            return new BlogImageDto
+            {
+                Id = img.Id,
+                Base64 = Convert.ToBase64String(img.Data),
+                ContentType = img.ContentType,
+                Order = img.Order
+            };
         }
+
+        public List<BlogImageDto> GetImagesByPostId(long postId)
+        {
+            var result = _blogRepository.GetImagesByPostId(postId);
+
+            return result
+                .Select(img => new BlogImageDto
+                {
+                    Id = img.Id,
+                    Base64 = Convert.ToBase64String(img.Data),
+                    ContentType = img.ContentType,
+                    Order = img.Order
+                })
+                .ToList();
+        }
+
+        public bool DeleteImage(long imageId)
+        {
+            var image = _blogRepository.GetImage(imageId);
+            if (image == null) return false;
+
+            _blogRepository.DeleteImage(image);
+            return true;
+        }
+
     }
 }

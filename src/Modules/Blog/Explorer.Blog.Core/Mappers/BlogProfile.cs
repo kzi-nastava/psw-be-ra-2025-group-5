@@ -14,8 +14,6 @@ public class BlogProfile : Profile
            .ForMember(dest => dest.Base64,
                opt => opt.MapFrom(src => Convert.ToBase64String(src.Data)));
 
-        CreateMap<BlogImageDto, BlogImage>()
-            .ForMember(dest => dest.Data,
-                opt => opt.MapFrom(src => Convert.FromBase64String(src.Base64)));
+        CreateMap<BlogImageDto, BlogImage>().ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

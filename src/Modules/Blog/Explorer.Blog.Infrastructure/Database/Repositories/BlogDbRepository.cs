@@ -51,6 +51,21 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
         }
 
         public BlogImage? GetImage(long id) => _dbContext.BlogImages.FirstOrDefault(x => x.Id == id);
-        
+
+        public List<BlogImage> GetImagesByPostId(long postId)
+        {
+            return _dbContext.BlogImages
+                .Where(i => i.BlogPostId == postId)
+                .OrderBy(i => i.Order)
+                .ToList();
+        }
+
+        public void DeleteImage(BlogImage image)
+        {
+            _dbContext.BlogImages.Remove(image);
+            _dbContext.SaveChanges();
+        }
+
+
     }
 }

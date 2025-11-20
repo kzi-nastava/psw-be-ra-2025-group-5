@@ -84,8 +84,41 @@ public class BlogController : ControllerBase
     [HttpGet("images/{imageId:long}")]
     public IActionResult GetImage(long imageId)
     {
-        var result = _blogService.GetImage(imageId);
-        return result == null ? NotFound() : Ok(result);
+        var dto = _blogService.GetImage(imageId);
+        if (dto == null) return NotFound();
+
+        if (string.IsNullOrWhiteSpace(dto.Base64))
+            return BadRequest("Image data missing");
+
+        byte[] data;
+
+        try
+        {
+            data = Convert.FromBase64String(dto.Base64);
+        }
+        catch
+        {
+            return BadRequest("Invalid Base64 format");
+        }
+
+        return File(data, dto.ContentType);
     }
+
+    [HttpGet("{postId:long}/images")]
+    public IActionResult GetImagesByPostId(long postId)
+    {
+        var images = _blogService.GetImagesByPostId(postId);
+        return Ok(images);
+    }
+
+    [HttpDelete("images/{imageId:long}")]
+    public IActionResult DeleteImage(long imageId)
+    {
+        var result = _blogService.DeleteImage(imageId);
+        if (!result) return NotFound();
+        return NoContent();
+    }
+
+
 }
 
