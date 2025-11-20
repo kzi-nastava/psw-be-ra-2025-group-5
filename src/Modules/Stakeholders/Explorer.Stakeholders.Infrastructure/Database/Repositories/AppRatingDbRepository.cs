@@ -26,7 +26,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
 
         public AppRating Update(AppRating rating)
         {
-            // Attach i označi kao Modified
+           
             _dbContext.Entry(rating).State = EntityState.Modified;
             _dbContext.SaveChanges();
             return rating;
@@ -34,16 +34,13 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
 
         public void Delete(long id)
         {
-            // Koristimo Find da direktno dohvatimo entitet po primary key
             var entity = _dbSet.Find(id);
 
             if (entity == null)
                 throw new KeyNotFoundException($"AppRating sa Id={id} ne postoji.");
 
-            // Označavamo entitet kao Deleted
             _dbContext.Entry(entity).State = EntityState.Deleted;
 
-            // Sačuvaj promene
             _dbContext.SaveChanges();
         }
 
