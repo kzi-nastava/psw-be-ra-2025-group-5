@@ -17,5 +17,8 @@ public class ToursProfile : Profile
         CreateMap<string, TourStatus>().ConvertUsing(static src => Enum.Parse<TourStatus>(src, true));
 
         CreateMap<Tour, TourDto>().ReverseMap();
+
+        CreateMap<MonumentLocationDto, MonumentLocation>().ReverseMap();
+        CreateMap<MonumentDto, Monument>().ReverseMap();
     }
 }
