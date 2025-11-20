@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Explorer.API.Controllers.Tourist
-{
-    [Authorize(Policy = "touristPolicy")]
+{ 
+    //[Authorize(Policy = "touristPolicy")] ne radi sa ovim
+    [Authorize(Roles = "Tourist")]
     [Route("api/clubs")]
     [ApiController]
     public class ClubController : ControllerBase
