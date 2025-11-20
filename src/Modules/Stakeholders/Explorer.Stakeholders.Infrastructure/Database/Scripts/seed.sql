@@ -1,4 +1,7 @@
-﻿INSERT INTO stakeholders."Users"(
+﻿DELETE FROM stakeholders."People";
+DELETE FROM stakeholders."Users";
+
+INSERT INTO stakeholders."Users"(
     "Id", "Username", "Password", "Email", "Role", "IsActive")
 VALUES (-1, 'admin@gmail.com', 'admin', 'admin@gmail.com', 0, true);
 
@@ -21,3 +24,23 @@ VALUES (-22, 'turista2@gmail.com', 'turista2', 'turista2@gmail.com', 2, true);
 INSERT INTO stakeholders."Users"(
     "Id", "Username", "Password", "Email", "Role", "IsActive")
 VALUES (-23, 'turista3@gmail.com', 'turista3', 'turista3@gmail.com', 2, true);
+
+INSERT INTO stakeholders."People"(
+    "Id", "UserId", "Name", "Surname", "Email")
+VALUES (-11, -11, 'Ana', 'Anić', 'autor1@gmail.com');
+INSERT INTO stakeholders."People"(
+    "Id", "UserId", "Name", "Surname", "Email")
+VALUES (-12, -12, 'Lena', 'Lenić', 'autor2@gmail.com');
+INSERT INTO stakeholders."People"(
+    "Id", "UserId", "Name", "Surname", "Email")
+VALUES (-13, -13, 'Sara', 'Sarić', 'autor3@gmail.com');
+
+INSERT INTO stakeholders."People"(
+    "Id", "UserId", "Name", "Surname", "Email")
+VALUES (-21, -21, 'Pera', 'Perić', 'turista1@gmail.com');
+INSERT INTO stakeholders."People"(
+    "Id", "UserId", "Name", "Surname", "Email")
+VALUES (-22, -22, 'Mika', 'Mikić', 'turista2@gmail.com');
+INSERT INTO stakeholders."People"(
+    "Id", "UserId", "Name", "Surname", "Email")
+VALUES (-23, -23, 'Steva', 'Stević', 'turista3@gmail.com');
