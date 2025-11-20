@@ -56,7 +56,7 @@ namespace Explorer.Stakeholders.Core.UseCases
             var existingClub = _clubRepository.GetById(clubDto.Id);
             if (existingClub == null)
             {
-                throw new KeyNotFoundException($"Club with ID {clubDto.Id} not found.");
+                throw new NotFoundException($"Club with ID {clubDto.Id} not found.");
             }
 
             if (existingClub.CreatorId != clubDto.CreatorId)
@@ -66,17 +66,14 @@ namespace Explorer.Stakeholders.Core.UseCases
 
             try
             {
-                List<byte[]> imageBytes;
-                if (clubDto.Images != null && clubDto.Images.Count > 0)
+                if (clubDto.Images == null || clubDto.Images.Count == 0)
                 {
-                    imageBytes = clubDto.Images
-                        .Select(base64 => Convert.FromBase64String(base64))
-                        .ToList();
+                    throw new ArgumentException("Club must have at least one image.");
                 }
-                else
-                {
-                    imageBytes = existingClub.Images;
-                }
+
+                List<byte[]> imageBytes = clubDto.Images
+                    .Select(base64 => Convert.FromBase64String(base64))
+                    .ToList();
 
                 var updatedClub = new Club(
                     clubDto.Name,
@@ -101,13 +98,16 @@ namespace Explorer.Stakeholders.Core.UseCases
             }
         }
 
-        public void Delete(long id)
+        public void Delete(long userId, long id)
         {
             var club = _clubRepository.GetById(id);
             if (club == null)
             {
-                throw new KeyNotFoundException($"Club with ID {id} not found.");
+                throw new NotFoundException($"Club with ID {id} not found.");
             }
+
+            if (club.CreatorId != userId)
+                throw new UnauthorizedAccessException("You can only delete your own clubs.");
 
             _clubRepository.Delete(id);
         }

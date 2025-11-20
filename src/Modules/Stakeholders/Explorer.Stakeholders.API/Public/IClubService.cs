@@ -11,7 +11,7 @@ namespace Explorer.Stakeholders.API.Public
     {
         ClubDto Create(ClubDto clubDto);
         ClubDto Update(ClubDto clubDto);
-        void Delete(long id);
+        void Delete(long userId, long id);
         ClubDto GetById(long id);
         List<ClubDto> GetAll();
     }

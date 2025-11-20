@@ -43,8 +43,9 @@ namespace Explorer.API.Controllers.Tourist
         }
 
         [HttpPut("{id:long}")]
-        public ActionResult<ClubDto> Update([FromBody] ClubDto clubDto)
+        public ActionResult<ClubDto> Update(long id, [FromBody] ClubDto clubDto)
         {
+            clubDto.Id = id;
             clubDto.CreatorId = User.PersonId();
             var result = _clubService.Update(clubDto);
             return Ok(result);
@@ -53,7 +54,7 @@ namespace Explorer.API.Controllers.Tourist
         [HttpDelete("{id:long}")]
         public ActionResult Delete(long id)
         { 
-            _clubService.Delete(id);
+            _clubService.Delete(User.PersonId(), id);
             return Ok();
         }
     }
