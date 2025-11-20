@@ -25,11 +25,11 @@ public class TourProblemCommandTests : BaseToursIntegrationTest
         var newEntity = new TourProblemDto
         {
             TourId = 1,
- ReporterId = 1,
+            ReporterId = 1,
             Category = ProblemCategory.Safety,
             Priority = ProblemPriority.High,
-         Description = "Problem sa bezbednošću na turi",
-    OccurredAt = DateTimeOffset.UtcNow,
+            Description = "Problem sa bezbednošću na turi",
+            OccurredAt = DateTimeOffset.UtcNow,
             CreatedAt = DateTimeOffset.UtcNow
         };
 
@@ -40,12 +40,12 @@ public class TourProblemCommandTests : BaseToursIntegrationTest
         result.ShouldNotBeNull();
         result.Id.ShouldNotBe(0);
         result.Description.ShouldBe(newEntity.Description);
-    result.Category.ShouldBe(newEntity.Category);
+        result.Category.ShouldBe(newEntity.Category);
         result.Priority.ShouldBe(newEntity.Priority);
 
         // Assert - Database
-      var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Description == newEntity.Description);
-  storedEntity.ShouldNotBeNull();
+        var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Description == newEntity.Description);
+        storedEntity.ShouldNotBeNull();
         storedEntity.Id.ShouldBe(result.Id);
     }
 
