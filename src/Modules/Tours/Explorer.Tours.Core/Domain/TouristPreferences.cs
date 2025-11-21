@@ -39,12 +39,12 @@ public class TouristPreferences : Entity
     }
 }
 
-public enum TourDifficulty
-{
-    Easy,
-    Medium,
-    Hard
-}
+//public enum TourDifficulty
+//{
+//    Easy,
+//    Medium,
+//    Hard
+//}
 
 public enum TransportationType
 {

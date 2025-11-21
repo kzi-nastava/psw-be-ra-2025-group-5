@@ -8,6 +8,7 @@ using Explorer.Tours.Tests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 
 namespace Explorer.Tours.Tests.Integration.Administration;
 
