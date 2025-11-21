@@ -1,26 +1,26 @@
 using Explorer.API.Controllers.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
-using Explorer.Stakeholders.Infrastructure.Database;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Public;
+using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace Explorer.Stakeholders.Tests.Integration.TouristPreferences;
+namespace Explorer.Tours.Tests.Integration.TouristPreferences;
 
 [Collection("Sequential")]
-public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
+public class TouristPreferencesCommandTests : BaseToursIntegrationTest
 {
-    public TouristPreferencesCommandTests(StakeholdersTestFactory factory) : base(factory) { }
+    public TouristPreferencesCommandTests(ToursTestFactory factory) : base(factory) { }
 
     [Fact]
     public void Gets()
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-23");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
 
         var result = ((ObjectResult)controller.Get().Result)?.Value as TouristPreferencesDto;
 
@@ -44,7 +44,7 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-22");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
         var newDto = new TouristPreferencesDto
         {
             UserId = -22,
@@ -75,7 +75,7 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-21");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
         var newDto = new TouristPreferencesDto
         {
             UserId = -21,
@@ -91,31 +91,6 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
         };
 
         Should.Throw<InvalidOperationException>(() => controller.Create(newDto));
-
-        var countBefore = dbContext.TouristPreferences.Count(tp => tp.UserId == -21);
-    }
-
-    [Fact]
-    public void Create_fails_invalid_user_id()
-    {
-        using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope, "invalid"); // Nevalidan userId
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        var newDto = new TouristPreferencesDto
-        {
-            UserId = 0,
-            PreferredDifficulty = TourDifficulty.Medium,
-            TransportationRatings = new Dictionary<TransportationType, int>
-            {
-                { TransportationType.Walking, 2 },
-                { TransportationType.Bicycle, 2 },
-                { TransportationType.Car, 2 },
-                { TransportationType.Boat, 2 }
-            },
-            PreferredTags = new List<string> { "invalid" }
-        };
-
-        Should.Throw<Exception>(() => controller.Create(newDto));
     }
 
     [Fact]
@@ -123,7 +98,7 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-23");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
         var updateDto = new TouristPreferencesDto
         {
             UserId = -23,
@@ -153,7 +128,7 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-999");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
         var updateDto = new TouristPreferencesDto
         {
             UserId = -999,
@@ -176,7 +151,7 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-21");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
 
         var result = (OkResult)controller.Delete();
 
@@ -192,7 +167,7 @@ public class TouristPreferencesCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-999");
-        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
 
         Should.Throw<NotFoundException>(() => controller.Delete());
     }

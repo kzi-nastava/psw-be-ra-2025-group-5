@@ -8,6 +8,6 @@ public class StakeholderProfile : Profile
 {
     public StakeholderProfile()
     {
-        CreateMap<TouristPreferencesDto, TouristPreferences>().ReverseMap();
+        // Mapper configuration can be added here if needed in the future
     }
 }

@@ -1,27 +1,20 @@
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.Core.Domain;
-using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.Core.Domain;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Explorer.Stakeholders.Infrastructure.Database.Repositories;
+namespace Explorer.Tours.Infrastructure.Database.Repositories;
 
 public class TouristPreferencesDbRepository : ITouristPreferencesRepository
 {
-    protected readonly StakeholdersContext DbContext;
+    protected readonly ToursContext DbContext;
     private readonly DbSet<TouristPreferences> _dbSet;
 
-    public TouristPreferencesDbRepository(StakeholdersContext dbContext)
+    public TouristPreferencesDbRepository(ToursContext dbContext)
     {
         DbContext = dbContext;
         _dbSet = DbContext.Set<TouristPreferences>();
     }
-
-    //public TouristPreferences Get(long userId)
-    //{
-    //    var entity = _dbSet.FirstOrDefault(tp => tp.UserId == userId);
-    //    if (entity == null) throw new NotFoundException("Not found: " + userId);
-    //    return entity;
-    //}
 
     public TouristPreferences? Get(long userId)
     {

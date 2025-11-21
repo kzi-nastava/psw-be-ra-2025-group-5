@@ -1,7 +1,7 @@
 ﻿DELETE FROM stakeholders."People";
 DELETE FROM stakeholders."Users";
 
-DELETE FROM stakeholders."TouristPreferences";
+DELETE FROM tours."TouristPreferences";
 
 INSERT INTO stakeholders."Users"(
     "Id", "Username", "Password", "Role", "IsActive")
@@ -47,7 +47,7 @@ INSERT INTO stakeholders."People"(
     "Id", "UserId", "Name", "Surname", "Email")
 VALUES (-23, -23, 'Steva', 'Stević', 'turista3@gmail.com');
 
-INSERT INTO stakeholders."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
+INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (-11, -21, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}'::jsonb, '["adventure","nature"]'::jsonb);
-INSERT INTO stakeholders."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
+INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (-12, -23, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}'::jsonb, '["adventure","nature"]'::jsonb);

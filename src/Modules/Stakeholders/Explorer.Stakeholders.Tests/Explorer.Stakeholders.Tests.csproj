@@ -23,9 +23,6 @@
 		<Content Include="TestData\c-people.sql">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="TestData\d-preferences.sql">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
 		    
 		    
 		    

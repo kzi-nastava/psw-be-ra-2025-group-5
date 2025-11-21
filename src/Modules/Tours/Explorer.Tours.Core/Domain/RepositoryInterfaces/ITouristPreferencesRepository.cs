@@ -1,6 +1,6 @@
-using Explorer.Stakeholders.Core.Domain;
+using Explorer.Tours.Core.Domain;
 
-namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+namespace Explorer.Tours.Core.Domain.RepositoryInterfaces;
 
 public interface ITouristPreferencesRepository
 {
