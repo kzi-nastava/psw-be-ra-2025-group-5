@@ -1,7 +1,8 @@
+DELETE FROM tours."TouristPreferences";
+
 ﻿DELETE FROM stakeholders."People";
 DELETE FROM stakeholders."Users";
 
-DELETE FROM tours."TouristPreferences";
 
 INSERT INTO stakeholders."Users"(
     "Id", "Username", "Password", "Role", "IsActive")
