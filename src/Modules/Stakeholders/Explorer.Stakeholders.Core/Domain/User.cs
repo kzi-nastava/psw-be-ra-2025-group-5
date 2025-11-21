@@ -31,7 +31,7 @@ public class User : Entity
 
     public string GetPrimaryRoleName()
     {
-        return Role.ToString();
+        return Role.ToString().ToLower();
     }
 
     public void Activate()
