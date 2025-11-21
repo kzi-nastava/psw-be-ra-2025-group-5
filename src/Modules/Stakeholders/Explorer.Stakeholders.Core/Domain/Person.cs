@@ -5,11 +5,14 @@ namespace Explorer.Stakeholders.Core.Domain;
 
 public class Person : Entity
 {
-    public long UserId { get; init; }
-    public string Name { get; init; }
-    public string Surname { get; init; }
-    public string Email { get; init; }
+    public long UserId { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public string Email { get; set; }
 
+    public string? Biography { get; set; }
+    public string? Motto { get; set; }
+    public byte[]? ProfileImage { get; set; }
     public Person(long userId, string name, string surname, string email)
     {
         UserId = userId;
@@ -17,6 +20,11 @@ public class Person : Entity
         Surname = surname;
         Email = email;
         Validate();
+    }
+
+    public Person()
+    {
+        
     }
 
     private void Validate()
