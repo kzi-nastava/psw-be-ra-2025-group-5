@@ -28,12 +28,18 @@ public static class ToursStartup
     {
         services.AddScoped<IEquipmentService, EquipmentService>();
         services.AddScoped<ITouristPreferencesService, TouristPreferencesService>();
+        services.AddScoped<ITourService, TourService>();
+        services.AddScoped<IMonumentService, MonumentService>();
+        services.AddScoped<ITouristEquipmentService, TouristEquipmentService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
     {
         services.AddScoped<IEquipmentRepository, EquipmentDbRepository>();
         services.AddScoped<ITouristPreferencesRepository, TouristPreferencesDbRepository>();
+        services.AddScoped<ITourRepository, TourDbRepository>();
+        services.AddScoped<IMonumentRepository, MonumentDbRepository>();
+        services.AddScoped<ITouristEquipmentRepository, TouristEquipmentDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("tours"));
         dataSourceBuilder.EnableDynamicJson();
