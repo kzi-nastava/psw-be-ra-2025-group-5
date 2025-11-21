@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Explorer.API.Controllers.Administrator.Administration
 {
-    [ApiController]
+    [Authorize(Policy = "administratorPolicy")]
     [Route("api/administration/users")]
-    [Authorize(Roles = "Administrator")]
+    [ApiController]
     public class AdministrationController : ControllerBase
     {
         private readonly IUserService _userService;
