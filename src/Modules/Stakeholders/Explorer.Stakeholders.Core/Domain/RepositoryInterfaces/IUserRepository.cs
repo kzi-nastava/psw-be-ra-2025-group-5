@@ -9,4 +9,5 @@ public interface IUserRepository
     List<User> GetAll();
     User Update(User user);
     User Get(long userId);
+    User? GetById(long userId);
 }

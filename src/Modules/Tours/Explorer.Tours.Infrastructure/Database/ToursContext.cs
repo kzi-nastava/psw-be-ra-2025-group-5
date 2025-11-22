@@ -6,7 +6,9 @@ namespace Explorer.Tours.Infrastructure.Database;
 public class ToursContext : DbContext
 {
     public DbSet<Equipment> Equipment { get; set; }
+    public DbSet<Tour> Tours { get; set; }
     public DbSet<Monument> Monument { get; set; }
+    public DbSet<TouristEquipment> TouristEquipment { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -14,5 +16,6 @@ public class ToursContext : DbContext
     {
         modelBuilder.HasDefaultSchema("tours");
         modelBuilder.Entity<Monument>().OwnsOne(m => m.Location);
+        modelBuilder.Entity<TouristEquipment>().ToTable("TouristEquipment");
     }
 }
