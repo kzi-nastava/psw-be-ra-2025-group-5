@@ -24,6 +24,8 @@ VALUES
 (-23, -23, 'Steva', 'Stević', 'turista3@gmail.com', NULL, 'Carpe Diem', NULL);
 
 
-INSERT INTO stakeholders."AppRatings" ("Id", "UserId", "Rating", "Comment", "CreatedAt") VALUES
-(-1, -21, 5, 'Odlicna aplikacija', NOW()),
-(-2, -22, 4, 'Solidno', NOW());
+INSERT INTO stakeholders."AppRatings" 
+("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
+(-1, -21, 5, 'Odlična aplikacija', NOW(), NOW()),
+(-2, -22, 4, 'Solidno', NOW(), NOW());
+

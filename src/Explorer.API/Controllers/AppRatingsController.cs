@@ -31,6 +31,12 @@ namespace Explorer.API.Controllers
         {
             long userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
 
+            var existing = _service.GetByUserId(userId).FirstOrDefault();
+            if (existing != null)
+            {
+                return BadRequest("Već ste ocenili aplikaciju. Možete samo izmeniti postojeću ocenu.");
+            }
+
             var newRating = new AppRatingDto
             {
                 UserId = userId,

@@ -18,7 +18,7 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ReverseMap();
 
             // ========================= AppRating <-> AppRatingDto =========================
-            CreateMap<AppRating, AppRatingDto>().ReverseMap();
+            CreateMap<AppRating, AppRatingDto>();
             CreateMap<AppRatingDto, AppRating>()
                 .ConstructUsing(dto => new AppRating(dto.UserId, dto.Rating, dto.Comment));
 
