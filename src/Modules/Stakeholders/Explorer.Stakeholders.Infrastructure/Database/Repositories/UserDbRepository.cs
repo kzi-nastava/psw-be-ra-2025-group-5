@@ -55,4 +55,8 @@ public class UserDbRepository : IUserRepository
     {
         return _dbContext.Users.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("User not found.");
     }
+    public User? GetById(long userId)
+    {
+        return _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+    }
 }
