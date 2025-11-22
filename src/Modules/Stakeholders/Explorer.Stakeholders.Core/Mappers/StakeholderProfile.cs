@@ -1,6 +1,6 @@
 using AutoMapper;
-using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.Core.Domain;
 
 using Explorer.Stakeholders.API.Dtos;
 namespace Explorer.Stakeholders.Core.Mappers;
@@ -9,6 +9,10 @@ public class StakeholderProfile : Profile
 {
     public StakeholderProfile()
     {
+        CreateMap<Person, ProfileDto>()
+     .ForMember(dest => dest.ProfileImageBase64, opt => opt.MapFrom(src => src.ProfileImage != null ? Convert.ToBase64String(src.ProfileImage) : string.Empty))
+     .ReverseMap();
+
         CreateMap<UserDto, User>().ReverseMap();
 
         CreateMap<CreateUserDto, User>()
