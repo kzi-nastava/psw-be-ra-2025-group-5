@@ -47,11 +47,11 @@ INSERT INTO stakeholders."People"(
 VALUES (-23, -23, 'Steva', 'Stević', 'turista3@gmail.com');
 
 INSERT INTO stakeholders."TourProblems"(
-	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt", "IsResolved", "CreatedAt")
-VALUES (-1, 1, -21, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', false, '2023-10-25T10:05:00Z');
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
+VALUES (-1, 1, -21, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', '2023-10-25T10:05:00Z');
 INSERT INTO stakeholders."TourProblems"(
-	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt", "IsResolved", "CreatedAt")
-VALUES (-2, 2, -22, 2, 1, 'Problem sa planom puta', '2023-10-26T11:00:00Z', false, '2023-10-26T11:05:00Z');
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
+VALUES (-2, 2, -22, 2, 1, 'Problem sa planom puta', '2023-10-26T11:00:00Z', '2023-10-26T11:05:00Z');
 INSERT INTO stakeholders."TourProblems"(
-	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt", "IsResolved", "CreatedAt")
-VALUES (-3, 3, -23, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', false, '2023-10-27T12:05:00Z');
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
+VALUES (-3, 3, -23, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z');
