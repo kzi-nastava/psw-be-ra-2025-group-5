@@ -44,3 +44,4 @@ VALUES (-22, -22, 'Mika', 'Mikić', 'turista2@gmail.com');
 INSERT INTO stakeholders."People"(
     "Id", "UserId", "Name", "Surname", "Email")
 VALUES (-23, -23, 'Steva', 'Stević', 'turista3@gmail.com');
+
