@@ -1,7 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public.Reporting;
-using Explorer.Tours.Core.UseCases.Administration;
+using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public.Reporting;
+using Explorer.Stakeholders.Core.UseCases.Reporting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

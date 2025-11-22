@@ -5,18 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Explorer.API.Controllers.Tourist.ProblemReporting;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public.Reporting;
+using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public.Reporting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
-namespace Explorer.Tours.Tests.Integration.Reporting;
+namespace Explorer.Stakeholders.Tests.Integration.Reporting;
 
 [Collection("Sequential")]
-public class TourProblemQueryTests : BaseToursIntegrationTest
+public class TourProblemQueryTests : BaseStakeholdersIntegrationTest
 {
-    public TourProblemQueryTests(ToursTestFactory factory) : base(factory) { }
+    public TourProblemQueryTests(StakeholdersTestFactory factory) : base(factory) { }
 
     [Fact]
     public void Retrieves_all()

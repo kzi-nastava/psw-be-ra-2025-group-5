@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public.Reporting;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public.Reporting;
+using Explorer.Stakeholders.Core.Domain;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 
-namespace Explorer.Tours.Core.UseCases.Reporting;
+namespace Explorer.Stakeholders.Core.UseCases.Reporting;
 
 public class TourProblemService : ITourProblemService
 {

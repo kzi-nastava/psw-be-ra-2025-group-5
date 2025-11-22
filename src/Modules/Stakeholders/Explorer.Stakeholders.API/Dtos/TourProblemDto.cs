@@ -1,15 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Explorer.Tours;
+using Explorer.Stakeholders;
 
-namespace Explorer.Tours.API.Dtos;
+namespace Explorer.Stakeholders.API.Dtos;
 
 public class TourProblemDto
 {
+    [Required]
     public long Id { get; set; }
 
+    [Required]
     [Range(1, long.MaxValue)]
     public long TourId { get; set; }
 
+    [Required]
     [Range(1, long.MaxValue)]
     public long ReporterId { get; set; }
 
@@ -25,7 +28,7 @@ public class TourProblemDto
 
     [Required]
     public DateTimeOffset OccurredAt { get; set; }
-
+    [Required]
     public DateTimeOffset CreatedAt { get; set; }
 }
 

@@ -18,5 +18,7 @@ public class StakeholderProfile : Profile
                 Enum.Parse<UserRole>(dto.Role, true),
                 true
             ));
+
+        CreateMap<TourProblemDto, TourProblem>().ReverseMap();
     }
 }

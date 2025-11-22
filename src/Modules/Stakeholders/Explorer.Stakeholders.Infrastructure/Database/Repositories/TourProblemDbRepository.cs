@@ -1,18 +1,18 @@
 ﻿using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.BuildingBlocks.Infrastructure.Database;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.Core.Domain;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Explorer.Tours.Infrastructure.Database.Repositories;
+namespace Explorer.Stakeholders.Infrastructure.Database.Repositories;
 
 public class TourProblemDbRepository : ITourProblemRepository
 {
-    protected readonly ToursContext DbContext;
+    protected readonly StakeholdersContext DbContext;
     private readonly DbSet<TourProblem> _dbSet;
 
-    public TourProblemDbRepository(ToursContext dbContext)
+    public TourProblemDbRepository(StakeholdersContext dbContext)
     {
         DbContext = dbContext;
         _dbSet = DbContext.Set<TourProblem>();

@@ -1,7 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
+using Explorer.Stakeholders.API.Dtos;
 
-namespace Explorer.Tours.API.Public.Reporting
+namespace Explorer.Stakeholders.API.Public.Reporting
 {
     public interface ITourProblemService
     {
