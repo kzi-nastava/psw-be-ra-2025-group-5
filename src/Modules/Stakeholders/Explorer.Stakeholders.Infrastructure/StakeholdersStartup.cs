@@ -17,7 +17,6 @@ public static class StakeholdersStartup
     public static IServiceCollection ConfigureStakeholdersModule(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(StakeholderProfile).Assembly);
-        services.AddAutoMapper(typeof(ClubProfile).Assembly);
         SetupCore(services);
         SetupInfrastructure(services);
         return services;
