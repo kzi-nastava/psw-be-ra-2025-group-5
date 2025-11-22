@@ -9,12 +9,20 @@ namespace Explorer.Stakeholders.Core.Mappers
     {
         public StakeholderProfile()
         {
-            // AppRating mapiranje
+            // ========================= Person <-> ProfileDto =========================
+            CreateMap<Person, ProfileDto>()
+                .ForMember(
+                    dest => dest.ProfileImageBase64,
+                    opt => opt.MapFrom(src => src.ProfileImage != null ? Convert.ToBase64String(src.ProfileImage) : string.Empty)
+                )
+                .ReverseMap();
+
+            // ========================= AppRating <-> AppRatingDto =========================
             CreateMap<AppRating, AppRatingDto>().ReverseMap();
             CreateMap<AppRatingDto, AppRating>()
                 .ConstructUsing(dto => new AppRating(dto.UserId, dto.Rating, dto.Comment));
 
-            // User mapiranje
+            // ========================= User mapiranja =========================
             CreateMap<UserDto, User>().ReverseMap();
 
             CreateMap<CreateUserDto, User>()
