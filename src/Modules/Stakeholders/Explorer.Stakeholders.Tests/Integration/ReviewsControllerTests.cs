@@ -7,6 +7,8 @@ using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.API.Controllers.Administration;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Stakeholders.Tests.Integration.AppRatings;
 
@@ -15,13 +17,15 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
 {
     public AppRatingsTests(StakeholdersTestFactory factory) : base(factory) { }
 
+
     [Fact]
     public void Tourist_can_create_rating()
     {
-        // Arrange
         using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope, "-23");
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        ResetDatabase(db);
+
+        var controller = CreateController(scope, "-23", "tourist");
 
         var dto = new CreateAppRatingDto
         {
@@ -29,17 +33,14 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
             Comment = "Sjajna aplikacija!"
         };
 
-        // Act
         var result = ((ObjectResult)controller.Create(dto).Result)?.Value as AppRatingDto;
 
-        // Assert - Response
         result.ShouldNotBeNull();
         result.Id.ShouldNotBe(0);
         result.Rating.ShouldBe(5);
         result.Comment.ShouldBe("Sjajna aplikacija!");
         result.UserId.ShouldBe(-23);
 
-        // Assert - Database
         var stored = db.AppRatings.FirstOrDefault(r => r.Id == result.Id);
         stored.ShouldNotBeNull();
         stored.UserId.ShouldBe(-23);
@@ -49,10 +50,11 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     [Fact]
     public void Author_can_update_own_rating()
     {
-        // Arrange
         using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope, "-21"); 
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        ResetDatabase(db);
+
+        var controller = CreateController(scope, "-21", "author");
 
         var updateDto = new UpdateAppRatingDto
         {
@@ -60,10 +62,8 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
             Comment = "Izmenjena ocena"
         };
 
-        // Act
         var result = ((ObjectResult)controller.Update(-1, updateDto).Result)?.Value as AppRatingDto;
 
-        // Assert
         result.ShouldNotBeNull();
         result.Id.ShouldBe(-1);
         result.Rating.ShouldBe(3);
@@ -77,15 +77,14 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     [Fact]
     public void User_can_delete_own_rating()
     {
-        // Arrange
         using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope, "-22"); 
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        ResetDatabase(db);
 
-        // Act
+        var controller = CreateController(scope, "-22", "tourist");
+
         var result = controller.Delete(-2);
 
-        // Assert
         result.ShouldBeOfType<NoContentResult>();
 
         var stored = db.AppRatings.FirstOrDefault(r => r.Id == -2);
@@ -95,13 +94,14 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     [Fact]
     public void Admin_can_get_all_ratings()
     {
-        // Arrange
         using var scope = Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+        ResetDatabase(db);
+
         var controller = CreateAdminController(scope);
 
-        // Act
-        var actionResult = controller.GetAll(); 
-        var result = actionResult.Result as OkObjectResult; 
+        var actionResult = controller.GetAll();
+        var result = actionResult.Result as OkObjectResult;
         result.ShouldNotBeNull();
 
         var ratings = result.Value as List<AppRatingDto>;
@@ -109,13 +109,14 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
         ratings.Count.ShouldBeGreaterThan(0);
 
         var first = ratings.First();
-        first.UserId.ShouldBe(-21); 
-        first.Rating.ShouldBe(5);
+        first.UserId.ShouldBe(-21);
+        first.Rating.ShouldBe(5); 
 
         var second = ratings[1];
-        second.UserId.ShouldBe(-22); 
+        second.UserId.ShouldBe(-22);
         second.Rating.ShouldBe(4);
     }
+
 
     private static AdminAppRatingsController CreateAdminController(IServiceScope scope)
     {
@@ -123,12 +124,73 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
             scope.ServiceProvider.GetRequiredService<IAppRatingService>());
     }
 
-    private static AppRatingsController CreateController(IServiceScope scope, string userId)
+    private static AppRatingsController CreateController(IServiceScope scope, string userId, string role)
     {
-        return new AppRatingsController(
-            scope.ServiceProvider.GetRequiredService<IAppRatingService>())
+        var controller = new AppRatingsController(
+            scope.ServiceProvider.GetRequiredService<IAppRatingService>());
+
+        controller.ControllerContext = BuildContext(userId, role);
+        return controller;
+    }
+
+    private static ControllerContext BuildContext(string userId, string role)
+    {
+        var claims = new[]
         {
-            ControllerContext = BuildContext(userId)
+            new Claim("id", userId),
+            new Claim("role", role)
         };
+
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        var user = new ClaimsPrincipal(identity);
+
+        return new ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = user
+            }
+        };
+    }
+
+    private void ResetDatabase(StakeholdersContext db)
+    {
+       
+        db.Database.ExecuteSqlRaw(@"DELETE FROM stakeholders.""AppRatings"";");
+        db.Database.ExecuteSqlRaw(@"DELETE FROM stakeholders.""People"";");
+        db.Database.ExecuteSqlRaw(@"DELETE FROM stakeholders.""Users"";");
+
+      
+        db.Database.ExecuteSqlRaw(@"
+            INSERT INTO stakeholders.""Users"" (""Id"", ""Username"", ""Password"", ""Email"", ""Role"", ""IsActive"")
+            VALUES
+            (-1, 'admin@gmail.com', 'admin', 'admin@gmail.com', 0, true),
+            (-11, 'autor1@gmail.com', 'autor1', 'autor1@gmail.com', 1, true),
+            (-12, 'autor2@gmail.com', 'autor2', 'autor2@gmail.com',1, true),
+            (-13, 'autor3@gmail.com', 'autor3', 'autor3@gmail.com', 1, true),
+            (-21, 'turista1@gmail.com','turista1','turista1@gmail.com', 2, true),
+            (-22, 'turista2@gmail.com','turista2','turista2@gmail.com', 2, true),
+            (-23, 'turista3@gmail.com','turista3','turista3@gmail.com', 2, true);
+        ");
+
+      
+        db.Database.ExecuteSqlRaw(@"
+            INSERT INTO stakeholders.""People"" (""Id"", ""UserId"", ""Name"", ""Surname"", ""Email"")
+            VALUES
+            (-11, -11, 'Ana',  'Anić',   'autor1@gmail.com'),
+            (-12, -12, 'Lena', 'Lenić',  'autor2@gmail.com'),
+            (-13, -13, 'Sara', 'Sarić',  'autor3@gmail.com'),
+            (-21, -21, 'Pera', 'Perić',  'turista1@gmail.com'),
+            (-22, -22, 'Mika', 'Mikić',  'turista2@gmail.com'),
+            (-23, -23, 'Steva','Stević', 'turista3@gmail.com');
+        ");
+
+       
+        db.Database.ExecuteSqlRaw(@"
+            INSERT INTO stakeholders.""AppRatings"" (""Id"", ""UserId"", ""Rating"", ""Comment"", ""CreatedAt"")
+            VALUES 
+            (-1, -21, 5, 'Odlicna aplikacija', NOW()),
+            (-2, -22, 4, 'Solidno', NOW());
+        ");
     }
 }

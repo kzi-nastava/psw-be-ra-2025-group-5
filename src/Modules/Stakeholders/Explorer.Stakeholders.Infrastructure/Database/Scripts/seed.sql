@@ -1,7 +1,7 @@
 ﻿
 DELETE FROM stakeholders."People";
 DELETE FROM stakeholders."Users";
-
+DELETE FROM stakeholders."AppRatings";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (-1,  'admin@gmail.com',   'admin',   'admin@gmail.com', 0, true),
