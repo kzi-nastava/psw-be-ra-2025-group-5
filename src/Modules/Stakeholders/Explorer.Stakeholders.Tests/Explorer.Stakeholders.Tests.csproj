@@ -9,25 +9,6 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="TestData\a-delete.sql" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="TestData\a-delete.sql">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>  
-		</Content>
-		<Content Include="TestData\b-users.sql">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>  
-		</Content>
-		<Content Include="TestData\c-people.sql">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		    
-		    
-		    
-	</ItemGroup>
-
   <ItemGroup>
     <None Remove="TestData\a-delete.sql" />
     <None Remove="TestData\b-users.sql" />
