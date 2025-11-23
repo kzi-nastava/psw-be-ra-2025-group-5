@@ -24,8 +24,9 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
         var newEntity = new TourProblemDto
         {
-            TourId = 1,
-            ReporterId = 1,
+            Id = -11,
+            TourId = 111,
+            ReporterId = -21,
             Category = ProblemCategory.Safety,
             Priority = ProblemPriority.High,
             Description = "Problem sa bezbednošću na turi",
@@ -74,11 +75,11 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
         var updatedEntity = new TourProblemDto
       {
-            Id = -1,
+            Id = -11,
             TourId = 1,
-           ReporterId = 1,
-             Category = ProblemCategory.Safety,
-           Priority = ProblemPriority.Critical,
+            ReporterId = -21,
+            Category = ProblemCategory.Safety,
+            Priority = ProblemPriority.Critical,
         Description = "Ažurirani problem bezbednosti",
           OccurredAt = DateTimeOffset.UtcNow,
        CreatedAt = DateTimeOffset.UtcNow
@@ -89,12 +90,12 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
 
      // Assert - Response
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(-1);
+        result.Id.ShouldBe(-11);
         result.Description.ShouldBe(updatedEntity.Description);
         result.Priority.ShouldBe(updatedEntity.Priority);
 
       // Assert - Database
-        var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Id == -1);
+        var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Id == -11);
         storedEntity.ShouldNotBeNull();
         storedEntity.Description.ShouldBe(updatedEntity.Description);
         storedEntity.Priority.ShouldBe(DomainProblemPriority.Critical);
@@ -131,14 +132,14 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
         // Act
-        var result = (OkResult)controller.Delete(-3);
+        var result = (OkResult)controller.Delete(-33);
 
         // Assert - Response
         result.ShouldNotBeNull();
         result.StatusCode.ShouldBe(200);
 
   // Assert - Database
-        var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Id == -3);
+        var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Id == -33);
         storedEntity.ShouldBeNull();
     }
 
@@ -157,7 +158,7 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
   {
      return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>())
         {
-        ControllerContext = BuildContext("-1")
+        ControllerContext = BuildContext("-21")
         };
     }
 }

@@ -23,7 +23,7 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        ResetDatabase(db);
+       // ResetDatabase(db);
 
         var controller = CreateController(scope, "-23", "tourist");
 
@@ -52,7 +52,7 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        ResetDatabase(db);
+       // ResetDatabase(db);
 
         var controller = CreateController(scope, "-21", "author");
 
@@ -79,7 +79,7 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        ResetDatabase(db);
+       // ResetDatabase(db);
 
         var controller = CreateController(scope, "-22", "tourist");
 
@@ -96,7 +96,7 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        ResetDatabase(db);
+        //ResetDatabase(db);
 
         var controller = CreateAdminController(scope);
 
