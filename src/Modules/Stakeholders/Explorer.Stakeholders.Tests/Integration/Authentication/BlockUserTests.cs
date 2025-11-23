@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Explorer.Stakeholders.Tests.Integration.Authentication
 {
+    [Collection("Sequential")]
     public class BlockUserTests : BaseStakeholdersIntegrationTest
     {
         public BlockUserTests(StakeholdersTestFactory factory) : base(factory) { }
