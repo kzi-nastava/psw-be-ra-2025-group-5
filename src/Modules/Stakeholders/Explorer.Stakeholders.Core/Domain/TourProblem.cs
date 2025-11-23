@@ -42,8 +42,8 @@ public class TourProblem : Entity
         DateTimeOffset occurredAt,
         DateTimeOffset? createdAt = null)
     {
-        if (tourId <= 0) throw new ArgumentOutOfRangeException(nameof(tourId));
-        if (reporterId <= 0) throw new ArgumentOutOfRangeException(nameof(reporterId));
+        if (tourId == 0) throw new ArgumentOutOfRangeException(nameof(tourId));
+        if (reporterId == 0) throw new ArgumentOutOfRangeException(nameof(reporterId));
         if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description is required.", nameof(description));
 
         TourId = tourId;

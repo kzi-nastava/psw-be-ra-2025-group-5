@@ -24,7 +24,7 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
         var newEntity = new TourProblemDto
         {
-            Id = -11,
+            Id = -999,
             TourId = 111,
             ReporterId = -21,
             Category = ProblemCategory.Safety,
