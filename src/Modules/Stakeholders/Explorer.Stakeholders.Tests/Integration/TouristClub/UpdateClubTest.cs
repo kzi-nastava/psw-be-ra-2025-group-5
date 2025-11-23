@@ -27,6 +27,7 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
             // Arrange – create a club
             var created = service.Create(new ClubDto
             {
+                Id = -5151,
                 Name = "Planinari",
                 Description = "Opis",
                 Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },

@@ -1,7 +1,8 @@
-﻿INSERT INTO stakeholders.[Clubs] (
-    [Name], [Description], [Images], [CreatorId]
+﻿INSERT INTO stakeholders."Clubs" (
+    "Id", "Name", "Description", "Images", "CreatorId"
 )
 VALUES (
+    -5151,
     'Planinari',
     'Planinarski klub',
     (
@@ -11,5 +12,5 @@ VALUES (
             'varbinary(max)'
         )
     ),
-    -11
+    -21
 );
