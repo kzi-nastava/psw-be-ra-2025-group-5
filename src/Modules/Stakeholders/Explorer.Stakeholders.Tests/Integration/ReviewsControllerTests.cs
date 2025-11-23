@@ -60,14 +60,14 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
             Comment = "Izmenjena ocena"
         };
 
-        var result = ((ObjectResult)controller.Update(-1, updateDto).Result)?.Value as AppRatingDto;
+        var result = ((ObjectResult)controller.Update(-11, updateDto).Result)?.Value as AppRatingDto;
 
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(-1);
+        result.Id.ShouldBe(-11);
         result.Rating.ShouldBe(3);
         result.Comment.ShouldBe("Izmenjena ocena");
 
-        var stored = db.AppRatings.First(r => r.Id == -1);
+        var stored = db.AppRatings.First(r => r.Id == -11);
         stored.Rating.ShouldBe(3);
         stored.Comment.ShouldBe("Izmenjena ocena");
     }
