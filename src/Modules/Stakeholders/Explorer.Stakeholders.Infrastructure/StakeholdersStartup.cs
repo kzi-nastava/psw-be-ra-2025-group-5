@@ -28,7 +28,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<ITokenGenerator, JwtGenerator>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IClubService, ClubService>();      
+            services.AddScoped<IClubService, ClubService>(); 
             services.AddScoped<IAppRatingService, AppRatingService>(); 
         }
 

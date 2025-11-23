@@ -53,6 +53,7 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
 
             var dto = new ClubDto
             {
+                Id = -1515,
                 Name = "Planinari",
                 Description = "",
                 Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
@@ -90,6 +91,7 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
 
             var dto = new ClubDto
             {
+                Id = -1515,
                 Name = "Planinari",
                 Description = "Opis",
                 Images = new List<string>(),
@@ -103,6 +105,7 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
 
             var dto = new ClubDto
             {
+                Id = -1556,
                 Name = "Planinari",
                 Description = "Opis",
                 Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
