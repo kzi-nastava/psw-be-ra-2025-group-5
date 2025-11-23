@@ -80,11 +80,11 @@ public class AppRatingsTests : BaseStakeholdersIntegrationTest
 
         var controller = CreateController(scope, "-22", "tourist");
 
-        var result = controller.Delete(-2);
+        var result = controller.Delete(-21);
 
         result.ShouldBeOfType<NoContentResult>();
 
-        var stored = db.AppRatings.FirstOrDefault(r => r.Id == -2);
+        var stored = db.AppRatings.FirstOrDefault(r => r.Id == -21);
         stored.ShouldBeNull();
     }
 
