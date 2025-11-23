@@ -1,4 +1,4 @@
-﻿
+﻿DELETE FROM stakeholders."TourProblems";
 DELETE FROM stakeholders."People";
 DELETE FROM stakeholders."Users";
 DELETE FROM stakeholders."AppRatings";
@@ -28,4 +28,12 @@ INSERT INTO stakeholders."AppRatings"
 ("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
 (-1, -21, 5, 'Odlična aplikacija', NOW(), NOW()),
 (-2, -22, 4, 'Solidno', NOW(), NOW());
-
+INSERT INTO stakeholders."TourProblems"(
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
+VALUES (-1, 1, -21, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', '2023-10-25T10:05:00Z');
+INSERT INTO stakeholders."TourProblems"(
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
+VALUES (-2, 2, -22, 2, 1, 'Problem sa planom puta', '2023-10-26T11:00:00Z', '2023-10-26T11:05:00Z');
+INSERT INTO stakeholders."TourProblems"(
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
+VALUES (-3, 3, -23, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z');
