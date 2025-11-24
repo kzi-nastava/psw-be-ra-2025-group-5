@@ -13,5 +13,6 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
         Monument Create(Monument map);
         Monument Update(Monument map);
         void Delete(long id);
+        IEnumerable<Monument> GetAllForTourists();
     }
 }

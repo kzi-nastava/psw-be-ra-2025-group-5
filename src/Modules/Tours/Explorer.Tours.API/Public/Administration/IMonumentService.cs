@@ -15,5 +15,6 @@ namespace Explorer.Tours.API.Public.Administration
         public MonumentDto Create(MonumentDto monumentDto);
         public MonumentDto Update(MonumentDto monumentDto);
         public void Delete(long id);
+        IEnumerable<MonumentDto> GetAllForTourists();
     }
 }
