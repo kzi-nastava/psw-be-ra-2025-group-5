@@ -21,10 +21,9 @@ public class TouristLocationDbRepository : ITouristLocationRepository
         return _dbSet.ToList();
     }
 
-    public TouristLocation Get(long id)
+    public TouristLocation? GetByTourist(long id)
     {
-        var entity = _dbSet.Find(id);
-        if (entity == null) throw new NotFoundException("Not found: " + id);
+        var entity = _dbSet.FirstOrDefault(l => l.PersonId == id);
         return entity;
     }
 

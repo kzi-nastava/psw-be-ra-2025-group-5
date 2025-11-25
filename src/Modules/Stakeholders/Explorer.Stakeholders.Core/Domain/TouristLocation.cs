@@ -5,7 +5,7 @@ namespace Explorer.Stakeholders.Core.Domain;
 
 public class TouristLocation : Entity
 {
-    public long PersonId { get; set; }
+    public long PersonId { get; private set; }
 
     public double Latitude { get; set; }
     public double Longitude { get; set; }

@@ -17,9 +17,9 @@ public class TouristLocationService : ITouristLocationService
         _mapper = mapper;
     }
 
-    public TouristLocationDto? Get(long id)
+    public TouristLocationDto? GetByTourist(long id)
     {
-        var entity = _TouristLocationRepository.Get(id);
+        var entity = _TouristLocationRepository.GetByTourist(id);
         return entity is null ? null : _mapper.Map<TouristLocationDto>(entity);
     }
 
