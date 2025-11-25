@@ -24,10 +24,10 @@ public class PositionController : ControllerBase
         return Ok(_PositionService.GetAll());
     }
 
-    [HttpGet("{personId:long}")]
-    public ActionResult<Position> GetByTourist(long id)
+    [HttpGet("{touristId:long}")]
+    public ActionResult<Position> GetByTourist(long touristId)
     {
-        return Ok(_PositionService.GetByTourist(id));
+        return Ok(_PositionService.GetByTourist(touristId));
     }
 
     [HttpPost]
