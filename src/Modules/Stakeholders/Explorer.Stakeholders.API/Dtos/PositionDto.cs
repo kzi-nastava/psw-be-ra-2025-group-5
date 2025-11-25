@@ -1,6 +1,6 @@
 ﻿namespace Explorer.Stakeholders.API.Dtos;
 
-public class TouristLocationDto
+public class PositionDto
 {
     public long Id { get; set; }
     public long PersonId { get; set; }

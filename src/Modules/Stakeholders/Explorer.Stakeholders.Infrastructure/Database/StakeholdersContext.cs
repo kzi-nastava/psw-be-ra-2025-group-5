@@ -10,7 +10,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<Club> Clubs { get; set; }
         public DbSet<AppRating> AppRatings { get; set; }
         public DbSet<TourProblem> TourProblems { get; set; }
-        public DbSet<TouristLocation> TouristLocations { get; set; }
+        public DbSet<Position> Positions { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -25,7 +25,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureStakeholder(modelBuilder);
             ConfigureAppRating(modelBuilder);
             ConfigureTourProblem(modelBuilder);
-            ConfigureTouristLocation(modelBuilder);
+            ConfigurePosition(modelBuilder);
         }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -100,12 +100,12 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             });
         }
 
-        private static void ConfigureTouristLocation(ModelBuilder modelBuilder)
+        private static void ConfigurePosition(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TouristLocation>()
+            modelBuilder.Entity<Position>()
                 .HasOne<Person>()
                 .WithOne()
-                .HasForeignKey<TouristLocation>(l => l.PersonId);
+                .HasForeignKey<Position>(l => l.PersonId);
         }
     }
 }

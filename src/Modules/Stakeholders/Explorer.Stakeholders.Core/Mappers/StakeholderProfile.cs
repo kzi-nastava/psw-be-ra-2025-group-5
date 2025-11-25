@@ -59,8 +59,8 @@ namespace Explorer.Stakeholders.Core.Mappers
 
             CreateMap<TourProblemDto, TourProblem>().ReverseMap();
 
-            // ========================= TouristLocation <-> TouristLocaitonDto =========================
-            CreateMap<TouristLocationDto, TouristLocation>().ReverseMap();
+            // ========================= Position <-> PositionDto =========================
+            CreateMap<PositionDto, Position>().ReverseMap();
         }
     }
 }

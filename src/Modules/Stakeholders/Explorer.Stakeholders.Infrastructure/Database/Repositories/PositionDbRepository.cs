@@ -5,36 +5,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Stakeholders.Infrastructure.Database.Repositories;
 
-public class TouristLocationDbRepository : ITouristLocationRepository
+public class PositionDbRepository : IPositionRepository
 {
     protected readonly StakeholdersContext DbContext;
-    private readonly DbSet<TouristLocation> _dbSet;
+    private readonly DbSet<Position> _dbSet;
 
-    public TouristLocationDbRepository(StakeholdersContext dbContext)
+    public PositionDbRepository(StakeholdersContext dbContext)
     {
         DbContext = dbContext;
-        _dbSet = DbContext.Set<TouristLocation>();
+        _dbSet = DbContext.Set<Position>();
     }
 
-    public List<TouristLocation> GetAll()
+    public List<Position> GetAll()
     {
         return _dbSet.ToList();
     }
 
-    public TouristLocation? GetByTourist(long id)
+    public Position? GetByTourist(long id)
     {
         var entity = _dbSet.FirstOrDefault(l => l.PersonId == id);
         return entity;
     }
 
-    public TouristLocation Create(TouristLocation entity)
+    public Position Create(Position entity)
     {
         _dbSet.Add(entity);
         DbContext.SaveChanges();
         return entity;
     }
 
-    public TouristLocation Update(TouristLocation entity)
+    public Position Update(Position entity)
     {
         try
         {

@@ -3,14 +3,14 @@ using Explorer.Stakeholders.Core.Domain.Shared;
 
 namespace Explorer.Stakeholders.Core.Domain;
 
-public class TouristLocation : Entity
+public class Position : Entity
 {
     public long PersonId { get; private set; }
 
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 
-    public TouristLocation(long personId, double latitude, double longitude)
+    public Position(long personId, double latitude, double longitude)
     {
         Guard.AgainstNull(personId, nameof(personId));
         Guard.AgainstOutOfRange(latitude, nameof(latitude), -90, 90);
