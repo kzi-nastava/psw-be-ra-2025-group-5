@@ -39,5 +39,13 @@ namespace Explorer.API.Controllers.Administrator.Administration
             _monumentService.Delete(id);
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public ActionResult<IEnumerable<MonumentDto>> GetPublic()
+        {
+            var monuments = _monumentService.GetAllForTourists();
+            return Ok(monuments);
+        }
     }
 }

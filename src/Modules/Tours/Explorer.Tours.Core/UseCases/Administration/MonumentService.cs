@@ -43,5 +43,12 @@ namespace Explorer.Tours.Core.UseCases.Administration
         public void Delete(long id) {
             _monumentRepository.Delete(id);
         }
+
+        public IEnumerable<MonumentDto> GetAllForTourists()
+        {
+            var monuments = _monumentRepository.GetAllForTourists();
+            return monuments.Select(_mapper.Map<MonumentDto>).ToList();
+        }
+
     }
 }

@@ -63,5 +63,11 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories
             _dbSet.Remove(entity);
             DbContext.SaveChanges();
         }
+
+        public IEnumerable<Monument> GetAllForTourists()
+        {
+            return _dbSet.ToList();
+        }
+
     }
 }
