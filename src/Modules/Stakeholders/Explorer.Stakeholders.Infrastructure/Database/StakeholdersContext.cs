@@ -10,6 +10,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<Club> Clubs { get; set; }
         public DbSet<AppRating> AppRatings { get; set; }
         public DbSet<TourProblem> TourProblems { get; set; }
+        public DbSet<TouristLocation> TouristLocations { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -24,6 +25,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureStakeholder(modelBuilder);
             ConfigureAppRating(modelBuilder);
             ConfigureTourProblem(modelBuilder);
+            ConfigureTouristLocation(modelBuilder);
         }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -51,9 +53,8 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 .Property(x => x.UserId)
                 .IsRequired();
         }
-    
 
-    private static void ConfigureTourProblem(ModelBuilder modelBuilder)
+        private static void ConfigureTourProblem(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TourProblem>(builder =>
             {
@@ -97,6 +98,14 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 // Index za brže pretraživanje po TourId
                 builder.HasIndex(tp => tp.TourId);
             });
+        }
+
+        private static void ConfigureTouristLocation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TouristLocation>()
+                .HasOne<Person>()
+                .WithOne()
+                .HasForeignKey<TouristLocation>(l => l.PersonId);
         }
     }
 }
