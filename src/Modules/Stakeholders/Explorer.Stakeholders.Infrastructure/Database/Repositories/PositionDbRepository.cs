@@ -23,7 +23,7 @@ public class PositionDbRepository : IPositionRepository
 
     public Position? GetByTourist(long id)
     {
-        var entity = _dbSet.FirstOrDefault(l => l.PersonId == id);
+        var entity = _dbSet.FirstOrDefault(l => l.TouristId == id);
         return entity;
     }
 

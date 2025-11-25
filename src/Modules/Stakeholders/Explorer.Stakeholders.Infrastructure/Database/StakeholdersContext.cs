@@ -103,9 +103,9 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         private static void ConfigurePosition(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Position>()
-                .HasOne<Person>()
+                .HasOne<User>()
                 .WithOne()
-                .HasForeignKey<Position>(l => l.PersonId);
+                .HasForeignKey<Position>(l => l.TouristId);
         }
     }
 }
