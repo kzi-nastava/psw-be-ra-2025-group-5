@@ -56,6 +56,8 @@ namespace Explorer.Stakeholders.Core.Mappers
                             ? src.Images.Select(img => Convert.FromBase64String(img)).ToList()
                             : new List<byte[]>())
                 );
+
+            CreateMap<TourProblemDto, TourProblem>().ReverseMap();
         }
     }
 }
