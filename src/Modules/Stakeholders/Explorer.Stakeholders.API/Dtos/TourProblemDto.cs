@@ -21,8 +21,8 @@ public class TourProblemDto
     [StringLength(2000)]
     public string Description { get; set; } = string.Empty;
 
-    public DateTimeOffset OccurredAt { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTime OccurredAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public enum ProblemCategory

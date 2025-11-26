@@ -28,8 +28,8 @@ public class TourProblem : Entity
     public ProblemPriority Priority { get; private set; }
 
     public string Description { get; private set; }
-    public DateTimeOffset OccurredAt { get; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTime OccurredAt { get; }
+    public DateTime CreatedAt { get; }
 
     private TourProblem() { }
 
@@ -39,8 +39,8 @@ public class TourProblem : Entity
         ProblemCategory category,
         ProblemPriority priority,
         string description,
-        DateTimeOffset occurredAt,
-        DateTimeOffset? createdAt = null)
+        DateTime occurredAt,
+        DateTime? createdAt = null)
     {
         if (tourId == 0) throw new ArgumentOutOfRangeException(nameof(tourId));
         if (reporterId == 0) throw new ArgumentOutOfRangeException(nameof(reporterId));
@@ -52,6 +52,6 @@ public class TourProblem : Entity
         Priority = priority;
         Description = description.Trim();
         OccurredAt = occurredAt;
-        CreatedAt = createdAt ?? DateTimeOffset.UtcNow;
+        CreatedAt = createdAt ?? DateTime.Now;
     }
 }

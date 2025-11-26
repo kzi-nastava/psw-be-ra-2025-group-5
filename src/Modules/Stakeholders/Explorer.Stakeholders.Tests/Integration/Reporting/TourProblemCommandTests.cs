@@ -30,8 +30,8 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
             Category = ProblemCategory.Safety,
             Priority = ProblemPriority.High,
             Description = "Problem sa bezbednošću na turi",
-            OccurredAt = DateTimeOffset.UtcNow,
-            CreatedAt = DateTimeOffset.UtcNow
+            OccurredAt = DateTime.Now,
+            CreatedAt = DateTime.Now
         };
 
         // Act
@@ -81,8 +81,8 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
             Category = ProblemCategory.Safety,
             Priority = ProblemPriority.Critical,
         Description = "Ažurirani problem bezbednosti",
-          OccurredAt = DateTimeOffset.UtcNow,
-       CreatedAt = DateTimeOffset.UtcNow
+          OccurredAt = DateTime.Now,
+       CreatedAt = DateTime.Now
         };
 
       // Act
@@ -115,8 +115,8 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
             Category = ProblemCategory.Safety,
             Priority = ProblemPriority.Low,
             Description = "Test",
-            OccurredAt = DateTimeOffset.UtcNow,
-            CreatedAt = DateTimeOffset.UtcNow
+            OccurredAt = DateTime.Now,
+            CreatedAt = DateTime.Now
       };
 
 // Act & Assert
