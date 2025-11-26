@@ -47,5 +47,12 @@ namespace Explorer.Tours.Core.UseCases.Administration
             var result = _facilityRepository.Update(_mapper.Map<Facility>(entity));
             return _mapper.Map<FacilityDto>(result);
         }
+
+        public IEnumerable<FacilityDto> GetAllForTourists()
+        {
+            var facilities = _facilityRepository.GetAllForTourists();
+            return facilities.Select(_mapper.Map<FacilityDto>).ToList();
+        }
+
     }
 }

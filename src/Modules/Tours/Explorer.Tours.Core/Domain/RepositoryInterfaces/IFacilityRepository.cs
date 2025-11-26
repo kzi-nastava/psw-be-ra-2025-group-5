@@ -8,5 +8,6 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
         Facility Create(Facility map);
         Facility Update(Facility map);
         void Delete(long id);
+        IEnumerable<Facility> GetAllForTourists(); 
     }
 }
