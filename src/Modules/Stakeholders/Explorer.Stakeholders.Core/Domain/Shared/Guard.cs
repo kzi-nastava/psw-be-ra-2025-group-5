@@ -4,7 +4,7 @@ public static class Guard
 {
     public static void AgainstNull(object? value, string paramName)
     {
-        if (value is null || (value is int && (int)value == 0))
+        if (value is null || (value is long && (long)value == 0))
             throw new ArgumentException($"{paramName} cannot be null.", paramName);
     }
 
