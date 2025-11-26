@@ -1,6 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.Administration;
+using Explorer.Tours.Core.UseCases.Administration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,14 @@ namespace Explorer.API.Controllers.Administrator.Administration
         {
             _facilityService.Delete(id);
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public ActionResult<IEnumerable<FacilityDto>> GetPublic()
+        {
+            var facilities = _facilityService.GetAllForTourists();
+            return Ok(facilities);
         }
     }
 }

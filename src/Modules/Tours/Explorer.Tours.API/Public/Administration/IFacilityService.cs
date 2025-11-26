@@ -9,5 +9,6 @@ namespace Explorer.Tours.API.Public.Administration
         FacilityDto Create(FacilityDto facility);
         FacilityDto Update(FacilityDto facility);
         void Delete(long id);
+        IEnumerable<FacilityDto> GetAllForTourists(); 
     }
 }
