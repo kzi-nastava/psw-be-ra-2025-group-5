@@ -58,6 +58,9 @@ namespace Explorer.Stakeholders.Core.Mappers
                 );
 
             CreateMap<TourProblemDto, TourProblem>().ReverseMap();
+
+            // ========================= Position <-> PositionDto =========================
+            CreateMap<PositionDto, Position>().ReverseMap();
         }
     }
 }
