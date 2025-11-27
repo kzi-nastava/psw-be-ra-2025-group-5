@@ -5,13 +5,13 @@ DELETE FROM stakeholders."AppRatings";
 DELETE FROM stakeholders."Clubs";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
-(0,  'admin@gmail.com',   'admin',   'admin@gmail.com', 0, true),
-(1, 'autor1@gmail.com',  'autor1',  'autor1@gmail.com', 1, true),
-(2, 'autor2@gmail.com',  'autor2',  'autor2@gmail.com', 1, true),
-(3, 'autor3@gmail.com',  'autor3',  'autor3@gmail.com', 1, true),
-(4, 'turista1@gmail.com','turista1','turista1@gmail.com', 2, true),
-(5, 'turista2@gmail.com','turista2','turista2@gmail.com', 2, true),
-(6, 'turista3@gmail.com','turista3','turista3@gmail.com', 2, true);
+(0,  'admin',   'admin',   'admin@gmail.com', 0, true),
+(1, 'autor1',  'autor1',  'autor1@gmail.com', 1, true),
+(2, 'autor2',  'autor2',  'autor2@gmail.com', 1, true),
+(3, 'autor3',  'autor3',  'autor3@gmail.com', 1, true),
+(4, 'turista1','turista1','turista1@gmail.com', 2, true),
+(5, 'turista2','turista2','turista2@gmail.com', 2, true),
+(6, 'turista3','turista3','turista3@gmail.com', 2, true);
 
 INSERT INTO stakeholders."Users" VALUES (7, 'zika', 'zika', 'zika@gmail.com', 1, true);
 INSERT INTO stakeholders."Users" VALUES (8, 'mika', 'mika', 'mika@gmail.com', 1, true);
