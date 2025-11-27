@@ -24,6 +24,14 @@ public class AuthenticationController : ControllerBase
     [HttpPost("login")]
     public ActionResult<AuthenticationTokensDto> Login([FromBody] CredentialsDto credentials)
     {
-        return Ok(_authenticationService.Login(credentials));
+        try
+        {
+            var result = _authenticationService.Login(credentials);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
     }
 }

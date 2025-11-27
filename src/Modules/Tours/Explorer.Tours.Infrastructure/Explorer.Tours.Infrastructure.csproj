@@ -11,4 +11,9 @@
     <ProjectReference Include="..\Explorer.Tours.Core\Explorer.Tours.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Scripts\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

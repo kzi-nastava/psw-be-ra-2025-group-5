@@ -24,6 +24,7 @@ public class BaseWebIntegrationTest<TTestFactory> : IClassFixture<TTestFactory> 
             {
                 User = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
+                    new Claim("id", id),
                     new Claim("personId", id)
                 }))
             }
