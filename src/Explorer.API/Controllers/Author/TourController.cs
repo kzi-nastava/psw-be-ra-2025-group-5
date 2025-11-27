@@ -25,6 +25,7 @@ public class TourController : ControllerBase
     }
 
     [HttpGet("tags")]
+    [AllowAnonymous]
     public ActionResult<List<string>> GetAllTags()
     {
         return Ok(_TourService.GetAllTags());
