@@ -15,11 +15,13 @@ namespace Explorer.Stakeholders.Core.UseCases
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IPersonRepository _personRepository;
         private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, IPersonRepository personRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _personRepository = personRepository;
             _mapper = mapper;
         }
 
@@ -37,6 +39,15 @@ namespace Explorer.Stakeholders.Core.UseCases
             user.Activate();
 
             User created = _userRepository.Create(user);
+
+            var person = new Person(
+                created.Id,
+                null,
+                null,
+                created.Email
+            );
+
+            _personRepository.Create(person);
 
             return _mapper.Map<UserDto>(created);
         }
