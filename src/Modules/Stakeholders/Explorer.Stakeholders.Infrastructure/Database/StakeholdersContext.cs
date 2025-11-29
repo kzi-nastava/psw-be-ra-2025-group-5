@@ -11,6 +11,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<AppRating> AppRatings { get; set; }
         public DbSet<TourProblem> TourProblems { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -26,6 +27,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureAppRating(modelBuilder);
             ConfigureTourProblem(modelBuilder);
             ConfigurePosition(modelBuilder);
+            ConfigureComment(modelBuilder);
         }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -97,6 +99,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
 
                 // Index za brže pretraživanje po TourId
                 builder.HasIndex(tp => tp.TourId);
+
             });
         }
 
@@ -106,6 +109,21 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 .HasOne<User>()
                 .WithOne()
                 .HasForeignKey<Position>(l => l.TouristId);
+        }
+
+        private static void ConfigureComment(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Comment>(builder =>
+            {
+                builder.HasKey(c => c.CommentId);
+                builder.Property(c => c.AuthorId).IsRequired();
+                builder.Property(c => c.Content).IsRequired().HasMaxLength(2000);
+                builder.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("NOW()");
+                builder.Property(c => c.UpdatedAt).IsRequired(false);
+                builder.HasOne<User>().WithMany().HasForeignKey(c => c.AuthorId).OnDelete(DeleteBehavior.Restrict);
+                builder.HasIndex(c => c.AuthorId);
+
+            });
         }
     }
 }

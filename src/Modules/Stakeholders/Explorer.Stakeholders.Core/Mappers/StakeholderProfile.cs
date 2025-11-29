@@ -61,6 +61,9 @@ namespace Explorer.Stakeholders.Core.Mappers
 
             // ========================= Position <-> PositionDto =========================
             CreateMap<PositionDto, Position>().ReverseMap();
+
+            CreateMap<Comment, CommentDto>();
+
         }
     }
 }
