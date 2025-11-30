@@ -14,6 +14,7 @@ public class ToursContext : DbContext
 
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
+    public DbSet<ShoppingCart> ShoppingCart { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -24,6 +25,10 @@ public class ToursContext : DbContext
         modelBuilder.Entity<TouristEquipment>().ToTable("TouristEquipment");
         
         ConfigureTouristPreferences(modelBuilder);
+
+        modelBuilder.Entity<ShoppingCart>()
+            .Property(s => s.Items)
+            .HasColumnType("jsonb");
     }
 
     private static void ConfigureTouristPreferences(ModelBuilder modelBuilder)
