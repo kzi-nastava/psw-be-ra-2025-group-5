@@ -2,7 +2,7 @@
 
 public class TourDto
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     public int AuthorId { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
@@ -10,4 +10,7 @@ public class TourDto
     public List<string> Tags { get; set; }
     public double Price { get; set; }
     public string Status { get; set; }
+    public DateTime? PublishedDate { get; set; }
+    public DateTime? ArchivedDate { get; set; }
+    public List<KeyPointDto> KeyPoints { get; set; }
 }
