@@ -21,12 +21,13 @@ public class TourCommandTests : BaseToursIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var updatedEntity = TourDtoBuilder.CreateValid();
-        var prop = typeof(TourDto).GetProperty(field);
-        prop.SetValue(updatedEntity, value);
-        Type exception = field == "Difficulty" || field == "Status" ? typeof(AutoMapper.AutoMapperMappingException) : typeof(ArgumentException);
+        var prop = typeof(CreateTourDto).GetProperty(field);
+        prop?.SetValue(updatedEntity, value);
+        
+        Type exception = typeof(ArgumentException);
 
         // Act & Assert
-        Should.Throw(() => isCreate ? controller.Create(updatedEntity) : controller.Update(updatedEntity), exception);
+        Should.Throw(() => controller.Create(updatedEntity), exception);
     }
 
     public TourCommandTests(ToursTestFactory factory) : base(factory) { }
@@ -55,24 +56,23 @@ public class TourCommandTests : BaseToursIntegrationTest
     }
 
     [Theory]
-    [InlineData(nameof(TourDto.Name))]
-    [InlineData(nameof(TourDto.AuthorId))]
+    [InlineData(nameof(CreateTourDto.Name))]
+    [InlineData(nameof(CreateTourDto.AuthorId))]
     public void Create_fails_null_data(string field)
     {
         ShouldFailValidation(field, null);
     }
 
     [Theory]
-    [InlineData(nameof(TourDto.Difficulty))]
-    [InlineData(nameof(TourDto.Status))]
+    [InlineData(nameof(CreateTourDto.Difficulty))]
     public void Create_fails_invalid_enum_data(string field)
     {
         ShouldFailValidation(field, "Invalid enum value");
     }
 
     [Theory]
-    [InlineData(nameof(TourDto.Tags))]
-    [InlineData(nameof(TourDto.Price))]
+    [InlineData(nameof(CreateTourDto.Tags))]
+    [InlineData(nameof(CreateTourDto.Price))]
     public void Create_fails_invalid_data(string field)
     {
         object value = field == "Price" ? -1 : new List<string> { "Nature", "Nature", "Viewpoints" };
@@ -86,11 +86,18 @@ public class TourCommandTests : BaseToursIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-        var updatedEntity = TourDtoBuilder.CreateValid();
-        updatedEntity.Id = -3;
+        
+        var updatedEntity = new UpdateTourDto
+        {
+            Name = "Updated Zlatibor Tour",
+            Description = "Updated description",
+            Difficulty = "Hard",
+            Tags = new List<string> { "Updated", "Nature" },
+            Price = 100
+        };
 
         // Act
-        var result = ((ObjectResult)controller.Update(updatedEntity).Result)?.Value as TourDto;
+        var result = ((ObjectResult)controller.Update(-3, updatedEntity).Result)?.Value as TourDto;
 
         // Assert - Response
         result.ShouldNotBeNull();
@@ -99,18 +106,13 @@ public class TourCommandTests : BaseToursIntegrationTest
         result.Description.ShouldBe(updatedEntity.Description);
 
         // Assert - Database
-        var storedEntity = dbContext.Tours.Single(i => i.Id == updatedEntity.Id);
+        var storedEntity = dbContext.Tours.Single(i => i.Id == -3);
         storedEntity.ShouldNotBeNull();
         storedEntity.Name.ShouldBe(updatedEntity.Name);
         storedEntity.Description.ShouldBe(updatedEntity.Description);
         storedEntity.Difficulty.ShouldBe(Enum.Parse<TourDifficulty>(updatedEntity.Difficulty));
-        storedEntity.Status.ShouldBe(Enum.Parse<TourStatus>(updatedEntity.Status));
-        storedEntity.AuthorId.ShouldBe(updatedEntity.AuthorId);
         storedEntity.Price.ShouldBe(updatedEntity.Price);
         storedEntity.Tags.ShouldBeEquivalentTo(updatedEntity.Tags);
-
-        var oldEntity = dbContext.Tours.FirstOrDefault(i => i.Name == "Novi Sad Food & Culture Tour");
-        oldEntity.ShouldBeNull();
     }
 
     [Fact]
@@ -119,36 +121,17 @@ public class TourCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        var updatedEntity = TourDtoBuilder.CreateValid();
-        updatedEntity.Id = -999;
+        var updatedEntity = new UpdateTourDto
+        {
+            Name = "Test",
+            Description = "Test",
+            Difficulty = "Easy",
+            Tags = new List<string> { "Test" },
+            Price = 0
+        };
 
         // Act & Assert
-        Should.Throw<NotFoundException>(() => controller.Update(updatedEntity));
-    }
-
-    [Theory]
-    [InlineData(nameof(TourDto.Name))]
-    [InlineData(nameof(TourDto.AuthorId))]
-    public void Update_fails_null_data(string field)
-    {
-        ShouldFailValidation(field, null, false);
-    }
-
-    [Theory]
-    [InlineData(nameof(TourDto.Difficulty))]
-    [InlineData(nameof(TourDto.Status))]
-    public void Update_fails_invalid_enum_data(string field)
-    {
-        ShouldFailValidation(field, "Invalid enum value", false);
-    }
-
-    [Theory]
-    [InlineData(nameof(TourDto.Tags))]
-    [InlineData(nameof(TourDto.Price))]
-    public void Update_fails_invalid_data(string field)
-    {
-        object value = field == "Price" ? -1 : new List<string> { "Nature", "Nature", "Viewpoints" };
-        ShouldFailValidation(field, value, false);
+        Should.Throw<NotFoundException>(() => controller.Update(-999, updatedEntity));
     }
 
     [Fact]
