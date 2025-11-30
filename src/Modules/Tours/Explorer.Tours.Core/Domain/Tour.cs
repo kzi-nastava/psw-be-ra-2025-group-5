@@ -142,8 +142,8 @@ public class Tour : AggregateRoot
 
     public void Update(string name, string? description, TourDifficulty difficulty, List<string> tags, double price)
     {
-        if (Status != TourStatus.Draft)
-            throw new InvalidOperationException("Only draft tours can be updated.");
+        //if (Status != TourStatus.Draft)
+        //    throw new InvalidOperationException("Only draft tours can be updated.");
 
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstInvalidEnum(difficulty, nameof(difficulty));
