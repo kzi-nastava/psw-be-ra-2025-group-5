@@ -21,10 +21,26 @@ public class ToursProfile : Profile
 
         CreateMap<Tour, TourDto>().ReverseMap();
 
+        CreateMap<CreateTourDto, Tour>()
+            .ConstructUsing(dto => new Tour(
+                dto.AuthorId,
+                dto.Name,
+                dto.Description,
+                Enum.Parse<TourDifficulty>(dto.Difficulty, true),
+                dto.Tags,
+                dto.Price
+            ));
+
         CreateMap<MonumentLocationDto, MonumentLocation>().ReverseMap();
         CreateMap<MonumentDto, Monument>().ReverseMap();
 
         CreateMap<TouristEquipmentDto, TouristEquipment>().ReverseMap();
         CreateMap<FacilityDto, Facility>().ReverseMap();
+
+        CreateMap<Location, LocationDto>().ReverseMap();
+
+        CreateMap<KeyPoint, KeyPointDto>().ReverseMap();
+        
+        CreateMap<CreateKeyPointDto, KeyPointDto>();
     }
 }
