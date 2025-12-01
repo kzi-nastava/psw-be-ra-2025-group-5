@@ -35,7 +35,7 @@ public class KeyPoint : Entity
         Position = position;
     }
 
-    public void Update(string name, string description, byte[]? image, string? secret)
+    public void Update(string name, string description, byte[]? image, string? secret, Location location)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Key point name is required.", nameof(name));
@@ -47,6 +47,7 @@ public class KeyPoint : Entity
         Description = description.Trim();
         Image = image;
         Secret = secret?.Trim();
+        Location = location;
     }
 
     public void UpdatePosition(int position)

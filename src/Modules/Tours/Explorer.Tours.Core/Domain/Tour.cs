@@ -67,7 +67,7 @@ public class Tour : AggregateRoot
         ReorderKeyPoints();
     }
 
-    public void UpdateKeyPoint(long keyPointId, string name, string description, byte[]? image, string? secret)
+    public void UpdateKeyPoint(long keyPointId, string name, string description, byte[]? image, string? secret, Location location)
     {
         if (Status != TourStatus.Draft)
             throw new InvalidOperationException("Key points can only be updated in tours in draft status.");
@@ -76,7 +76,7 @@ public class Tour : AggregateRoot
         if (keyPoint == null)
             throw new InvalidOperationException("Key point not found.");
 
-        keyPoint.Update(name, description, image, secret);
+        keyPoint.Update(name, description, image, secret, location);
     }
 
     public void ReorderKeyPoints(List<long> orderedKeyPointIds)

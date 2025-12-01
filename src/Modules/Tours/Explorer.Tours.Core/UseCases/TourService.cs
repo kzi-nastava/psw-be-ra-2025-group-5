@@ -88,13 +88,15 @@ public class TourService : ITourService
     public TourDto UpdateKeyPoint(long tourId, long keyPointId, CreateKeyPointDto keyPointDto)
     {
         var tour = _tourRepository.Get(tourId);
+        var location = _mapper.Map<Location>(keyPointDto.Location);
 
         tour.UpdateKeyPoint(
             keyPointId,
             keyPointDto.Name,
             keyPointDto.Description,
             keyPointDto.Image,
-            keyPointDto.Secret);
+            keyPointDto.Secret,
+            location);
 
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
