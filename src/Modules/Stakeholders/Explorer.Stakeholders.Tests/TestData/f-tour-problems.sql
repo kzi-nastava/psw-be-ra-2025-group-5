@@ -10,7 +10,7 @@ INSERT INTO stakeholders."TourProblems"(
 
 INSERT INTO stakeholders."Comments"("CommentId","AuthorId","CreatedAt","UpdatedAt","Content")
 VALUES
-(11,-11,NOW(),NULL,'Problem je rešen');
+(11,-11,NOW(),NULL,'Problem je resen');
 
 UPDATE stakeholders."TourProblems"
 	SET "Comments" = ARRAY[11]

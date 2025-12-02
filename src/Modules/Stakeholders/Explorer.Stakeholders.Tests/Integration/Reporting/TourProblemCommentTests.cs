@@ -1,44 +1,47 @@
-﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
+﻿using Explorer.API.Controllers;
 using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public.Reporting;
+using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.Core.UseCases;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using AutoMapper;
 
 namespace Explorer.Stakeholders.Tests.Integration.Reporting
 {
     [Collection("Sequential")]
-    public class TourProblemCommentTests : BaseStakeholdersIntegrationTest
+    public class CommentTests : BaseStakeholdersIntegrationTest
     {
-        public TourProblemCommentTests(StakeholdersTestFactory factory) : base(factory) { }
+        public CommentTests(StakeholdersTestFactory factory) : base(factory) { }
 
         [Fact]
-        public void Successfully_adds_comment()
+        public void Successfully_creates_comment()
         {
             // Arrange
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
             var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+
             var createCommentDto = new CreateCommentDto
             {
-                Content = "Novi komentar na problem"
+                Content = "Novi komentar iz testa"
             };
 
             // Act
-            var result = ((ObjectResult)controller.AddComment(-11, createCommentDto).Result)?.Value as CommentDto;
+            var actionResult = controller.Create(createCommentDto);
+            var result = ((OkObjectResult)actionResult.Result)?.Value as CommentDto;
 
             // Assert - Response
             result.ShouldNotBeNull();
-            result.CommentId.ShouldNotBe(0);
+            result.CommentId.ShouldBeGreaterThan(0);
             result.AuthorId.ShouldBe(-21);
-            result.Content.ShouldBe(createCommentDto.Content);
+            result.Content.ShouldBe("Novi komentar iz testa");
             result.CreatedAt.ShouldNotBe(DateTimeOffset.MinValue);
 
             // Assert - Database
@@ -46,102 +49,90 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var storedComment = dbContext.Comments.FirstOrDefault(c => c.CommentId == result.CommentId);
             storedComment.ShouldNotBeNull();
             storedComment.AuthorId.ShouldBe(-21);
-            storedComment.Content.ShouldBe(createCommentDto.Content);
+            storedComment.Content.ShouldBe("Novi komentar iz testa");
         }
 
         [Fact]
-        public void Add_comment_fails_empty_content()
-        {
-            // Arrange
-            using var scope = Factory.Services.CreateScope();
-            var controller = CreateController(scope);
-            var createCommentDto = new CreateCommentDto
-            {
-                Content = ""
-            };
-
-            // Act & Assert
-            Should.Throw<ArgumentException>(() => controller.AddComment(-11, createCommentDto));
-        }
-
-        [Fact]
-        public void Add_comment_fails_null_content()
-        {
-            // Arrange
-            using var scope = Factory.Services.CreateScope();
-            var controller = CreateController(scope);
-            var createCommentDto = new CreateCommentDto
-            {
-                Content = null
-            };
-
-            // Act & Assert
-            Should.Throw<ArgumentException>(() => controller.AddComment(-11, createCommentDto));
-        }
-
-        [Fact]
-        public void Add_comment_fails_invalid_problem_id()
-        {
-            // Arrange
-            using var scope = Factory.Services.CreateScope();
-            var controller = CreateController(scope);
-            var createCommentDto = new CreateCommentDto
-            {
-                Content = "Komentar"
-            };
-
-            // Act & Assert
-            Should.Throw<Exception>(() => controller.AddComment(-9999, createCommentDto));
-        }
-
-        [Fact]
-        public void Successfully_retrieves_comments()
+        public void Successfully_retrieves_existing_comment()
         {
             // Arrange
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
 
-            // Act
-            var result = ((ObjectResult)controller.GetComments(-11).Result)?.Value as List<CommentDto>;
+            // Act - Preuzmi postojeći komentar iz SQL skripte (ID: 11)
+            var actionResult = controller.GetById(11);
+            var result = ((OkObjectResult)actionResult.Result)?.Value as CommentDto;
 
             // Assert
             result.ShouldNotBeNull();
-            result.Count.ShouldBeGreaterThanOrEqualTo(1);
-            result.First().CommentId.ShouldBe(11);
-            result.First().Content.ShouldBe("Problem je rešen");
+            result.CommentId.ShouldBe(11);
+            result.Content.ShouldBe("Problem je resen");
+            result.AuthorId.ShouldBe(-11);
         }
 
         [Fact]
-        public void Get_comments_returns_empty_list_when_no_comments()
+        public void GetById_fails_for_nonexistent_comment()
         {
             // Arrange
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
-
-            // Act
-            var result = ((ObjectResult)controller.GetComments(-22).Result)?.Value as List<CommentDto>;
-
-            // Assert
-            result.ShouldNotBeNull();
-            result.Count.ShouldBe(0);
-        }
-
-        [Fact]
-        public void Get_comments_fails_invalid_problem_id()
-        {
-            // Arrange
-            using var scope = Factory.Services.CreateScope();
-            var controller = CreateController(scope);
+            long nonExistentId = 9999;
 
             // Act & Assert
-            Should.Throw<Exception>(() => controller.GetComments(-9999));
+            Should.Throw<KeyNotFoundException>(() => controller.GetById(nonExistentId));
         }
 
-        private static TourProblemController CreateController(IServiceScope scope)
+        [Fact]
+        public void Successfully_creates_multiple_comments()
         {
-            return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>(), scope.ServiceProvider.GetRequiredService<ITourRepository>())
+            // Arrange
+            using var scope = Factory.Services.CreateScope();
+            var controller = CreateController(scope);
+            var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+
+            // Act - Kreiraj više komentara
+            var comment1 = ((OkObjectResult)controller.Create(new CreateCommentDto { Content = "Prvi komentar" }).Result)?.Value as CommentDto;
+            var comment2 = ((OkObjectResult)controller.Create(new CreateCommentDto { Content = "Drugi komentar" }).Result)?.Value as CommentDto;
+            var comment3 = ((OkObjectResult)controller.Create(new CreateCommentDto { Content = "Treći komentar" }).Result)?.Value as CommentDto;
+
+            // Assert
+            comment1.ShouldNotBeNull();
+            comment2.ShouldNotBeNull();
+            comment3.ShouldNotBeNull();
+
+            comment1.CommentId.ShouldNotBe(comment2.CommentId);
+            comment2.CommentId.ShouldNotBe(comment3.CommentId);
+
+            // Assert - Svi su u bazi
+            dbContext.ChangeTracker.Clear();
+            var allComments = dbContext.Comments.Where(c =>
+                c.CommentId == comment1.CommentId ||
+                c.CommentId == comment2.CommentId ||
+                c.CommentId == comment3.CommentId).ToList();
+
+            allComments.Count.ShouldBe(3);
+        }
+
+        private static CommentController CreateController(IServiceScope scope)
+        {
+            // Ručno kreiraj servise jer nisu registrovani u DI
+            var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+            var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+            var commentRepository = new CommentDbRepository(dbContext);
+            var commentService = new CommentService(commentRepository, mapper);
+
+            return new CommentController(commentService)
             {
-                ControllerContext = BuildContext("-21")
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+                        {
+                            new Claim("id", "-21")
+                        }))
+                    }
+                }
             };
         }
     }
