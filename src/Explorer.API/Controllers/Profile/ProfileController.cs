@@ -1,10 +1,9 @@
-﻿
-using Explorer.Stakeholders.API.Dtos;
+﻿using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Explorer.Stakeholders.API.Controllers;
+namespace Explorer.API.Controllers.Profile;
 
 
 [ApiController]

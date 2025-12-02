@@ -145,4 +145,58 @@ public class TourService : ITourService
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
+
+    // for tourists
+    public PagedResult<TourDto> GetPagedPublished(int page, int pageSize)
+    {
+        var result = _tourRepository.GetPagedByStatus(TourStatus.Published, page, pageSize);
+
+        var items = result.Results.Select(tour =>
+        {
+            var dto = _mapper.Map<TourDto>(tour);
+
+            foreach (var kp in dto.KeyPoints)
+            {
+                kp.Secret = null;
+            }
+
+            return dto;
+        }).ToList();
+
+        return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+
+    public TourDto GetPublished(long id)
+    {
+        var tour = _tourRepository.Get(id);
+
+        if (tour == null || tour.Status != TourStatus.Published)
+            throw new InvalidOperationException("Tour not found or not published.");
+
+        var dto = _mapper.Map<TourDto>(tour);
+
+        foreach (var kp in dto.KeyPoints)
+        {
+            kp.Secret = null;
+        }
+
+        return dto;
+    }
+
+    public KeyPointDto GetKeyPoint(long tourId, long keyPointId)
+    {
+        var tour = _tourRepository.Get(tourId);
+
+        var keyPoint = tour.KeyPoints.FirstOrDefault(kp => kp.Id == keyPointId);
+        if (keyPoint == null)
+            throw new KeyNotFoundException("Key point not found.");
+
+        var dto = _mapper.Map<KeyPointDto>(keyPoint);
+        dto.Secret = null; 
+
+        return dto;
+    }
+
+
+
 }

@@ -115,4 +115,16 @@ public class TourDbRepository : ITourRepository
         _dbSet.Remove(entity);
         DbContext.SaveChanges();
     }
+
+    public PagedResult<Tour> GetPagedByStatus(TourStatus status, int page, int pageSize)
+    {
+        var query = _dbSet
+            .Include(t => t.KeyPoints)
+            .Where(t => t.Status == status);
+
+        var task = query.GetPagedById(page, pageSize);
+        task.Wait();
+        return task.Result;
+    }
+
 }
