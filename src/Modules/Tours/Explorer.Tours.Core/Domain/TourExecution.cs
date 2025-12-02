@@ -32,6 +32,12 @@ namespace Explorer.Tours.Core.Domain
             CurrentKeyPoint = 0;
         }
 
+        public static TourExecution StartNew(long userId, long tourId)
+        {
+            return new TourExecution(userId, tourId);
+        }
+
+
         public void CompleteKeyPoint(long keyPointId, double distanceTravelled)
         {
             if (Status != TourExecutionStatus.Active)
@@ -62,6 +68,7 @@ namespace Explorer.Tours.Core.Domain
         {
             LastActivity = DateTime.UtcNow;
         }
+
 
     }
 }
