@@ -23,6 +23,7 @@ public class TourProblemDto
 
     public DateTimeOffset OccurredAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+    public List<CommentDto> Comments { get; set; } = new();
 }
 
 public enum ProblemCategory

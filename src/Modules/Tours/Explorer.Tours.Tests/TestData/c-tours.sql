@@ -1,6 +1,7 @@
 INSERT INTO tours."Tours"(
-	"Id", "Name", "Description", "Difficulty", "Tags", "Price", "Status", "AuthorId")
-	VALUES (-1, 'Belgrade Fortress Walk', 'A guided walking tour through Kalemegdan and the old fortress.', 0, ARRAY['History','Sightseeing'], 5.0, 1, 1);
+    "Id", "Name", "Description", "Difficulty", "Tags", "Price", "Status", "AuthorId")
+VALUES (-1, 'Belgrade Fortress Walk', 'Opis ture...', 0, ARRAY['History','Sightseeing'], 5.0, 1, 1);
+
 INSERT INTO tours."Tours"(
 	"Id", "Name", "Description", "Difficulty", "Tags", "Price", "Status", "AuthorId")
 	VALUES (-2, 'Tara National Park Hike', 'A full-day hiking adventure across the Tara mountain ridges.', 2, ARRAY['Nature','Hiking','Scenic'], 0, 0, 1);

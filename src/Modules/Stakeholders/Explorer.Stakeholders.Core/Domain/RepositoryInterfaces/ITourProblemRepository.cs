@@ -8,5 +8,10 @@ namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces
         TourProblem Create(TourProblem entity);
         TourProblem Update(TourProblem entity);
         void Delete(long id);
+        TourProblem Get(long id);
+        TourProblem GetWithComments(long id);
+        void AddComment(Comment comment);
+        Comment GetCommentById(long commentId);
+        public List<Comment> GetCommentsByIds(List<long> ids);
     }
 }
