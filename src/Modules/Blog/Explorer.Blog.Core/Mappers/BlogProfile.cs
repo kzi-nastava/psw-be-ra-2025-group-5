@@ -15,5 +15,7 @@ public class BlogProfile : Profile
                opt => opt.MapFrom(src => Convert.ToBase64String(src.Data)));
 
         CreateMap<BlogImageDto, BlogImage>().ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<BlogPost, BlogPostDto>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
     }
 }

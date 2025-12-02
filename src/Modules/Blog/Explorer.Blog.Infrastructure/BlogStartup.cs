@@ -26,6 +26,8 @@ public static class BlogStartup
     {
         services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<IBlogRepository, BlogDbRepository>();
+        services.AddScoped<BlogDomainService>();
+
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
