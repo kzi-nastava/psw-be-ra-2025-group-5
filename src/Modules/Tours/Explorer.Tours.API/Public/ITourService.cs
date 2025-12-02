@@ -23,4 +23,9 @@ public interface ITourService
     TourDto Publish(long tourId);
     TourDto Archive(long tourId);
     TourDto Reactivate(long tourId);
+
+    // For tourists
+    PagedResult<TourDto> GetPagedPublished(int page, int pageSize);
+    TourDto GetPublished(long id);
+    KeyPointDto GetKeyPoint(long tourId, long keyPointId);
 }
