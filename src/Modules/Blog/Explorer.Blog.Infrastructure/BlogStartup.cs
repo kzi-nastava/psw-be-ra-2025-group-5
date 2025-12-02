@@ -15,17 +15,19 @@ public static class BlogStartup
 {
     public static IServiceCollection ConfigureBlogModule(this IServiceCollection services)
     {
-        // Registers all profiles since it works on the assembly
+       
         services.AddAutoMapper(typeof(BlogProfile).Assembly);
         SetupCore(services);
         SetupInfrastructure(services);
         return services;
     }
-    
+
     private static void SetupCore(IServiceCollection services)
     {
         services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<IBlogRepository, BlogDbRepository>();
+
+        services.AddScoped<BlogCommentService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -33,7 +35,7 @@ public static class BlogStartup
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("blog"));
         dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
-        
+
         services.AddDbContext<BlogContext>(opt =>
             opt.UseNpgsql(dataSource,
                 x => x.MigrationsHistoryTable("__EFMigrationsHistory", "blog")));

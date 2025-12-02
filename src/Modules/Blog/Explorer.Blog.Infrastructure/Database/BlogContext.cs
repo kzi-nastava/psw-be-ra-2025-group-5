@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Explorer.Blog.Core.Domain;
+using Explorer.Stakeholders.Core.Domain;
 
 namespace Explorer.Blog.Infrastructure.Database;
 
@@ -7,7 +8,8 @@ public class BlogContext : DbContext
 {
     public DbSet<BlogPost> BlogPosts { get; set; }
     public DbSet<BlogImage> BlogImages { get; set; }
-    public BlogContext(DbContextOptions<BlogContext> options) : base(options) {}
+    public DbSet<Comment> Comments { get; set; }
+    public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,9 +25,30 @@ public class BlogContext : DbContext
 
         modelBuilder.Entity<BlogImage>(i =>
         {
-            i.Property(x => x.Data).IsRequired().HasColumnType("bytea"); 
+            i.Property(x => x.Data).IsRequired().HasColumnType("bytea");
             i.Property(x => x.ContentType).IsRequired().HasMaxLength(100);
             i.Property(x => x.Order).IsRequired();
         });
+
+        modelBuilder.Entity<Comment>(c =>
+        {
+            c.ToTable("Comments"); 
+            c.HasKey(x => x.CommentId);
+
+            c.Property(x => x.AuthorId).IsRequired();
+            c.Property(x => x.Content).IsRequired().HasColumnType("text");
+            c.Property(x => x.CreatedAt).IsRequired();
+            c.Property(x => x.UpdatedAt).IsRequired(false);
+
+          
+            c.Property<long>("BlogPostId").IsRequired();
+
+            c.HasOne<BlogPost>()
+             .WithMany(b => b.Comments)
+             .HasForeignKey("BlogPostId")
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+
     }
 }

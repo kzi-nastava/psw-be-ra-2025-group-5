@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.Core.Domain;
 
 namespace Explorer.Blog.Infrastructure.Database.Repositories
 {
-    public class BlogDbRepository: IBlogRepository
+    public class BlogDbRepository : IBlogRepository
     {
         private readonly BlogContext _dbContext;
 
@@ -18,7 +19,12 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
             _dbContext = dbContext;
         }
         public List<BlogPost> GetAll() => _dbContext.BlogPosts.Include(x => x.Images).ToList();
-        public BlogPost? GetById(long id) => _dbContext.BlogPosts.FirstOrDefault(blog => blog.Id == id);
+        public BlogPost? GetById(long id) => _dbContext.BlogPosts
+        .Include(b => b.Images)
+        .Include(b => b.Comments)
+        .FirstOrDefault(blog => blog.Id == id);
+
+
         public List<BlogPost> GetByAuthor(long authorId) => _dbContext.BlogPosts.Where(author => author.AuthorId == authorId).ToList();
         public BlogPost Create(BlogPost blog)
         {
@@ -65,6 +71,48 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
             _dbContext.BlogImages.Remove(image);
             _dbContext.SaveChanges();
         }
+
+        public List<Comment> GetComments(long blogId)
+        {
+            var blog = _dbContext.BlogPosts.Include(b => b.Comments).FirstOrDefault(b => b.Id == blogId);
+            return blog?.Comments ?? new List<Comment>();
+        }
+
+        public void AddComment(long blogId, Comment comment)
+        {
+            var blog = _dbContext.BlogPosts
+                .Include(b => b.Comments)
+                .FirstOrDefault(b => b.Id == blogId);
+
+            if (blog == null) throw new Exception("Blog not found");
+
+            blog.Comments.Add(comment);
+
+            var entry = _dbContext.Entry(comment);
+            if (entry != null)
+            {
+                entry.Property("BlogPostId").CurrentValue = blogId;
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+
+
+        public void RemoveComment(long blogId, long commentId)
+        {
+            var blog = _dbContext.BlogPosts.Include(b => b.Comments).FirstOrDefault(b => b.Id == blogId);
+            if (blog == null) throw new Exception("Blog not found");
+
+            var comment = blog.Comments.FirstOrDefault(c => c.CommentId == commentId);
+            if (comment != null)
+            {
+                blog.Comments.Remove(comment);
+                _dbContext.SaveChanges();
+            }
+        }
+
+
 
 
     }
