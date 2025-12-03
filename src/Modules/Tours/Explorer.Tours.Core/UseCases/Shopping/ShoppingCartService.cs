@@ -27,6 +27,9 @@ public class ShoppingCartService : IShoppingCartService
 
     public ShoppingCartDto Create(CreateShoppingCartDto entity)
     {
+        if(_ShoppingCartRepository.GetByTourist(entity.TouristId) is not null)
+            throw new InvalidOperationException($"Shopping cart already exists for tourist {entity.TouristId}");
+
         var result = _ShoppingCartRepository.Create(_mapper.Map<ShoppingCart>(entity));
         return _mapper.Map<ShoppingCartDto>(result);
     }
