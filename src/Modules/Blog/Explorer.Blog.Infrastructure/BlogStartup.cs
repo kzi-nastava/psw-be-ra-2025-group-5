@@ -15,7 +15,6 @@ public static class BlogStartup
 {
     public static IServiceCollection ConfigureBlogModule(this IServiceCollection services)
     {
-       
         services.AddAutoMapper(typeof(BlogProfile).Assembly);
         SetupCore(services);
         SetupInfrastructure(services);
@@ -27,7 +26,9 @@ public static class BlogStartup
         services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<IBlogRepository, BlogDbRepository>();
 
+        
         services.AddScoped<BlogCommentService>();
+        services.AddScoped<BlogDomainService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)

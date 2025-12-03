@@ -20,6 +20,11 @@ public class BlogContext : DbContext
             b.Property(x => x.Title).IsRequired().HasMaxLength(300);
             b.Property(x => x.Description).IsRequired().HasColumnType("text");
             b.Property(x => x.CreatedAt).IsRequired();
+            b.Property(x => x.LastUpdatedAt); 
+
+            b.Property(x => x.Status)
+                .IsRequired()
+                .HasConversion<string>();
             b.HasMany(x => x.Images).WithOne().HasForeignKey(i => i.BlogPostId).OnDelete(DeleteBehavior.Cascade);
         });
 
