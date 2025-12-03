@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Explorer.Blog.API.Dtos;
 using Explorer.Blog.Core.Domain;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.Core.Domain;
+
 
 namespace Explorer.Blog.Core.Mappers;
 

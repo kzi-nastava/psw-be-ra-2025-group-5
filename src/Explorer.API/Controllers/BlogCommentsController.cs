@@ -7,6 +7,7 @@ using AutoMapper;
 using System;
 using System.Collections.Generic;
 using Explorer.Blog.API.Dtos;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 
 namespace Explorer.API.Controllers
 {
@@ -17,10 +18,15 @@ namespace Explorer.API.Controllers
     {
         private readonly BlogCommentService _commentService;
         private readonly IMapper _mapper;
+        private readonly IPersonRepository _personRepository;
 
-        public BlogCommentsController(BlogCommentService commentService, IMapper mapper)
+        public BlogCommentsController(
+         BlogCommentService commentService,
+         IPersonRepository personRepository, 
+         IMapper mapper)
         {
             _commentService = commentService;
+            _personRepository = personRepository;  
             _mapper = mapper;
         }
 
@@ -32,6 +38,16 @@ namespace Explorer.API.Controllers
             {
                 var comments = _commentService.GetAll(blogId);
                 var dtos = _mapper.Map<List<CommentBlogDto>>(comments);
+
+                foreach (var dto in dtos)
+                {
+                    var person = _personRepository.Get(dto.AuthorId);
+                    if (person != null)
+                    {
+                        dto.AuthorName = $"{person.Name} {person.Surname}";
+                    }
+                }
+
                 return Ok(dtos);
             }
             catch (Exception ex)

@@ -1,5 +1,5 @@
-﻿using Explorer.Blog.Core.Domain.RepositoryInterfaces;
-using Explorer.Stakeholders.Core.Domain;
+﻿using Explorer.Blog.Core.Domain;
+using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +21,13 @@ namespace Explorer.Blog.Core.UseCases
 
         public void AddComment(long blogId, long authorId, string content)
         {
-         
-            var comment = new Comment(authorId, content);
+            var blog = _blogRepository.GetById(blogId);
+            if (blog.Status != BlogStatus.Published && blog.Status != BlogStatus.Active && blog.Status != BlogStatus.Famous)
+                throw new InvalidOperationException("Cannot add comment to a blog that is not published");
 
-         
-            _blogRepository.AddComment(blogId, comment);
+            var comment = new Comment(authorId, content);
+            blog.AddComment(comment); 
+            _blogRepository.Update(blog);
         }
         public void UpdateComment(long blogId, long commentId, long authorId, string newContent)
         {

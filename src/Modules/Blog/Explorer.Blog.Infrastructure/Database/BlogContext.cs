@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Explorer.Blog.Core.Domain;
-using Explorer.Stakeholders.Core.Domain;
+
 
 namespace Explorer.Blog.Infrastructure.Database;
 

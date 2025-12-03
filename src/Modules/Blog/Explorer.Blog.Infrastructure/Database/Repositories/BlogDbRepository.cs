@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
-using Explorer.Stakeholders.Core.Domain;
+
 
 namespace Explorer.Blog.Infrastructure.Database.Repositories
 {
