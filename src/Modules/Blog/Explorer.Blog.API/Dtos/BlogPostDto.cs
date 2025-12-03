@@ -16,6 +16,7 @@ namespace Explorer.Blog.API.Dtos
         public DateTime? LastUpdatedAt { get; set; }  
         public string Status { get; set; }
         public List<BlogImageDto>? Images { get; set; }
+       
 
     }
 }

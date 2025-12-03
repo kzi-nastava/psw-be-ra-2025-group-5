@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Explorer.Stakeholders.Core.Domain
+namespace Explorer.Blog.Core.Domain
 {
     public class Comment
     {
@@ -47,4 +47,5 @@ namespace Explorer.Stakeholders.Core.Domain
         }
 
     }
+
 }
