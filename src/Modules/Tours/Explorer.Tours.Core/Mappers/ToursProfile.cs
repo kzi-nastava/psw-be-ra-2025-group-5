@@ -21,6 +21,16 @@ public class ToursProfile : Profile
 
         CreateMap<Tour, TourDto>().ReverseMap();
 
+        CreateMap<CreateTourDto, Tour>()
+            .ConstructUsing(dto => new Tour(
+                dto.AuthorId,
+                dto.Name,
+                dto.Description,
+                Enum.Parse<TourDifficulty>(dto.Difficulty, true),
+                dto.Tags,
+                dto.Price
+            ));
+
         CreateMap<MonumentLocationDto, MonumentLocation>().ReverseMap();
         CreateMap<MonumentDto, Monument>().ReverseMap();
 
@@ -33,5 +43,11 @@ public class ToursProfile : Profile
 
         CreateMap<CreateShoppingCartDto, ShoppingCart>()
             .ConstructUsing(src => new ShoppingCart(src.TouristId));
+
+        CreateMap<Location, LocationDto>().ReverseMap();
+
+        CreateMap<KeyPoint, KeyPointDto>().ReverseMap();
+        
+        CreateMap<CreateKeyPointDto, KeyPointDto>();
     }
 }

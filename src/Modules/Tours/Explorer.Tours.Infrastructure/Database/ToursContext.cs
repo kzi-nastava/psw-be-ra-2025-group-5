@@ -1,7 +1,9 @@
-ï»¿using Explorer.Tours.Core.Domain;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
+using TransportationType = Explorer.Tours.Core.Domain.TransportationType;
 
 namespace Explorer.Tours.Infrastructure.Database;
 
@@ -11,7 +13,6 @@ public class ToursContext : DbContext
     public DbSet<Tour> Tours { get; set; }
     public DbSet<Monument> Monument { get; set; }
     public DbSet<TouristEquipment> TouristEquipment { get; set; }
-
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
     public DbSet<ShoppingCart> ShoppingCart { get; set; }
@@ -24,8 +25,45 @@ public class ToursContext : DbContext
         modelBuilder.Entity<Monument>().OwnsOne(m => m.Location);
         modelBuilder.Entity<TouristEquipment>().ToTable("TouristEquipment");
         
+        ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
         ConfigureShoppingCart(modelBuilder);
+    }
+
+    private static void ConfigureTour(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Tour>()
+            .HasMany(t => t.KeyPoints)
+            .WithOne()
+            .HasForeignKey("TourId")
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false); // TourId može biti null privremeno
+
+        // Konfiguracija KeyPoint-a
+        modelBuilder.Entity<KeyPoint>()
+            .ToTable("KeyPoints");
+
+        // Konfiguracija Location kao JSON vrednosnog objekta
+        modelBuilder.Entity<KeyPoint>()
+            .Property(kp => kp.Location)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(new { v.Latitude, v.Longitude }, (JsonSerializerOptions)null),
+                v => JsonSerializer.Deserialize<LocationDto>(v, (JsonSerializerOptions)null) != null 
+                    ? new Location(JsonSerializer.Deserialize<LocationDto>(v, (JsonSerializerOptions)null).Latitude,
+                                   JsonSerializer.Deserialize<LocationDto>(v, (JsonSerializerOptions)null).Longitude)
+                    : null
+            )
+            .Metadata.SetValueComparer(new ValueComparer<Location>(
+                (l1, l2) => l1 != null && l2 != null && l1.Latitude == l2.Latitude && l1.Longitude == l2.Longitude,
+                l => HashCode.Combine(l.Latitude, l.Longitude),
+                l => new Location(l.Latitude, l.Longitude)
+            ));
+
+        // Konfiguracija Image kao bytea
+        modelBuilder.Entity<KeyPoint>()
+            .Property(kp => kp.Image)
+            .HasColumnType("bytea");
     }
 
     private static void ConfigureTouristPreferences(ModelBuilder modelBuilder)
