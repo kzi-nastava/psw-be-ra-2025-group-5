@@ -10,5 +10,17 @@ namespace Explorer.Tours.Core.Domain;
 public class ReviewImage: Entity
 {
     public string ImagePath { get; set; } = null!;
-    public long TourReviewId { get; set; }
+    public long ReviewId { get; set; }
+
+    public ReviewImage() { }
+
+    public ReviewImage(string imagePath)
+    {
+        ImagePath = imagePath;
+    }
+
+    public void UpdatePath(string path)
+    {
+        ImagePath = path;
+    }
 }

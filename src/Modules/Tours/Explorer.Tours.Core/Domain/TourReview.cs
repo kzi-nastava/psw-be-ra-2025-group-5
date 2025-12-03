@@ -58,9 +58,19 @@ public class TourReview: AggregateRoot
         Images = newImages;
     }
 
-    public void UpdatePercentage(Percentage newPercentage)
+    public void UpdatePercentage(double newPercentage)
     {
-        Percentage = newPercentage;
+        Progress = new TourProgress(newPercentage);
+    }
+
+    public void AddImage(string imagePath)
+    {
+        Images.Add(new ReviewImage(imagePath));
+    }
+
+    public void RemoveImage(int imageId)
+    {
+        Images.RemoveAll(img => img.Id == imageId);
     }
 
 }

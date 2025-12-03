@@ -12,9 +12,9 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
         PagedResult<TourReview> GetPaged(int page, int pageSize);
         PagedResult<TourReview> GetByTour(long tourId, int page, int pageSize);
         PagedResult<TourReview> GetByTourist(long touristId, int page, int pageSize);
-        TourReview Get(int id);
+        TourReview Get(long id);
         TourReview Create(TourReview newReview);
         TourReview Update(TourReview newReview);
-        void Delete(int id);
+        void Delete(long id);
     }
 }

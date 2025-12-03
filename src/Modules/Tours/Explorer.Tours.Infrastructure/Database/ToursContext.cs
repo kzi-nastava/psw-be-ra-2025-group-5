@@ -13,6 +13,8 @@ public class ToursContext : DbContext
     public DbSet<TouristEquipment> TouristEquipment { get; set; }
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
+    public DbSet<TourReview> TourReviews { get; set; }
+    public DbSet<ReviewImage> ReviewImages { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -24,6 +26,7 @@ public class ToursContext : DbContext
         
         ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
+        ConfigureReview(modelBuilder);
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -84,6 +87,22 @@ public class ToursContext : DbContext
                 v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>()
             )
             .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
+    }
+
+    private static void ConfigureReview(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ReviewImage>()
+            .HasKey(ri => ri.Id);
+
+        modelBuilder.Entity<ReviewImage>()
+            .Property(ri => ri.ReviewId)
+            .IsRequired();
+
+        modelBuilder.Entity<TourReview>()
+            .HasMany(r => r.Images)
+            .WithOne()                             
+            .HasForeignKey(ri => ri.ReviewId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     // Helper klasa za deserijalizaciju Location-a

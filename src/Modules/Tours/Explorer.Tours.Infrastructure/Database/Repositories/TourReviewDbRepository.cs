@@ -47,35 +47,68 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories
             return task.Result;
         }
 
-        TourReview Get(int id)
+        public TourReview Get(long id)
         {
             var entity = _dbSet.Include(t => t.Images).FirstOrDefault(t => t.Id  == id);
             if (entity == null) throw new NotFoundException("Not found: " + id);
             return entity;
         }
-        TourReview Create(TourReview newReview)
+        public TourReview Create(TourReview newReview)
         {
             _dbSet.Add(newReview);
             DbContext.SaveChanges();
             return newReview;
         }
-        TourReview Update(TourReview newReview)
+        public TourReview Update(TourReview newReview)
         {
-            var existing = DbContext.Set<TourReview>()
-                    .Include(r => r.Images)
-                    .FirstOrDefault(r => r.Id == newReview.Id)
-                    ?? throw new NotFoundException($"Review with id {newReview.Id} not found.");
+            var existing = DbContext.TourReviews
+                .Include(r => r.Images)
+                .FirstOrDefault(r => r.Id == newReview.Id);
+
+            if (existing == null)
+                throw new NotFoundException($"Review {newReview.Id} not found.");
 
             existing.UpdateComment(newReview.Comment);
             existing.UpdateGrade(newReview.Grade);
-            existing.ReplaceImages(newReview.Images);
+
+            UpdateReviewImages(existing, newReview.Images);
 
             DbContext.SaveChanges();
-
             return existing;
         }
 
-        void Delete(int id)
+        private void UpdateReviewImages(TourReview existing, List<ReviewImage> newImages)
+        {
+            var imageSet = DbContext.Set<ReviewImage>();
+
+            
+            var newIds = newImages.Where(i => i.Id != 0).Select(i => i.Id).ToHashSet();
+
+            var imagesToDelete = existing.Images
+                .Where(img => !newIds.Contains(img.Id))
+                .ToList();
+
+            foreach (var img in imagesToDelete)
+                imageSet.Remove(img);
+
+            
+            var imagesToAdd = newImages
+                .Where(img => img.Id == 0)
+                .ToList();
+
+            foreach (var img in imagesToAdd)
+                existing.Images.Add(new ReviewImage(img.ImagePath));
+
+            
+            foreach (var existingImg in existing.Images)
+            {
+                var updated = newImages.FirstOrDefault(i => i.Id == existingImg.Id);
+                if (updated != null)
+                    existingImg.UpdatePath(updated.ImagePath);
+            }
+        }
+
+        public void Delete(long id)
         {
             var entity = Get(id);
             _dbSet.Remove(entity);
