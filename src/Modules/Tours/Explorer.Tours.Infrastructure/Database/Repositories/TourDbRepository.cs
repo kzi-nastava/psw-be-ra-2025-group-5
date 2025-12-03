@@ -72,4 +72,6 @@ public class TourDbRepository : ITourRepository
         _dbSet.Remove(entity);
         DbContext.SaveChanges();
     }
+
+
 }

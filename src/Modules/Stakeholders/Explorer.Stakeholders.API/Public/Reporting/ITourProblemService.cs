@@ -9,5 +9,8 @@ namespace Explorer.Stakeholders.API.Public.Reporting
         TourProblemDto Create(TourProblemDto problem);
         TourProblemDto Update(TourProblemDto problem);
         void Delete(long id);
+        CommentDto AddComment(long problemId, long authorId, string content);
+        TourProblemDto GetById(long id);
+        List<CommentDto> GetComments(long id);
     }
 }
