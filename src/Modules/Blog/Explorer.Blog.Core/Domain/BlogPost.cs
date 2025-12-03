@@ -15,7 +15,10 @@ namespace Explorer.Blog.Core.Domain
         {
             Draft,      
             Published, 
-            Archived   
+            Archived,
+            Active,
+            Famous
+
         }
 
         public long AuthorId { get; set; }

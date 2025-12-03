@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Explorer.Blog.Core.Domain.BlogPost;
 
 namespace Explorer.Blog.Core.UseCases
 {
