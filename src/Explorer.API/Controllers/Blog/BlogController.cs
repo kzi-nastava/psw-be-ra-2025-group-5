@@ -23,17 +23,26 @@ public class BlogController : ControllerBase
     [HttpGet]
     public IActionResult GetAll()
     {
-        var posts = _blogService.GetAll();
+        var userId = GetUserIdFromToken();
+        var posts = _blogService.GetAll(userId);
         return Ok(posts);
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetPost(int id)
+    [HttpGet("{id:long}")]
+    public IActionResult GetPost(long id)
     {
         var post = _blogService.GetById(id);
         if (post == null) return NotFound();
+
+        var userId = GetUserIdFromToken(); 
+        if (post.Status == "Draft" && post.AuthorId != userId)
+        {
+            return Forbid();
+        }
+
         return Ok(post);
     }
+
 
     [HttpGet("author/{authorId:long}")]
     public IActionResult GetByAuthor(long authorId)
@@ -119,6 +128,29 @@ public class BlogController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:long}/publish")]
+    public IActionResult Publish(long id)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.Publish(id, authorId);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}/archive")]
+    public IActionResult Archive(long id)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.Archive(id, authorId);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}/draft")]
+    public IActionResult UpdateDraft(long id, [FromBody] UpdateDraftBlogPostDto dto)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.UpdateDraft(id, dto, authorId);
+        return Ok(result);
+    }
 
 }
 

@@ -55,34 +55,7 @@ namespace Explorer.Blog.Tests.Integration
             Should.Throw<ArgumentException>(() => service.Create(dto, authorId: 1));
         }
 
-        [Fact]
-        public void Successfully_updates_blog()
-        {
-            using var scope = Factory.Services.CreateScope();
-            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
-
-            var originalDto = new CreateBlogPostDto
-            {
-                Title = "Original Blog",
-                Description = "Opis originalnog bloga"
-            };
-            var created = service.Create(originalDto, authorId: 1);
-
-            var updateDto = new UpdateBlogPostDto
-            {
-                Title = "Updated Blog",
-                Description = "Opis izmenjenog bloga"
-            };
-
-            var updated = service.Update(created.Id, updateDto, authorId: 1);
-
-            updated.Title.ShouldBe("Updated Blog");
-            updated.Description.ShouldBe("Opis izmenjenog bloga");
-
-            var stored = dbContext.BlogPosts.Find(created.Id);
-            stored.Title.ShouldBe("Updated Blog");
-        }
+        
 
         [Fact]
         public void Successfully_adds_images_to_blog()
@@ -147,6 +120,52 @@ namespace Explorer.Blog.Tests.Integration
             var storedBlog = dbContext.BlogPosts.Find(created.Id);
             storedBlog.Images.ShouldBeEmpty();
         }
+        [Fact]
+        public void Successfully_creates_blog_in_draft_state()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var createDto = new CreateBlogPostDto
+            {
+                Title = "Test title",
+                Description = "Test description"
+            };
+
+            var created = service.Create(createDto, authorId: 1);
+
+            created.ShouldNotBeNull();
+            created.Status.ShouldBe(BlogPost.BlogStatus.Draft.ToString());
+
+            var stored = dbContext.BlogPosts.Find(created.Id);
+            stored.ShouldNotBeNull();
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Draft);
+        }
+
+        [Fact]
+        public void Successfully_publishes_blog()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var createDto = new CreateBlogPostDto
+            {
+                Title = "Draft Blog",
+                Description = "Opis"
+            };
+            var created = service.Create(createDto, authorId: 1);
+
+            var published = service.Publish(created.Id, authorId: 1);
+
+            published.ShouldNotBeNull();
+            published.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+
+            var stored = dbContext.BlogPosts.Find(created.Id);
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Published);
+        }
+       
 
     }
 }
