@@ -14,7 +14,7 @@ namespace Explorer.Blog.API.Dtos
         public long AuthorId { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<BlogImageDto>? Images { get; set; }
-        public string Status { get; set; }
+       
 
     }
 }
