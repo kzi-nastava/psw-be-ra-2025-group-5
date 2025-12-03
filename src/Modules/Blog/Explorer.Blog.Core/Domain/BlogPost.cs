@@ -9,11 +9,19 @@ namespace Explorer.Blog.Core.Domain
 {
     public class BlogPost: Entity 
     {
+        public enum BlogStatus
+        {
+            Draft,      
+            Published, 
+            Archived   
+        }
         public long AuthorId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; }
-        public List<BlogImage>? Images { get; set; } = new(); 
+        public DateTime? LastUpdatedAt { get; set; }
+        public List<BlogImage>? Images { get; set; } = new();
+        public BlogStatus Status { get; set; } = BlogStatus.Draft;
 
         public BlogPost(long authorId, string title, string description, DateTime createdAt) 
         { 

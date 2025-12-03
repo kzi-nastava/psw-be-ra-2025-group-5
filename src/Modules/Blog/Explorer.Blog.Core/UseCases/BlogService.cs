@@ -8,6 +8,7 @@ using Explorer.Blog.API.Public;
 using Explorer.Blog.API.Dtos;
 using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
+using static Explorer.Blog.Core.Domain.BlogPost;
 
 namespace Explorer.Blog.Core.UseCases
 {
@@ -15,16 +16,24 @@ namespace Explorer.Blog.Core.UseCases
     {
         private readonly IBlogRepository _blogRepository;
         private readonly IMapper _mapper;
-        public BlogService(IBlogRepository blogRepository, IMapper mapper)
+        private readonly BlogDomainService _domainService;
+        public BlogService(IBlogRepository blogRepository, IMapper mapper, BlogDomainService domainService)
         {
             _blogRepository = blogRepository;
             _mapper = mapper;
+            _domainService = domainService;
         }
-
-        public List<BlogPostDto> GetAll()
+        public List<BlogPostDto> GetAll(long userId)
         {
             var result = _blogRepository.GetAll();
-            return _mapper.Map<List<BlogPostDto>>(result);
+
+            var filtered = result.Where(post =>
+                post.Status == BlogPost.BlogStatus.Published ||
+                post.Status == BlogPost.BlogStatus.Archived ||
+                (post.Status == BlogPost.BlogStatus.Draft && post.AuthorId == userId)
+            ).ToList();
+
+            return _mapper.Map<List<BlogPostDto>>(filtered);
         }
 
         public BlogPostDto GetById(long id)
@@ -68,14 +77,50 @@ namespace Explorer.Blog.Core.UseCases
             if (post.AuthorId != authorId)
                 throw new UnauthorizedAccessException("Unauthorized");
 
-            post.Title = dto.Title;
-            post.Description = dto.Description;
+            switch (post.Status)
+            {
+                case BlogStatus.Published:
+                    _domainService.UpdateDescription(post, dto.Description);
+                    break;
+
+                case BlogStatus.Draft:
+                    throw new InvalidOperationException("Draft posts must be updated through UpdateDraft");
+
+                case BlogStatus.Archived:
+                    throw new InvalidOperationException("Cannot modify archived blog");
+
+                default:
+                    throw new InvalidOperationException("Unknown blog state");
+            }
 
             _blogRepository.Update(post);
             return _mapper.Map<BlogPostDto>(post);
         }
+
+        public BlogPostDto UpdateDraft(long id, UpdateDraftBlogPostDto dto, long authorId)
+        {
+            var post = _blogRepository.GetById(id);
+            if (post == null) return null;
+
+            if (post.AuthorId != authorId)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            if (post.Status != BlogStatus.Draft)
+                throw new InvalidOperationException("Only draft posts can use UpdateDraft");
+
+            _domainService.UpdateDraft(post, dto.Title, dto.Description);
+
+            _blogRepository.Update(post);
+            return _mapper.Map<BlogPostDto>(post);
+        }
+
         public BlogImageDto AddImage(long postId, BlogImageDto dto)
         {
+            var post = _blogRepository.GetById(postId);
+            if (post == null) throw new Exception("Post not found");
+
+            if (post.Status != BlogStatus.Draft)
+                throw new InvalidOperationException("Cannot add images unless post is in Draft");
             try
             {
                 byte[] bytes = null;
@@ -109,17 +154,22 @@ namespace Explorer.Blog.Core.UseCases
                 throw new Exception("AddImage FAILED: " + ex.Message);
             }
         }
-
-
         public BlogImageDto UpdateImage(BlogImageDto dto)
         {
-            var domain = _mapper.Map<BlogImage>(dto);
+            var image = _blogRepository.GetImage(dto.Id);
+            if (image == null) return null;
 
+            var post = _blogRepository.GetById(image.BlogPostId);
+
+            if (post.Status != BlogStatus.Draft)
+                throw new InvalidOperationException("Cannot update images unless post is in Draft");
+
+            var domain = _mapper.Map<BlogImage>(dto);
             var updated = _blogRepository.UpdateImage(domain);
-            if (updated == null) return null;
 
             return _mapper.Map<BlogImageDto>(updated);
         }
+
 
         public BlogImageDto GetImage(long id)
         {
@@ -155,8 +205,41 @@ namespace Explorer.Blog.Core.UseCases
             var image = _blogRepository.GetImage(imageId);
             if (image == null) return false;
 
+            var post = _blogRepository.GetById(image.BlogPostId);
+
+            if (post.Status != BlogStatus.Draft)
+                throw new InvalidOperationException("Cannot delete images unless post is in Draft");
+
             _blogRepository.DeleteImage(image);
             return true;
+        }
+
+        public BlogPostDto Publish(long id, long authorId)
+        {
+            var post = _blogRepository.GetById(id);
+            if (post == null) return null;
+
+            if (post.AuthorId != authorId)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            _domainService.Publish(post);
+            _blogRepository.Update(post);
+
+            return _mapper.Map<BlogPostDto>(post);
+        }
+        
+        public BlogPostDto Archive(long id, long authorId)
+        {
+            var post = _blogRepository.GetById(id);
+            if (post == null) return null;
+
+            if (post.AuthorId != authorId)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            _domainService.Archive(post);
+            _blogRepository.Update(post);
+
+            return _mapper.Map<BlogPostDto>(post);
         }
 
     }

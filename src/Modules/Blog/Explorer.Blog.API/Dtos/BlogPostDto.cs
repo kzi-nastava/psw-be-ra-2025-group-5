@@ -13,6 +13,8 @@ namespace Explorer.Blog.API.Dtos
         public string Description { get; set; }
         public long AuthorId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? LastUpdatedAt { get; set; }  
+        public string Status { get; set; }
         public List<BlogImageDto>? Images { get; set; }
 
     }

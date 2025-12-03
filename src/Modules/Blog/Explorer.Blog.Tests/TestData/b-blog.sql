@@ -1,7 +1,7 @@
-﻿INSERT INTO blog_post (id, author_id, title, description, created_at)
+﻿INSERT INTO blog_post (id, author_id, title, description, created_at, last_update_at, status)
 VALUES 
-(-1, 1, 'Prvi test blog', 'Opis prvog test bloga', NOW()),
-(-2, 1, 'Drugi test blog', 'Opis drugog test bloga', NOW());
+(-1, 1, 'Prvi test blog', 'Opis prvog test bloga', NOW(), NULL, 'Published'),
+(-2, 1, 'Drugi test blog', 'Opis drugog test bloga', NOW(), NULL, 'Draft');
 
 INSERT INTO blog_image (id, blog_post_id, data, content_type, "order")
 VALUES
