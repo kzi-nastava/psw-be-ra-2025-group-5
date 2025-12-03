@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
+using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public.Reporting;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Explorer.API.Controllers.Tourist.ProblemReporting;
-using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public.Reporting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
 
 namespace Explorer.Stakeholders.Tests.Integration.Reporting;
 
@@ -36,9 +37,9 @@ public class TourProblemQueryTests : BaseStakeholdersIntegrationTest
 
     private static TourProblemController CreateController(IServiceScope scope)
     {
-      return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>())
-{
+      return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>(), scope.ServiceProvider.GetRequiredService<ITourRepository>())
+            {
             ControllerContext = BuildContext("-1")
-        };
+            };
     }
 }

@@ -19,7 +19,7 @@ public enum ProblemPriority
     Critical
 }
 
-public class TourProblem : Entity
+public class TourProblem : AggregateRoot
 {
     public long TourId { get; }
     public long ReporterId { get; }
@@ -30,7 +30,7 @@ public class TourProblem : Entity
     public string Description { get; private set; }
     public DateTimeOffset OccurredAt { get; }
     public DateTimeOffset CreatedAt { get; }
-
+    public List<long> Comments { get; private set; } = new List<long>();
     private TourProblem() { }
 
     public TourProblem(
@@ -53,5 +53,7 @@ public class TourProblem : Entity
         Description = description.Trim();
         OccurredAt = occurredAt;
         CreatedAt = createdAt ?? DateTimeOffset.UtcNow;
+        Comments = new List<long>();
     }
+
 }
