@@ -24,6 +24,12 @@ public class TourController : ControllerBase
         return authorId.HasValue ? Ok(_TourService.GetPagedByAuthor((long)authorId, page, pageSize)) : Ok(_TourService.GetPaged(page, pageSize));
     }
 
+    [HttpGet("{id:long}")]
+    public ActionResult<TourDto> Get(long id)
+    {
+        return Ok(_TourService.Get(id));
+    }
+
     [HttpGet("tags")]
     [AllowAnonymous]
     public ActionResult<List<string>> GetAllTags()
