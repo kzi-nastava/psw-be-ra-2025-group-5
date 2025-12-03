@@ -25,10 +25,7 @@ public class ToursContext : DbContext
         modelBuilder.Entity<TouristEquipment>().ToTable("TouristEquipment");
         
         ConfigureTouristPreferences(modelBuilder);
-
-        modelBuilder.Entity<ShoppingCart>()
-            .Property(s => s.Items)
-            .HasColumnType("jsonb");
+        ConfigureShoppingCart(modelBuilder);
     }
 
     private static void ConfigureTouristPreferences(ModelBuilder modelBuilder)
@@ -53,5 +50,16 @@ public class ToursContext : DbContext
                 v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>()
             )
             .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
+    }
+
+    private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ShoppingCart>()
+        .Property(s => s.Items)
+        .HasColumnType("jsonb")
+        .HasConversion(
+            items => JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false }),
+            json => JsonSerializer.Deserialize<List<OrderItem>>(json, new JsonSerializerOptions()) ?? new List<OrderItem>()
+        );
     }
 }

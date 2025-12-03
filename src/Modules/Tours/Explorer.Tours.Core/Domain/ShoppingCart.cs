@@ -8,6 +8,8 @@ public class ShoppingCart : AggregateRoot
     public long TouristId { get; private set; }
     public List<OrderItem> Items { get; private set; } = [];
 
+    private ShoppingCart() { }
+
     public ShoppingCart(long touristId)
     {
         Guard.AgainstNegative(touristId, nameof(touristId));

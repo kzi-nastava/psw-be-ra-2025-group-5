@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.Shopping;
 using Explorer.Tours.Core.Domain;
@@ -23,15 +24,9 @@ public class ShoppingCartService : IShoppingCartService
         return _mapper.Map<ShoppingCartDto>(result);
     }
 
-    public ShoppingCartDto Create(ShoppingCartDto entity)
+    public ShoppingCartDto Create(CreateShoppingCartDto entity)
     {
         var result = _ShoppingCartRepository.Create(_mapper.Map<ShoppingCart>(entity));
-        return _mapper.Map<ShoppingCartDto>(result);
-    }
-
-    public ShoppingCartDto Update(ShoppingCartDto entity)
-    {
-        var result = _ShoppingCartRepository.Update(_mapper.Map<ShoppingCart>(entity));
         return _mapper.Map<ShoppingCartDto>(result);
     }
 }
