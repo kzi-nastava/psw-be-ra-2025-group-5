@@ -98,6 +98,20 @@ public class ToursContext : DbContext
             .Property(ri => ri.ReviewId)
             .IsRequired();
 
+        modelBuilder.Entity<TourReview>(b =>
+        {
+            b.OwnsOne(tr => tr.Progress, p =>
+            {
+                p.Property(pp => pp.Percentage)
+                 .HasColumnName("Progress")
+                 .IsRequired();
+            });
+
+            b.HasMany(tr => tr.Images)
+             .WithOne()
+             .HasForeignKey("TourReviewId"); 
+        });
+
         modelBuilder.Entity<TourReview>()
             .HasMany(r => r.Images)
             .WithOne()                             

@@ -10,7 +10,9 @@ namespace Explorer.Tours.Core.Domain
 {
     public class TourProgress: ValueObject
     {
-        public double Percentage { get; }
+        public double Percentage { get; private set; }
+
+        private TourProgress() { }
 
         public TourProgress(double percentage)
         {
