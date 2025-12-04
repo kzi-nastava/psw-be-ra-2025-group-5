@@ -1,5 +1,6 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Explorer.Stakeholders.Infrastructure.Database
 {
@@ -11,6 +12,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<AppRating> AppRatings { get; set; }
         public DbSet<TourProblem> TourProblems { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -92,11 +94,27 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                     .HasForeignKey(tp => tp.ReporterId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                builder.Property(tp => tp.Comments)
+                    .HasColumnType("bigint[]");
+
+
                 // Index za brže pretraživanje po reporteru
                 builder.HasIndex(tp => tp.ReporterId);
 
                 // Index za brže pretraživanje po TourId
                 builder.HasIndex(tp => tp.TourId);
+
+                modelBuilder.Entity<Comment>(cb =>
+                {
+                    cb.HasKey(c => c.CommentId);
+                    cb.Property(c => c.CommentId).ValueGeneratedOnAdd();
+                    cb.Property(c => c.AuthorId).IsRequired();
+                    cb.Property(c => c.Content).IsRequired().HasMaxLength(2000);
+                    cb.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("NOW()");
+                    cb.Property(c => c.UpdatedAt).IsRequired(false);
+
+                    cb.HasIndex(c => c.AuthorId);
+                });
             });
         }
 
@@ -107,5 +125,6 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 .WithOne()
                 .HasForeignKey<Position>(l => l.TouristId);
         }
+
     }
 }

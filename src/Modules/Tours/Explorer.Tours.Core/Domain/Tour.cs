@@ -27,7 +27,7 @@ public class Tour : AggregateRoot
 
     public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
     {
-        Guard.AgainstNull(authorId, nameof(authorId));
+        Guard.AgainstZero(authorId, nameof(authorId));
         Guard.AgainstNegative(price, nameof(price));
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstInvalidEnum(difficulty, nameof(difficulty));
@@ -67,7 +67,7 @@ public class Tour : AggregateRoot
         ReorderKeyPoints();
     }
 
-    public void UpdateKeyPoint(long keyPointId, string name, string description, byte[]? image, string? secret)
+    public void UpdateKeyPoint(long keyPointId, string name, string description, byte[]? image, string? secret, Location location)
     {
         if (Status != TourStatus.Draft)
             throw new InvalidOperationException("Key points can only be updated in tours in draft status.");
@@ -76,7 +76,7 @@ public class Tour : AggregateRoot
         if (keyPoint == null)
             throw new InvalidOperationException("Key point not found.");
 
-        keyPoint.Update(name, description, image, secret);
+        keyPoint.Update(name, description, image, secret, location);
     }
 
     public void ReorderKeyPoints(List<long> orderedKeyPointIds)

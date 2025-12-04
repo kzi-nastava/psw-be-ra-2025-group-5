@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Tours.API.Dtos;
 
 namespace Explorer.Tours.Core.Domain.RepositoryInterfaces;
 
@@ -11,4 +12,6 @@ public interface ITourRepository
     Tour Create(Tour map);
     Tour Update(Tour map);
     void Delete(long id);
+    PagedResult<Tour> GetPagedByStatus(TourStatus status, int page, int pageSize);
+    
 }

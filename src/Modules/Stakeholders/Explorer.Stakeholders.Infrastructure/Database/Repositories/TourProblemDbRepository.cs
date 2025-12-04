@@ -59,4 +59,39 @@ public class TourProblemDbRepository : ITourProblemRepository
         _dbSet.Remove(entity);
         DbContext.SaveChanges();
     }
+
+    public TourProblem GetWithComments(long id)
+    {
+        var entity = DbContext.TourProblems.Find(id);
+        if (entity == null)
+            throw new NotFoundException($"TourProblem {id} not found");
+
+        var comments = DbContext.Comments
+            .Where(c => entity.Comments.Contains(c.CommentId))
+            .ToList();
+
+        return entity;
+    }
+
+
+    public void AddComment(Comment comment)
+    {
+        DbContext.Comments.Add(comment);
+        DbContext.SaveChanges(); 
+    }
+    public Comment GetCommentById(long commentId)
+    {
+        var comment = DbContext.Comments.Find(commentId);
+        if (comment == null) throw new NotFoundException($"Comment not found: {commentId}");
+        return comment;
+    }
+
+    public List<Comment> GetCommentsByIds(List<long> ids)
+    {
+        return DbContext.Comments
+            .Where(c => ids.Contains(c.CommentId))
+            .ToList();
+    }
+
+
 }

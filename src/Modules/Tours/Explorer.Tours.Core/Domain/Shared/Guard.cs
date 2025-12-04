@@ -4,8 +4,16 @@ public static class Guard
 {
     public static void AgainstNull(object? value, string paramName)
     {
-        if (value is null || (value is int && (int)value == 0))
+        if (value is null)
             throw new ArgumentException($"{paramName} cannot be null.", paramName);
+    }
+
+    public static void AgainstZero(object? value, string paramName)
+    {
+        AgainstNull(value, paramName);
+
+        if (Convert.ToDouble(value) == 0)
+            throw new ArgumentException($"{paramName} cannot be 0.", paramName);
     }
 
     public static void AgainstNullOrWhiteSpace(string? value, string paramName)
@@ -22,7 +30,7 @@ public static class Guard
 
     public static void AgainstDuplicateStrings(IEnumerable<string> collection, string paramName)
     {
-        AgainstNull(collection, nameof(collection));
+        AgainstNull(collection, paramName);
 
         var duplicates = collection.GroupBy(s => s.Trim().ToLowerInvariant()).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
 

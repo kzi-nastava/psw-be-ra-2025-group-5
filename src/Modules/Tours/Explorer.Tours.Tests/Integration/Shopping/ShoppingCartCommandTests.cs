@@ -1,0 +1,160 @@
+﻿using Explorer.API.Controllers.Author;
+using Explorer.API.Controllers.Tourist;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Public.Shopping;
+using Explorer.Tours.Infrastructure.Database;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
+
+namespace Explorer.Tours.Tests.Integration.Shopping;
+
+[Collection("Sequential")]
+public class ShoppingCartCommandTests : BaseToursIntegrationTest
+{
+    public ShoppingCartCommandTests(ToursTestFactory factory) : base(factory) { }
+
+    [Fact]
+    public void Creates()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var newEntity = new CreateShoppingCartDto { TouristId = -1 };
+
+        // Act
+        var result = ((ObjectResult)controller.Create(newEntity).Result)?.Value as ShoppingCartDto;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.Id.ShouldNotBe(0);
+        result.TouristId.ShouldBe(newEntity.TouristId);
+
+        // Assert - Database
+        var storedEntity = dbContext.ShoppingCarts.FirstOrDefault(i => i.TouristId == newEntity.TouristId);
+        storedEntity.ShouldNotBeNull();
+        storedEntity.Id.ShouldBe(result.Id);
+    }
+
+    [Fact]
+    public void Create_fails_duplicate_cart()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var newEntity = new CreateShoppingCartDto { TouristId = -2 };
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => controller.Create(newEntity));
+    }
+
+    [Fact]
+    public void Create_fails_invalid_data()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var newEntity = new CreateShoppingCartDto { TouristId = 0 };
+
+        // Act & Assert
+        Should.Throw<ArgumentException>(() => controller.Create(newEntity));
+    }
+
+    [Fact]
+    public void Adds_item_to_cart()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var cartController = CreateController(scope);
+        var tourController = CreateTourController(scope);
+
+        // Act
+        var result = ((ObjectResult)cartController.AddOrderItem(-4, -2).Result)?.Value as ShoppingCartDto;
+        var tour = ((ObjectResult)tourController.Get(-2).Result)?.Value as TourDto;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.Id.ShouldBe(-2);
+        result.TouristId.ShouldBe(-4);
+        result.Total.ShouldBe(0);
+        result.Items.Count.ShouldBe(1);
+        result.Items.ShouldContain(i => i.TourId == tour.Id);
+
+        // Assert - Database
+        var storedEntity = dbContext.ShoppingCarts.Single(i => i.Id == -2);
+        storedEntity.ShouldNotBeNull();
+        storedEntity.Items.ShouldContain(i => i.TourId == tour.Id);
+    }
+
+    [Fact]
+    public void Add_item_fails_item_already_in_cart()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var controller = CreateController(scope);
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => controller.AddOrderItem(-4, -2));
+    }
+
+    [Fact]
+    public void Removes_item_from_cart()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var cartController = CreateController(scope);
+        var tourController = CreateTourController(scope);
+
+        // Act
+        var result = ((ObjectResult)cartController.RemoveOrderItem(-2, -1).Result)?.Value as ShoppingCartDto;
+        var tour = ((ObjectResult)tourController.Get(-1).Result)?.Value as TourDto;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.Id.ShouldBe(-1);
+        result.TouristId.ShouldBe(-2);
+        result.Total.ShouldBe(0);
+        result.Items.Count.ShouldBe(0);
+        result.Items.ShouldNotContain(i => i.TourId == tour.Id);
+
+        // Assert - Database
+        var storedEntity = dbContext.ShoppingCarts.Single(i => i.Id == -1);
+        storedEntity.ShouldNotBeNull();
+        storedEntity.Items.ShouldNotContain(i => i.TourId == tour.Id);
+    }
+
+    [Fact]
+    public void Remove_item_fails_item_not_in_cart()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var controller = CreateController(scope);
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => controller.RemoveOrderItem(-4, -1));
+    }
+
+    private static ShoppingCartController CreateController(IServiceScope scope)
+    {
+        return new ShoppingCartController(scope.ServiceProvider.GetRequiredService<IShoppingCartService>())
+        {
+            ControllerContext = BuildContext("-1")
+        };
+    }
+
+    private static TourController CreateTourController(IServiceScope scope)
+    {
+        return new TourController(scope.ServiceProvider.GetRequiredService<ITourService>())
+        {
+            ControllerContext = BuildContext("-1")
+        };
+    }
+}
