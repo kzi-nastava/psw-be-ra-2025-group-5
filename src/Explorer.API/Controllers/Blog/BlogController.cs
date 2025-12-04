@@ -152,5 +152,14 @@ public class BlogController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("{id:long}/vote/{voteType}")]
+    public ActionResult<BlogPostDto> Vote(long id, VoteType voteType)
+    {
+        var userId = GetUserIdFromToken();
+        var result = _blogService.Vote(id, userId, voteType.ToString());
+
+        return Ok(result);
+    }
+
 }
 

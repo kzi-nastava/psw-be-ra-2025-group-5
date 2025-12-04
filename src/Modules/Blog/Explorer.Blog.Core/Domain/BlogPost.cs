@@ -28,6 +28,7 @@ namespace Explorer.Blog.Core.Domain
         public DateTime? LastUpdatedAt { get; set; }        
         public List<Comment> Comments { get; set; } = new();  
         public List<BlogImage>? Images { get; set; } = new();
+        public List<BlogVote> Votes { get; private set; } = new();
         public BlogStatus Status { get; set; } = BlogStatus.Draft;
 
         public BlogPost(long authorId, string title, string description, DateTime createdAt)
@@ -96,6 +97,30 @@ namespace Explorer.Blog.Core.Domain
                 throw new InvalidOperationException("Only draft blogs can be published.");
 
             Status = BlogStatus.Published;
+        }
+
+        public void Vote(long userId, VoteType voteType)
+        {
+            if(Status == BlogStatus.Published)
+            {
+                var existingVote = Votes.FirstOrDefault(v => v.UserId == userId);
+                if (existingVote != null)
+                {
+                    Votes.Remove(existingVote);
+                    var newVote = new BlogVote(userId, Id, voteType);
+                    Votes.Add(newVote);
+                }
+                else
+                {
+                    var newVote = new BlogVote(userId, Id, voteType);
+                    Votes.Add(newVote);
+                }
+            }
+        }
+
+        public long GetScore()
+        {
+            return Votes.Sum(v => (int)v.VoteType);
         }
     }
 }

@@ -242,5 +242,17 @@ namespace Explorer.Blog.Core.UseCases
             return _mapper.Map<BlogPostDto>(post);
         }
 
+        public BlogPostDto Vote(long blogId, long userId, string voteTypeStr)
+        {
+            var voteType = Enum.Parse<VoteType>(voteTypeStr, true);
+
+            var blog = _blogRepository.GetById(blogId) ?? throw new KeyNotFoundException("Blog not found");
+
+            blog.Vote(userId, voteType);
+            _blogRepository.Update(blog);
+
+            return _mapper.Map<BlogPostDto>(blog);
+        }
+
     }
 }
