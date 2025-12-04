@@ -126,5 +126,4 @@ public class TourDbRepository : ITourRepository
         task.Wait();
         return task.Result;
     }
-
 }

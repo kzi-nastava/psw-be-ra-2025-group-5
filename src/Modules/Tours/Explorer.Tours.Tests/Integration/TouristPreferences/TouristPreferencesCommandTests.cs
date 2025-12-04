@@ -35,8 +35,8 @@ public class TouristPreferencesCommandTests : BaseToursIntegrationTest
         result.TransportationRatings[TransportationType.Car].ShouldBe(1);
         result.TransportationRatings.ShouldContainKey(TransportationType.Boat);
         result.TransportationRatings[TransportationType.Boat].ShouldBe(0);
-        result.PreferredTags.ShouldContain("adventure");
-        result.PreferredTags.ShouldContain("nature");
+        result.PreferredTags.ShouldContain("Adventure");
+        result.PreferredTags.ShouldContain("Nature");
     }
 
     [Fact]

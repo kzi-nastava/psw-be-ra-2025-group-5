@@ -27,7 +27,7 @@ public class Tour : AggregateRoot
 
     public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
     {
-        Guard.AgainstNull(authorId, nameof(authorId));
+        Guard.AgainstZero(authorId, nameof(authorId));
         Guard.AgainstNegative(price, nameof(price));
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstInvalidEnum(difficulty, nameof(difficulty));
