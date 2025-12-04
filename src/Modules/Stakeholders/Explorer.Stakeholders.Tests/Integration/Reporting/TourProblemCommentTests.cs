@@ -115,11 +115,11 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
 
         private static CommentController CreateController(IServiceScope scope)
         {
-            // Ručno kreiraj servise jer nisu registrovani u DI
             var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
             var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
             var commentRepository = new CommentDbRepository(dbContext);
-            var commentService = new CommentService(commentRepository, mapper);
+            var userRepository = new UserDbRepository(dbContext);
+            var commentService = new CommentService(commentRepository, userRepository, mapper);
 
             return new CommentController(commentService)
             {

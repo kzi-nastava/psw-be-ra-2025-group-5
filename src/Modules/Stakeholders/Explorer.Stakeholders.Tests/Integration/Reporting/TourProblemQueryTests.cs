@@ -3,12 +3,14 @@ using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,16 +32,30 @@ public class TourProblemQueryTests : BaseStakeholdersIntegrationTest
         var result = ((ObjectResult)controller.GetAll(0, 0).Result)?.Value as PagedResult<TourProblemDto>;
 
         // Assert
-        result.ShouldNotBeNull();
+        result.ShouldNotBeOfType<ForbidResult>();
         result.Results.Count.ShouldBe(3);
         result.TotalCount.ShouldBe(3);
     }
 
     private static TourProblemController CreateController(IServiceScope scope)
     {
-      return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>(), scope.ServiceProvider.GetRequiredService<ITourRepository>())
+        var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
+        var tourRepository = scope.ServiceProvider.GetRequiredService<ITourRepository>();
+
+        return new TourProblemController(tourProblemService, tourRepository)
+        {
+            ControllerContext = new ControllerContext
             {
-            ControllerContext = BuildContext("-1")
-            };
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+                    {
+                        new Claim("id", "-1"),
+                        new Claim("personId", "-1"),
+                        new Claim(ClaimTypes.Role, "administrator")
+                    }))
+                }
+            }
+        };
     }
 }
