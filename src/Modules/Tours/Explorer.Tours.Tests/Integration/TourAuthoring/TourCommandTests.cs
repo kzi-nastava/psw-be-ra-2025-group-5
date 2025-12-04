@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 
-namespace Explorer.Tours.Tests.Integration.Administration;
+namespace Explorer.Tours.Tests.Integration.TourAuthoring;
 
 [Collection("Sequential")]
 public class TourCommandTests : BaseToursIntegrationTest

@@ -1,6 +1,6 @@
 INSERT INTO tours."Tours"(
     "Id", "Name", "Description", "Difficulty", "Tags", "Price", "Status", "AuthorId")
-VALUES (-1, 'Belgrade Fortress Walk', 'Opis ture...', 0, ARRAY['History','Sightseeing'], 5.0, 1, -11);
+VALUES (-1, 'Belgrade Fortress Walk', 'A guided walking tour through Kalemegdan and the old fortress', 0, ARRAY['History','Sightseeing'], 5.0, 1, -11);
 
 INSERT INTO tours."Tours"(
 	"Id", "Name", "Description", "Difficulty", "Tags", "Price", "Status", "AuthorId")
