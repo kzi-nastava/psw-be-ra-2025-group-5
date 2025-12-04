@@ -14,5 +14,6 @@ namespace Explorer.Stakeholders.API.Dtos
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
         public string Content { get; set; }
+        public string AuthorRole { get; set; } = string.Empty;
     }
 }

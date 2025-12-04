@@ -24,11 +24,37 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
         }
 
         [HttpGet]
-        [Authorize(Policy = "touristPolicy")]
+        [Authorize(Policy = "authorTouristAdminPolicy")]
         public ActionResult<PagedResult<TourProblemDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return Ok(_tourProblemService.GetPaged(page, pageSize));
+            long userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+            bool isAdmin = User.IsInRole("administrator");
+
+            PagedResult<TourProblemDto> result;
+
+            if (isAdmin)
+            {
+                result = _tourProblemService.GetPaged(page, pageSize);
+            }
+            else if (User.IsInRole("tourist"))
+            {
+                result = _tourProblemService.GetPagedByReporterId(userId, page, pageSize);
+            }
+            else if (User.IsInRole("author"))
+            {
+                var tours = _tourRepository.GetPagedByAuthor(userId, page, int.MaxValue).Results;
+                var tourIds = tours.Select(t => t.Id).ToList();
+
+                result = _tourProblemService.GetPagedByTourIds(tourIds, page, pageSize);
+            }
+            else
+            {
+                return Forbid();
+            }
+
+            return Ok(result);
         }
+
 
         [HttpPost]
         [Authorize(Policy = "touristPolicy")]

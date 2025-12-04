@@ -25,6 +25,24 @@ public class TourProblemDbRepository : ITourProblemRepository
         return task.Result;
     }
 
+    public PagedResult<TourProblem> GetPagedByReporterId(long reporterId, int page, int pageSize)
+    {
+        var filteredQuery = _dbSet.Where(p => p.ReporterId == reporterId);
+
+        var task = filteredQuery.GetPagedById(page, pageSize);
+        task.Wait();
+        return task.Result;
+    }
+
+    public PagedResult<TourProblem> GetPagedByTourIds(List<long> tourIds, int page, int pageSize)
+    {
+        var filteredQuery = _dbSet.Where(p => tourIds.Contains(p.TourId));
+
+        var task = filteredQuery.GetPagedById(page, pageSize);
+        task.Wait();
+        return task.Result;
+    }
+
     public TourProblem Get(long id)
     {
         var entity = _dbSet.Find(id);

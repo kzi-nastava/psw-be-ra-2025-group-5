@@ -11,39 +11,32 @@ namespace Explorer.Stakeholders.Core.UseCases.Reporting;
 public class TourProblemService : ITourProblemService
 {
     private readonly ITourProblemRepository _repository;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
 
-    public TourProblemService(ITourProblemRepository repository, IMapper mapper)
+    public TourProblemService(ITourProblemRepository repository, IUserRepository userRepository, IMapper mapper)
     {
         _repository = repository;
+        _userRepository = userRepository;
         _mapper = mapper;
     }
 
     public PagedResult<TourProblemDto> GetPaged(int page, int pageSize)
     {
         var result = _repository.GetPaged(page, pageSize);
-
-        var items = result.Results.Select(problem => new TourProblemDto
-        {
-            Id = problem.Id,
-            TourId = problem.TourId,
-            ReporterId = problem.ReporterId,
-            Category = (API.Dtos.ProblemCategory)problem.Category,
-            Priority = (API.Dtos.ProblemPriority)problem.Priority,
-            Description = problem.Description,
-            OccurredAt = problem.OccurredAt,
-            CreatedAt = problem.CreatedAt,
-            Comments = problem.Comments
-                .Select(cid => {
-                    var comment = _repository.GetCommentById(cid);
-                    return _mapper.Map<CommentDto>(comment);
-                })
-                .ToList()
-        }).ToList();
-
-        return new PagedResult<TourProblemDto>(items, result.TotalCount);
+        return MapToDto(result);
     }
 
+    public PagedResult<TourProblemDto> GetPagedByReporterId(long reporterId, int page, int pageSize)
+    {
+        var result = _repository.GetPagedByReporterId(reporterId, page, pageSize);
+        return MapToDto(result);
+    }
+    public PagedResult<TourProblemDto> GetPagedByTourIds(List<long> tourIds, int page, int pageSize)
+    {
+        var result = _repository.GetPagedByTourIds(tourIds, page, pageSize);
+        return MapToDto(result);
+    }
 
     public TourProblemDto Create(TourProblemDto dto)
     {
@@ -69,7 +62,12 @@ public class TourProblemService : ITourProblemService
         problem.Comments.Add(comment.CommentId);
         _repository.Update(problem);
 
-        return _mapper.Map<CommentDto>(comment);
+        var dto = _mapper.Map<CommentDto>(comment);
+
+        var user = _userRepository.GetById(authorId);
+        dto.AuthorRole = user.Role.ToString();
+
+        return dto;
     }
 
 
@@ -91,7 +89,12 @@ public class TourProblemService : ITourProblemService
             Comments = problem.Comments
                 .Select(cid => {
                     var c = _repository.GetCommentById(cid);
-                    return _mapper.Map<CommentDto>(c);
+                    var dto = _mapper.Map<CommentDto>(c);
+
+                    var user = _userRepository.GetById(c.AuthorId);
+                    dto.AuthorRole = user.Role.ToString();
+
+                    return dto;
                 })
                 .ToList()
         };
@@ -107,8 +110,38 @@ public class TourProblemService : ITourProblemService
 
         var comments = _repository.GetCommentsByIds(problem.Comments);
 
-        return comments.Select(c => _mapper.Map<CommentDto>(c)).ToList();
+        return comments.Select(c =>
+        {
+            var dto = _mapper.Map<CommentDto>(c);
+
+            var user = _userRepository.GetById(c.AuthorId);
+            dto.AuthorRole = user.Role.ToString();
+
+            return dto;
+        }).ToList();
+
     }
 
+    private PagedResult<TourProblemDto> MapToDto(PagedResult<TourProblem> result)
+    {
+        var items = result.Results.Select(problem => new TourProblemDto
+        {
+            Id = problem.Id,
+            TourId = problem.TourId,
+            ReporterId = problem.ReporterId,
+            Category = (API.Dtos.ProblemCategory)problem.Category,
+            Priority = (API.Dtos.ProblemPriority)problem.Priority,
+            Description = problem.Description,
+            OccurredAt = problem.OccurredAt,
+            CreatedAt = problem.CreatedAt,
+            Comments = problem.Comments
+                .Select(cid => {
+                    var comment = _repository.GetCommentById(cid);
+                    return _mapper.Map<CommentDto>(comment);
+                })
+                .ToList()
+        }).ToList();
 
+        return new PagedResult<TourProblemDto>(items, result.TotalCount);
+    }
 }
