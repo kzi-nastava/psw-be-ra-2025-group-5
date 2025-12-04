@@ -31,14 +31,14 @@ public class ShoppingCartController : ControllerBase
     }
 
     [HttpPost("{touristId:long}/items/{tourId:long}")]
-    public ActionResult<TourDto> AddOrderItem(long touristId, long tourId)
+    public ActionResult<ShoppingCartDto> AddOrderItem(long touristId, long tourId)
     {
         var result = _ShoppingCartService.AddOrderItem(touristId, tourId);
         return Ok(result);
     }
 
     [HttpDelete("{touristId:long}/items/{tourId:long}")]
-    public ActionResult<TourDto> RemoveOrderItem(long touristId, long tourId)
+    public ActionResult<ShoppingCartDto> RemoveOrderItem(long touristId, long tourId)
     {
         var result = _ShoppingCartService.RemoveOrderItem(touristId, tourId);
         return Ok(result);
