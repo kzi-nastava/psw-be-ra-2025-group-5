@@ -11,8 +11,8 @@ public class TourReview: AggregateRoot
     public List<ReviewImage> Images { get; private set; }
     public DateTime? ReviewTime { get; private set; }
     public TourProgress Progress { get; private set; }
-    public long TouristID { get; private set; }
-    public long TourID { get; private set; }
+    public long TouristID { get; set; }
+    public long TourID { get; set; }
 
     public TourReview()
     {
