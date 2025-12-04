@@ -19,6 +19,12 @@ public class ShoppingCartService : IShoppingCartService
         _mapper = mapper;
     }
 
+    public List<ShoppingCartDto> GetAll()
+    {
+        var entities = _ShoppingCartRepository.GetAll();
+        return _mapper.Map<List<ShoppingCartDto>>(entities);
+    }
+
     public ShoppingCartDto GetByTourist(long touristId)
     {
         var result = _ShoppingCartRepository.GetByTourist(touristId);
@@ -27,7 +33,7 @@ public class ShoppingCartService : IShoppingCartService
 
     public ShoppingCartDto Create(CreateShoppingCartDto entity)
     {
-        if(_ShoppingCartRepository.GetByTourist(entity.TouristId) is not null)
+        if(GetAll().Any(cart => cart.TouristId == entity.TouristId))
             throw new InvalidOperationException($"Shopping cart already exists for tourist {entity.TouristId}");
 
         var result = _ShoppingCartRepository.Create(_mapper.Map<ShoppingCart>(entity));

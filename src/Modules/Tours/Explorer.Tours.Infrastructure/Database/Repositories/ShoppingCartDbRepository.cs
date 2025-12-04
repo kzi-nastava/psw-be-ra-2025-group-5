@@ -16,6 +16,11 @@ public class ShoppingCartDbRepository : IShoppingCartRepository
         _dbSet = DbContext.Set<ShoppingCart>();
     }
 
+    public List<ShoppingCart> GetAll()
+    {
+        return _dbSet.ToList();
+    }
+
     public ShoppingCart GetByTourist(long touristId)
     {
         var entity = _dbSet.FirstOrDefault(t => t.TouristId == touristId);
