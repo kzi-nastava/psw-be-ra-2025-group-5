@@ -1,5 +1,6 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Explorer.Stakeholders.Infrastructure.Database
 {
@@ -27,7 +28,6 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureAppRating(modelBuilder);
             ConfigureTourProblem(modelBuilder);
             ConfigurePosition(modelBuilder);
-            ConfigureComment(modelBuilder);
         }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -94,12 +94,27 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                     .HasForeignKey(tp => tp.ReporterId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                builder.Property(tp => tp.Comments)
+                    .HasColumnType("bigint[]");
+
+
                 // Index za brže pretraživanje po reporteru
                 builder.HasIndex(tp => tp.ReporterId);
 
                 // Index za brže pretraživanje po TourId
                 builder.HasIndex(tp => tp.TourId);
 
+                modelBuilder.Entity<Comment>(cb =>
+                {
+                    cb.HasKey(c => c.CommentId);
+                    cb.Property(c => c.CommentId).ValueGeneratedOnAdd();
+                    cb.Property(c => c.AuthorId).IsRequired();
+                    cb.Property(c => c.Content).IsRequired().HasMaxLength(2000);
+                    cb.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("NOW()");
+                    cb.Property(c => c.UpdatedAt).IsRequired(false);
+
+                    cb.HasIndex(c => c.AuthorId);
+                });
             });
         }
 
@@ -111,19 +126,5 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 .HasForeignKey<Position>(l => l.TouristId);
         }
 
-        private static void ConfigureComment(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Comment>(builder =>
-            {
-                builder.HasKey(c => c.CommentId);
-                builder.Property(c => c.AuthorId).IsRequired();
-                builder.Property(c => c.Content).IsRequired().HasMaxLength(2000);
-                builder.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("NOW()");
-                builder.Property(c => c.UpdatedAt).IsRequired(false);
-                builder.HasOne<User>().WithMany().HasForeignKey(c => c.AuthorId).OnDelete(DeleteBehavior.Restrict);
-                builder.HasIndex(c => c.AuthorId);
-
-            });
-        }
     }
 }

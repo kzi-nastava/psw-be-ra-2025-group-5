@@ -1,7 +1,10 @@
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
+using TransportationType = Explorer.Tours.Core.Domain.TransportationType;
 
 namespace Explorer.Tours.Infrastructure.Database;
 
@@ -13,6 +16,7 @@ public class ToursContext : DbContext
     public DbSet<TouristEquipment> TouristEquipment { get; set; }
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
+    public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     public DbSet<TourExecution> TourExecutions { get; set; }
 
 
@@ -26,6 +30,7 @@ public class ToursContext : DbContext
         
         ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
+        ConfigureShoppingCart(modelBuilder);
         ConfigureTourExecution(modelBuilder);
     }
 
@@ -37,6 +42,10 @@ public class ToursContext : DbContext
             .HasForeignKey("TourId")
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false); // TourId može biti null privremeno
+
+        modelBuilder.Entity<Tour>()
+            .Property(t => t.Tags)
+            .HasColumnType("text[]");
 
         // Konfiguracija KeyPoint-a
         modelBuilder.Entity<KeyPoint>()
@@ -113,10 +122,19 @@ public class ToursContext : DbContext
 
 
 
-    // Helper klasa za deserijalizaciju Location-a
-    private class LocationDto
+    private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
     {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        modelBuilder.Entity<ShoppingCart>()
+        .Property(s => s.Items)
+        .HasColumnType("jsonb")
+        .HasConversion(
+            items => JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false }),
+            json => JsonSerializer.Deserialize<List<OrderItem>>(json, new JsonSerializerOptions()) ?? new List<OrderItem>(),
+            new ValueComparer<List<OrderItem>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()
+            )
+        );
     }
 }

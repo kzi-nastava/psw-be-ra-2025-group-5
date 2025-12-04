@@ -37,6 +37,13 @@ public class ToursProfile : Profile
         CreateMap<TouristEquipmentDto, TouristEquipment>().ReverseMap();
         CreateMap<FacilityDto, Facility>().ReverseMap();
 
+        CreateMap<OrderItem, OrderItemDto>().ReverseMap();
+
+        CreateMap<ShoppingCartDto, ShoppingCart>().ReverseMap();
+
+        CreateMap<CreateShoppingCartDto, ShoppingCart>()
+            .ConstructUsing(src => new ShoppingCart(src.TouristId));
+
         CreateMap<Location, LocationDto>().ReverseMap();
 
         CreateMap<KeyPoint, KeyPointDto>().ReverseMap();
