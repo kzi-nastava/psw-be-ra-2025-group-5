@@ -35,7 +35,7 @@ namespace Explorer.Blog.Core.UseCases
 
         public void UpdateDescription(BlogPost post, string description)
         {
-            if (post.Status != BlogStatus.Published)
+            if (post.Status != BlogStatus.Published && post.Status != BlogStatus.Active && post.Status != BlogStatus.Famous)
                 throw new InvalidOperationException("Only published blogs can update description.");
 
             if (string.IsNullOrWhiteSpace(description))
@@ -55,7 +55,7 @@ namespace Explorer.Blog.Core.UseCases
 
         public void Archive(BlogPost post)
         {
-            if (post.Status != BlogStatus.Published)
+            if (post.Status != BlogStatus.Published && post.Status != BlogStatus.Active && post.Status != BlogStatus.Famous)
                 throw new InvalidOperationException("Only Published blogs can be archived.");
 
             post.Status = BlogStatus.Archived;

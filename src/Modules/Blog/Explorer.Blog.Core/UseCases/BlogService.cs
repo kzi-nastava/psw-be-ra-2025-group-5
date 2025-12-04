@@ -30,6 +30,9 @@ namespace Explorer.Blog.Core.UseCases
             var filtered = result.Where(post =>
                 post.Status == BlogPost.BlogStatus.Published ||
                 post.Status == BlogPost.BlogStatus.Archived ||
+                post.Status == BlogPost.BlogStatus.Active ||
+                post.Status == BlogPost.BlogStatus.Famous ||
+                post.Status == BlogPost.BlogStatus.ReadOnly ||
                 (post.Status == BlogPost.BlogStatus.Draft && post.AuthorId == userId)
             ).ToList();
 
@@ -88,6 +91,15 @@ namespace Explorer.Blog.Core.UseCases
 
                 case BlogStatus.Archived:
                     throw new InvalidOperationException("Cannot modify archived blog");
+
+                case BlogStatus.Active:
+                    throw new InvalidOperationException("Cannot modify active blog");
+
+                case BlogStatus.Famous:
+                    throw new InvalidOperationException("Cannot modify famous blog");
+
+                case BlogStatus.ReadOnly:
+                    throw new InvalidOperationException("Cannot modify closed blog");
 
                 default:
                     throw new InvalidOperationException("Unknown blog state");

@@ -17,8 +17,8 @@ namespace Explorer.Blog.Core.Domain
             Published, 
             Archived,
             Active,
-            Famous
-
+            Famous,
+            ReadOnly
         }
 
         public long AuthorId { get; set; }
@@ -55,16 +55,16 @@ namespace Explorer.Blog.Core.Domain
 
             Comments.Add(comment);
 
-            UpdateStatusByComments();
+            UpdateStatus();
         }
 
-        public void UpdateStatusByComments()
+        /*public void UpdateStatusByComments()
         {
             if (Comments.Count > 30)
                 Status = BlogStatus.Famous;
             else if (Comments.Count > 10)
                 Status = BlogStatus.Active;
-        }
+        }*/
 
         public void RemoveComment(long commentId, long requestingUserId)
         {
@@ -76,6 +76,7 @@ namespace Explorer.Blog.Core.Domain
                 throw new UnauthorizedAccessException("Cannot delete this comment");
 
             Comments.Remove(comment);
+            UpdateStatus();
         }
 
         public void UpdateComment(long commentId, string newContent, long requestingUserId)
@@ -101,7 +102,7 @@ namespace Explorer.Blog.Core.Domain
 
         public void Vote(long userId, VoteType voteType)
         {
-            if(Status == BlogStatus.Published)
+            if(Status == BlogStatus.Published || Status == BlogStatus.Active || Status == BlogStatus.Famous)
             {
                 var existingVote = Votes.FirstOrDefault(v => v.UserId == userId);
                 if (existingVote != null)
@@ -116,11 +117,40 @@ namespace Explorer.Blog.Core.Domain
                     Votes.Add(newVote);
                 }
             }
+            UpdateStatus();
         }
 
         public long GetScore()
         {
             return Votes.Sum(v => (int)v.VoteType);
+        }
+
+        private void UpdateStatus()
+        {
+            if (Status == BlogStatus.Draft || Status == BlogStatus.Archived || Status == BlogStatus.ReadOnly)
+                return;
+
+            long score = GetScore();
+            int commentCount = Comments.Count;
+
+            if (score < -1)
+            {
+                Status = BlogStatus.ReadOnly;
+                return;
+            }
+
+            if (score > 500 && commentCount > 30)
+            {
+                Status = BlogStatus.Famous;
+            }
+            else if (score > 100 && commentCount > 10)
+            {
+                Status = BlogStatus.Active;
+            }
+            else
+            {
+                Status = BlogStatus.Published;
+            }
         }
     }
 }
