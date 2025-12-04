@@ -16,15 +16,7 @@ namespace Explorer.Tours.Core.Domain
         public DateTime LastActivity { get; }
         public KeyPoint? NextKeyPoint { get; }
 
-        public CheckProximityResult(
-            bool isNearKeyPoint,
-            long? completedKeyPointId,
-            DateTime? completedAt,
-            bool unlockedSecret,
-            double percentCompleted,
-            DateTime lastActivity,
-            KeyPoint? nextKeyPoint
-        )
+        public CheckProximityResult(bool isNearKeyPoint, long? completedKeyPointId, DateTime? completedAt, bool unlockedSecret, double percentCompleted, DateTime lastActivity, KeyPoint? nextKeyPoint)
         {
             IsNearKeyPoint = isNearKeyPoint;
             CompletedKeyPointId = completedKeyPointId;

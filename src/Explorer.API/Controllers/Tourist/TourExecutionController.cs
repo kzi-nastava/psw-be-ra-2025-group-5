@@ -17,7 +17,6 @@ public class TourExecutionController : ControllerBase
         _service = service;
     }
 
-    // POST api/tour-execution/start/{tourId}
     [HttpPost("start/{tourId:long}")]
     public ActionResult<StartExecutionResultDto> Start(long tourId)
     {
@@ -27,7 +26,6 @@ public class TourExecutionController : ControllerBase
         return Ok(result);
     }
 
-    // POST api/tour-execution/check-proximity/{executionId}
     [HttpPost("check-proximity/{executionId:long}")]
     public ActionResult<CheckProximityDto> CheckProximity(
         long executionId,
@@ -37,7 +35,6 @@ public class TourExecutionController : ControllerBase
         return Ok(result);
     }
 
-    // POST api/tour-execution/complete/{executionId}
     [HttpPost("complete/{executionId:long}")]
     public IActionResult Complete(long executionId)
     {
@@ -45,7 +42,6 @@ public class TourExecutionController : ControllerBase
         return Ok();
     }
 
-    // POST api/tour-execution/abandon/{executionId}
     [HttpPost("abandon/{executionId:long}")]
     public IActionResult Abandon(long executionId)
     {
@@ -53,7 +49,6 @@ public class TourExecutionController : ControllerBase
         return Ok();
     }
 
-    // GET api/tour-execution/{executionId}
     [HttpGet("{executionId:long}")]
     public ActionResult<TourExecutionDto> Get(long executionId)
     {

@@ -57,3 +57,6 @@ SELECT setval(pg_get_serial_sequence('tours."Facilities"', 'Id'), (SELECT COALES
 SELECT setval(pg_get_serial_sequence('tours."Monument"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Monument"));
 SELECT setval(pg_get_serial_sequence('tours."Equipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Equipment"));
 SELECT setval(pg_get_serial_sequence('tours."TouristEquipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristEquipment"));
+
+INSERT INTO tours."Tours" VALUES 
+(4, 'Belgrade Historical Tour', 'Explore key historical locations in Belgrade, including Kalemegdan Fortress and the old town.', 0, '{History,Culture,Education}', 5.05, 1, 2, NULL, NULL);

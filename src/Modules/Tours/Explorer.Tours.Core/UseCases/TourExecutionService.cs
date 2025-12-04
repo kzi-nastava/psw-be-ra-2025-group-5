@@ -39,15 +39,10 @@ namespace Explorer.Tours.Core.UseCases
                     StartTime = existing.StartTime
                 };
             }
-
             var execution = TourExecution.StartNew(userId, tourId);
-            Console.WriteLine($"TourId: {tourId}, UserId: {userId}");
             _repo.Add(execution);
-            Console.WriteLine($"Execution.TourId: {execution.TourId}, Execution.Id: {execution.Id}");
-
             var tour = _tourRepo.Get(tourId);
             var nextKeyPoint = tour?.KeyPoints.OrderBy(k => k.Position).FirstOrDefault();
-
             return new StartExecutionResultDto
             {
                 ExecutionId = execution.Id,
@@ -126,8 +121,6 @@ namespace Explorer.Tours.Core.UseCases
                 NextKeyPoint = upcoming != null ? _mapper.Map<KeyPointDto>(upcoming) : null
             };
         }
-
-
 
         public void CompleteExecution(long executionId)
         {
