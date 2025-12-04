@@ -12,7 +12,7 @@ public class ShoppingCart : AggregateRoot
 
     public ShoppingCart(long touristId)
     {
-        Guard.AgainstNegative(touristId, nameof(touristId));
+        Guard.AgainstZero(touristId, nameof(touristId));
 
         TouristId = touristId;
     }

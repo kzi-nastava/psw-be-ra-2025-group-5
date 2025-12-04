@@ -22,7 +22,7 @@ public class OrderItem : ValueObject
 
     public void Validate()
     {
-        Guard.AgainstNegative(TourId, nameof(TourId));
+        Guard.AgainstZero(TourId, nameof(TourId));
         Guard.AgainstNullOrWhiteSpace(TourName, nameof(TourName));
         Guard.AgainstNegative(ItemPrice, nameof(ItemPrice));
     }
