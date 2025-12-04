@@ -19,10 +19,7 @@ namespace Explorer.Tours.Core.UseCases
         private readonly ITourRepository _tourRepo;
         private readonly IMapper _mapper;
 
-        public TourReviewService(
-            ITourReviewRepository reviewRepo,
-            ITourRepository tourRepo,
-            IMapper mapper)
+        public TourReviewService(ITourReviewRepository reviewRepo, ITourRepository tourRepo, IMapper mapper)
         {
             _reviewRepo = reviewRepo;
             _tourRepo = tourRepo;
