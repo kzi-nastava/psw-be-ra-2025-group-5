@@ -17,6 +17,8 @@ public class ToursContext : DbContext
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
     public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+    public DbSet<TourExecution> TourExecutions { get; set; }
+
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -29,6 +31,7 @@ public class ToursContext : DbContext
         ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
         ConfigureShoppingCart(modelBuilder);
+        ConfigureTourExecution(modelBuilder);
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -94,6 +97,30 @@ public class ToursContext : DbContext
             )
             .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
     }
+
+    private static void ConfigureTourExecution(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourExecution>()
+            .ToTable("TourExecutions");
+
+        modelBuilder.Entity<TourExecution>()
+            .OwnsMany(e => e.CompletedKeyPoints, cb =>
+            {
+                cb.ToTable("KeyPointCompletions");
+
+                cb.WithOwner().HasForeignKey("TourExecutionId");
+
+                cb.Property<long>("Id");
+                cb.HasKey("Id");
+
+                cb.Property(kp => kp.KeyPointId).IsRequired();
+                cb.Property(kp => kp.CompletedAt).IsRequired();
+                cb.Property(kp => kp.DistanceTravelled).IsRequired();
+            });
+    }
+
+
+
 
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
     {
