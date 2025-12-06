@@ -101,14 +101,16 @@ public class ToursContext : DbContext
     private static void ConfigureReview(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ReviewImage>()
-            .HasKey(ri => ri.Id);
+        .HasKey(ri => ri.Id);
 
         modelBuilder.Entity<ReviewImage>()
             .Property(ri => ri.ReviewId)
             .IsRequired();
 
+        // TourReview konfiguracija
         modelBuilder.Entity<TourReview>(b =>
         {
+            // Progress kao owned entity
             b.OwnsOne(tr => tr.Progress, p =>
             {
                 p.Property(pp => pp.Percentage)
@@ -116,16 +118,19 @@ public class ToursContext : DbContext
                  .IsRequired();
             });
 
+            // Veza TourReview -> ReviewImages
             b.HasMany(tr => tr.Images)
              .WithOne()
-             .HasForeignKey("TourReviewId"); 
-        });
+             .HasForeignKey(ri => ri.ReviewId)
+             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<TourReview>()
-            .HasMany(r => r.Images)
-            .WithOne()                             
-            .HasForeignKey(ri => ri.ReviewId)
-            .OnDelete(DeleteBehavior.Cascade);
+            // Veza Tour -> TourReviews
+            b.HasOne<Tour>()  // ili .WithMany() sa Tour entity
+             .WithMany(t => t.Reviews)
+             .HasForeignKey(tr => tr.TourID)
+             .OnDelete(DeleteBehavior.Cascade)
+             .IsRequired();
+        });
     }
 
     // Helper klasa za deserijalizaciju Location-a

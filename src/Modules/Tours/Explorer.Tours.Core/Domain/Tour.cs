@@ -18,11 +18,13 @@ public class Tour : AggregateRoot
     public DateTime? PublishedDate { get; private set; }
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
+    public List<TourReview> Reviews { get; private set; }
 
     private Tour() 
     {
         Tags = new List<string>();
         KeyPoints = new List<KeyPoint>();
+        Reviews = new List<TourReview>();
     }
 
     public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
@@ -41,6 +43,7 @@ public class Tour : AggregateRoot
         Price = price;
         Status = TourStatus.Draft;
         KeyPoints = new List<KeyPoint>();
+        Reviews = new List<TourReview>();
     }
 
     public void AddKeyPoint(string name, string description, Location location, byte[]? image, string? secret)
@@ -156,4 +159,32 @@ public class Tour : AggregateRoot
         Tags = tags ?? new List<string>();
         Price = price;
     }
+
+    public TourReview AddReview(int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images)
+    {
+        var review = new TourReview(grade, comment, reviewTime, progress, touristId, this.Id, images);
+        Reviews.Add(review);
+        return review;
+    }
+
+    public TourReview AddReview(TourReview review)
+    {
+        Reviews.Add(review);
+        return review;
+    }
+
+    public void UpdateReview(long reviewId, int grade, string? comment, double progress, List<ReviewImage>? images = null)
+    {
+        var review = Reviews.FirstOrDefault(r => r.Id == reviewId);
+        if (review == null) throw new KeyNotFoundException("Review not found");
+        review.Update(grade, comment, progress, images);
+    }
+
+    public void RemoveReview(long reviewId)
+    {
+        var review = Reviews.FirstOrDefault(r => r.Id == reviewId);
+        if (review == null) throw new KeyNotFoundException("Review not found");
+        Reviews.Remove(review);
+    }
+
 }

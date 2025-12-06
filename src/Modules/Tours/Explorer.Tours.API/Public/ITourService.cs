@@ -28,4 +28,9 @@ public interface ITourService
     PagedResult<TourDto> GetPagedPublished(int page, int pageSize);
     TourDto GetPublished(long id);
     KeyPointDto GetKeyPoint(long tourId, long keyPointId);
+
+    // Review operacije
+    TourDto AddReview(long tourId, TourReviewDto dto);
+    public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto);
+    TourDto RemoveReview(long tourId, long reviewId);
 }

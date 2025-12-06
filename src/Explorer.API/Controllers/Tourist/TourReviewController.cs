@@ -11,42 +11,44 @@ namespace Explorer.API.Controllers.Tourist
     [ApiController]
     public class TourReviewController : ControllerBase
     {
-        private readonly ITourReviewService _tourReviewService;
+        private readonly ITourService _tourService;
 
-        public TourReviewController(ITourReviewService service)
+        public TourReviewController(ITourService tourService)
         {
-            _tourReviewService = service;
+            _tourService = tourService;
         }
 
         [HttpGet]
         public ActionResult<PagedResult<TourReviewDto>> GetByTour(long tourId, int page = 0, int pageSize = 10)
         {
-            var result = _tourReviewService.GetByTour(tourId, page, pageSize);
-            return Ok(result);
+            var tour = _tourService.Get(tourId);
+
+            var reviews = tour.Reviews
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(new PagedResult<TourReviewDto>(reviews, tour.Reviews.Count));
         }
 
         [HttpPost]
-        public ActionResult<TourReviewDto> Create( long tourId, [FromBody] TourReviewDto dto)
+        public ActionResult<TourDto> Create(long tourId, [FromBody] TourReviewDto dto)
         {
-            dto.TourID = tourId;
-            var result = _tourReviewService.Create(dto);
+            var result = _tourService.AddReview(tourId, dto);
             return Ok(result);
         }
 
         [HttpPut("{reviewId}")]
-        public ActionResult<TourReviewDto> Update(long tourId, long reviewId, [FromBody] TourReviewDto dto)
+        public ActionResult<TourDto> Update(long tourId, long reviewId, [FromBody] TourReviewDto dto)
         {
-            dto.Id = reviewId;
-            dto.TourID = tourId;
-
-            var result = _tourReviewService.Update(reviewId, dto);
+            var result = _tourService.UpdateReview(tourId, reviewId, dto);
             return Ok(result);
         }
 
         [HttpDelete("{reviewId}")]
-        public IActionResult Delete(long reviewId)
+        public IActionResult Delete(long tourId, long reviewId)
         {
-            _tourReviewService.Delete(reviewId);
+            _tourService.RemoveReview(tourId, reviewId);
             return NoContent();
         }
     }
