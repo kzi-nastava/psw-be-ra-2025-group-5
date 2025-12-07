@@ -58,4 +58,13 @@ public class ShoppingCartService : IShoppingCartService
         var result = _ShoppingCartRepository.Update(cart);
         return _mapper.Map<ShoppingCartDto>(result);
     }
+
+    public ShoppingCartDto ClearShoppingCart(long touristId)
+    {
+        var cart = _ShoppingCartRepository.GetByTourist(touristId);
+        cart.ClearShoppingCart();
+
+        var result = _ShoppingCartRepository.Update(cart);
+        return _mapper.Map<ShoppingCartDto>(result);
+    }
 }
