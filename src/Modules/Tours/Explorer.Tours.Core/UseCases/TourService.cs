@@ -216,14 +216,19 @@ public class TourService : ITourService
     public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto)
     {
         var tour = _tourRepository.Get(tourId);
+        if (tour == null)
+            throw new KeyNotFoundException($"Tour {tourId} not found.");
 
-        var review = tour.Reviews.FirstOrDefault(r => r.Id == reviewId);
-        if (review == null)
-            throw new KeyNotFoundException("Review not found.");
+        List<ReviewImage>? images = null;
+        if (dto.Images != null && dto.Images.Any())
+        {
+            images = _mapper.Map<List<ReviewImage>>(dto.Images);
+        }
 
-        _mapper.Map(dto, review);
+        tour.UpdateReview(reviewId, dto.Grade, dto.Comment, dto.Progress, images);
 
         var updatedTour = _tourRepository.Update(tour);
+
         return _mapper.Map<TourDto>(updatedTour);
     }
 

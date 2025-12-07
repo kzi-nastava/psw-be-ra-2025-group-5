@@ -96,12 +96,12 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
         {
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
+            var invalidTourId = -999;
 
-            var action = controller.GetByTour(-999);
-            var result = action.Result as NotFoundObjectResult;
-
-            result.ShouldNotBeNull();
-            result.StatusCode.ShouldBe(404);
+            Should.Throw<NotFoundException>(() =>
+            {
+                var actionResult = controller.GetByTour(invalidTourId).Result;
+            });
         }
 
         private static TourReviewController CreateController(IServiceScope scope)

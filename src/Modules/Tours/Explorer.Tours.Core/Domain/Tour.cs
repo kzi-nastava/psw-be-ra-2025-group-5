@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Tours.Core.Domain.Shared;
 
 namespace Explorer.Tours.Core.Domain;
@@ -183,7 +184,9 @@ public class Tour : AggregateRoot
     public void RemoveReview(long reviewId)
     {
         var review = Reviews.FirstOrDefault(r => r.Id == reviewId);
-        if (review == null) throw new KeyNotFoundException("Review not found");
+        if (review == null)
+            throw new NotFoundException($"Review with id {reviewId} not found.");
+
         Reviews.Remove(review);
     }
 

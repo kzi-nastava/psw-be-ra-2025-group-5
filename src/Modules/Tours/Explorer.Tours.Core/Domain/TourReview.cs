@@ -86,6 +86,13 @@ public class TourReview: Entity
         Progress = new TourProgress(progress);
 
         if (images != null)
-            Images = images;
+        {
+            foreach (var img in images)
+            {
+                if (!Images.Any(i => i.ImagePath == img.ImagePath))
+                    Images.Add(new ReviewImage { ImagePath = img.ImagePath });
+            }
+            Images.RemoveAll(i => !images.Any(d => d.ImagePath == i.ImagePath));
+        }
     }
 }
