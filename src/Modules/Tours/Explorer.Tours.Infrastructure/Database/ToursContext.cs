@@ -18,6 +18,8 @@ public class ToursContext : DbContext
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
     public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     public DbSet<TourExecution> TourExecutions { get; set; }
+    public DbSet<TourReview> TourReviews { get; set; }
+    public DbSet<ReviewImage> ReviewImages { get; set; }
 
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
@@ -32,6 +34,7 @@ public class ToursContext : DbContext
         ConfigureTouristPreferences(modelBuilder);
         ConfigureShoppingCart(modelBuilder);
         ConfigureTourExecution(modelBuilder);
+        ConfigureReview(modelBuilder);
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -122,6 +125,46 @@ public class ToursContext : DbContext
 
 
 
+    private static void ConfigureReview(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ReviewImage>()
+        .HasKey(ri => ri.Id);
+
+        modelBuilder.Entity<ReviewImage>()
+            .Property(ri => ri.ReviewId)
+            .IsRequired();
+
+        // TourReview konfiguracija
+        modelBuilder.Entity<TourReview>(b =>
+        {
+            // Progress kao owned entity
+            b.OwnsOne(tr => tr.Progress, p =>
+            {
+                p.Property(pp => pp.Percentage)
+                 .HasColumnName("Progress")
+                 .IsRequired();
+            });
+
+            // Veza TourReview -> ReviewImages
+            b.HasMany(tr => tr.Images)
+             .WithOne()
+             .HasForeignKey(ri => ri.ReviewId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            // Veza Tour -> TourReviews
+            b.HasOne<Tour>()  // ili .WithMany() sa Tour entity
+             .WithMany(t => t.Reviews)
+             .HasForeignKey(tr => tr.TourID)
+             .OnDelete(DeleteBehavior.Cascade)
+             .IsRequired();
+        });
+    }
+
+    // Helper klasa za deserijalizaciju Location-a
+    private class LocationDtopublic{
+        double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ShoppingCart>()

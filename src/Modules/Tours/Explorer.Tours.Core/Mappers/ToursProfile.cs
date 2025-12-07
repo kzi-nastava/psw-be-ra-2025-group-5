@@ -61,5 +61,16 @@ public class ToursProfile : Profile
 
         CreateMap<CheckProximityResult, CheckProximityDto>(); 
 
+
+        CreateMap<TourProgress, double>().ConvertUsing(tp => tp.Percentage);
+        CreateMap<double, TourProgress>().ConvertUsing(d => new TourProgress(d));
+
+        CreateMap<ReviewImage, ReviewImageDto>().ReverseMap();
+
+        CreateMap<TourReview, TourReviewDto>()
+            .ForMember(d => d.Progress, opt => opt.MapFrom(s => s.Progress.Percentage))
+            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images))
+            .ReverseMap()
+            .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)));
     }
 }
