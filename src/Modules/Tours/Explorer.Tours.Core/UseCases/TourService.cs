@@ -199,6 +199,48 @@ public class TourService : ITourService
         return dto;
     }
 
+    public TourDto AddReview(long tourId, TourReviewDto dto)
+    {
+        var tour = _tourRepository.Get(tourId);
 
+        // Mapiranje DTO -> TourReview entitet preko AutoMapper-a
+        var review = _mapper.Map<TourReview>(dto);
+
+        tour.AddReview(review);
+
+        var updatedTour = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(updatedTour);
+    }
+
+    // Update review
+    public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto)
+    {
+        var tour = _tourRepository.Get(tourId);
+        if (tour == null)
+            throw new KeyNotFoundException($"Tour {tourId} not found.");
+
+        List<ReviewImage>? images = null;
+        if (dto.Images != null && dto.Images.Any())
+        {
+            images = _mapper.Map<List<ReviewImage>>(dto.Images);
+        }
+
+        tour.UpdateReview(reviewId, dto.Grade, dto.Comment, dto.Progress, images);
+
+        var updatedTour = _tourRepository.Update(tour);
+
+        return _mapper.Map<TourDto>(updatedTour);
+    }
+
+    // Remove review
+    public TourDto RemoveReview(long tourId, long reviewId)
+    {
+        var tour = _tourRepository.Get(tourId);
+
+        tour.RemoveReview(reviewId);
+
+        var updatedTour = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(updatedTour);
+    }
 
 }

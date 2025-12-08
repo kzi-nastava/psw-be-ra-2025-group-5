@@ -20,7 +20,7 @@ public class TourDbRepository : ITourRepository
 
     public PagedResult<Tour> GetPaged(int page, int pageSize)
     {
-        var query = _dbSet.Include(t => t.KeyPoints);
+        var query = _dbSet.Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images);
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
         return task.Result;
@@ -29,7 +29,7 @@ public class TourDbRepository : ITourRepository
     public PagedResult<Tour> GetPagedByAuthor(long authorId, int page, int pageSize)
     {
         var query = _dbSet
-            .Include(t => t.KeyPoints)
+            .Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images)
             .Where(t => t.AuthorId == authorId);
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
@@ -38,13 +38,13 @@ public class TourDbRepository : ITourRepository
 
     public List<Tour> GetAll()
     {
-        return _dbSet.Include(t => t.KeyPoints).ToList();
+        return _dbSet.Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images).ToList();
     }
 
     public Tour Get(long id)
     {
         var entity = _dbSet
-            .Include(t => t.KeyPoints)
+            .Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images)
             .FirstOrDefault(t => t.Id == id);
         if (entity == null) throw new NotFoundException("Not found: " + id);
         return entity;
@@ -61,7 +61,7 @@ public class TourDbRepository : ITourRepository
     {
         // 1. Učitaj postojeći tour SA TRACKING-om
         var existingTour = _dbSet
-            .Include(t => t.KeyPoints)
+            .Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images)
             .AsNoTracking() // ← Ne pratimo promene za sada
             .FirstOrDefault(t => t.Id == entity.Id);
 
@@ -100,6 +100,27 @@ public class TourDbRepository : ITourRepository
             Console.WriteLine($"[TourDbRepository] Deleted {deletedCount} KeyPoint(s) from database");
         }
 
+        // Brisanje review-a
+        var newReviewIds = entity.Reviews.Select(r => r.Id).Where(id => id != 0).ToHashSet();
+        var reviewIdsToDelete = existingTour.Reviews
+            .Where(r => r.Id != 0 && !newReviewIds.Contains(r.Id))
+            .Select(r => r.Id)
+            .ToList();
+
+        if (reviewIdsToDelete.Any())
+        {
+            var reviewsDbSet = DbContext.Set<TourReview>();
+            foreach (var reviewId in reviewIdsToDelete)
+            {
+                var reviewToDelete = reviewsDbSet
+                    .Include(r => r.Images)
+                    .FirstOrDefault(r => r.Id == reviewId);
+                if (reviewToDelete != null)
+                    reviewsDbSet.Remove(reviewToDelete);
+            }
+            DbContext.SaveChanges();
+        }
+
         // 4. Attach i ažuriraj Tour
         DbContext.Update(entity);
         var updatedCount = DbContext.SaveChanges();
@@ -125,5 +146,35 @@ public class TourDbRepository : ITourRepository
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
         return task.Result;
+    }
+
+    public TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images = null)
+    {
+        var tour = Get(tourId);
+
+        var review = tour.AddReview(grade, comment, reviewTime, progress, touristId, images);
+
+        DbContext.Update(tour);
+        DbContext.SaveChanges();
+
+        return review;
+    }
+
+    public void UpdateReview(long tourId, long reviewId, int grade, string? comment, double progress, List<ReviewImage>? images = null)
+    {
+        var tour = Get(tourId);
+        tour.UpdateReview(reviewId, grade, comment, progress, images);
+
+        DbContext.Update(tour);
+        DbContext.SaveChanges();
+    }
+
+    public void RemoveReview(long tourId, long reviewId)
+    {
+        var tour = Get(tourId);
+        tour.RemoveReview(reviewId);
+
+        DbContext.Update(tour);
+        DbContext.SaveChanges();
     }
 }

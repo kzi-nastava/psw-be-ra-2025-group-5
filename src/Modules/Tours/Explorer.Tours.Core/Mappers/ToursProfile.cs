@@ -49,5 +49,28 @@ public class ToursProfile : Profile
         CreateMap<KeyPoint, KeyPointDto>().ReverseMap();
         
         CreateMap<CreateKeyPointDto, KeyPointDto>();
+
+        CreateMap<KeyPointCompletion, KeyPointCompletionDto>().ReverseMap();
+
+        CreateMap<TourExecution, TourExecutionDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+        CreateMap<TourExecution, StartExecutionResultDto>()
+            .ForMember(dest => dest.ExecutionId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.StartTime));
+
+        CreateMap<CheckProximityResult, CheckProximityDto>(); 
+
+
+        CreateMap<TourProgress, double>().ConvertUsing(tp => tp.Percentage);
+        CreateMap<double, TourProgress>().ConvertUsing(d => new TourProgress(d));
+
+        CreateMap<ReviewImage, ReviewImageDto>().ReverseMap();
+
+        CreateMap<TourReview, TourReviewDto>()
+            .ForMember(d => d.Progress, opt => opt.MapFrom(s => s.Progress.Percentage))
+            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images))
+            .ReverseMap()
+            .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)));
     }
 }
