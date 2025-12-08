@@ -24,7 +24,6 @@ public class ShoppingCartDbRepository : IShoppingCartRepository
     public ShoppingCart GetByTourist(long touristId)
     {
         var entity = _dbSet.FirstOrDefault(t => t.TouristId == touristId);
-        if (entity == null) throw new NotFoundException("Not found: " + touristId);
         return entity;
     }
 
