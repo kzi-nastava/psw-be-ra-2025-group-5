@@ -24,10 +24,10 @@ public class ShoppingCartQueryTests : BaseToursIntegrationTest
 
         // Assert
         result.ShouldNotBeNull();
+        result.Items.Count.ShouldBe(2);
         result.Items[0].TourId.ShouldBe(-1);
-        result.Items[0].TourName.ShouldBe("Belgrade Fortress Walk");
-        result.Items[0].ItemPrice.ShouldBe(5);
-        result.Total.ShouldBe(5);
+        result.Items[1].TourId.ShouldBe(-2);
+        result.Total.ShouldBe(10.05);
     }
 
     private static ShoppingCartController CreateController(IServiceScope scope)

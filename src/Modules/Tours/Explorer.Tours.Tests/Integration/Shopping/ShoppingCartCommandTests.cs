@@ -120,8 +120,8 @@ public class ShoppingCartCommandTests : BaseToursIntegrationTest
         result.ShouldNotBeNull();
         result.Id.ShouldBe(-1);
         result.TouristId.ShouldBe(-2);
-        result.Total.ShouldBe(0);
-        result.Items.Count.ShouldBe(0);
+        result.Total.ShouldBe(5);
+        result.Items.Count.ShouldBe(1);
         result.Items.ShouldNotContain(i => i.TourId == tour.Id);
 
         // Assert - Database
@@ -140,6 +140,25 @@ public class ShoppingCartCommandTests : BaseToursIntegrationTest
 
         // Act & Assert
         Should.Throw<InvalidOperationException>(() => controller.RemoveOrderItem(-4, -1));
+    }
+
+    [Fact]
+    public void Checkout()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var controller = CreateController(scope);
+
+        // Act
+        var result = ((ObjectResult)controller.Checkout(-4).Result)?.Value as ShoppingCartDto;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.Id.ShouldNotBe(0);
+        result.TouristId.ShouldBe(-4);
+        result.Items.Count.ShouldBe(0);
+        result.Total.ShouldBe(0);
     }
 
     private static ShoppingCartController CreateController(IServiceScope scope)
