@@ -15,5 +15,6 @@ namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces
         public List<Comment> GetCommentsByIds(List<long> ids);
         PagedResult<TourProblem> GetPagedByReporterId(long reporterId, int page, int pageSize);
         PagedResult<TourProblem> GetPagedByTourIds(List<long> tourIds, int page, int pageSize);
+        public void MarkResolved(long problemId, bool isResolved);
     }
 }

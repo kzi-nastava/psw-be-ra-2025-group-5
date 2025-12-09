@@ -31,6 +31,7 @@ public class TourProblem : AggregateRoot
     public DateTimeOffset OccurredAt { get; }
     public DateTimeOffset CreatedAt { get; }
     public List<long> Comments { get; private set; } = new List<long>();
+    public bool IsResolved { get; set; }
     private TourProblem() { }
 
     public TourProblem(
@@ -54,6 +55,7 @@ public class TourProblem : AggregateRoot
         OccurredAt = occurredAt;
         CreatedAt = createdAt ?? DateTimeOffset.UtcNow;
         Comments = new List<long>();
+        IsResolved = false;
     }
 
 }

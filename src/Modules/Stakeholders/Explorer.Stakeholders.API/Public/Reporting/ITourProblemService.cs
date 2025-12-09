@@ -14,5 +14,6 @@ namespace Explorer.Stakeholders.API.Public.Reporting
         List<CommentDto> GetComments(long id);
         PagedResult<TourProblemDto> GetPagedByReporterId(long reporterId, int page, int pageSize);
         PagedResult<TourProblemDto> GetPagedByTourIds(List<long> tourIds, int page, int pageSize);
+        public TourProblemDto MarkResolved(long problemId, bool isResolved);
     }
 }

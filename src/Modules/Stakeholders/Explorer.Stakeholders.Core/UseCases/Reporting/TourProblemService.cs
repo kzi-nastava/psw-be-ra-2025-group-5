@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public.Reporting;
@@ -70,8 +71,6 @@ public class TourProblemService : ITourProblemService
         return dto;
     }
 
-
-
     public TourProblemDto GetById(long id)
     {
         var problem = _repository.Get(id);
@@ -96,13 +95,12 @@ public class TourProblemService : ITourProblemService
 
                     return dto;
                 })
-                .ToList()
+                .ToList(),
+            IsResolved = problem.IsResolved
         };
 
         return dto;
     }
-
-
 
     public List<CommentDto> GetComments(long id)
     {
@@ -119,7 +117,6 @@ public class TourProblemService : ITourProblemService
 
             return dto;
         }).ToList();
-
     }
 
     private PagedResult<TourProblemDto> MapToDto(PagedResult<TourProblem> result)
@@ -139,9 +136,37 @@ public class TourProblemService : ITourProblemService
                     var comment = _repository.GetCommentById(cid);
                     return _mapper.Map<CommentDto>(comment);
                 })
-                .ToList()
+                .ToList(),
+            IsResolved = problem.IsResolved
         }).ToList();
 
         return new PagedResult<TourProblemDto>(items, result.TotalCount);
+    }
+
+    public TourProblemDto MarkResolved(long problemId, bool isResolved)
+    {
+        _repository.MarkResolved(problemId, isResolved);
+
+        var updatedProblem = _repository.Get(problemId);
+
+        if (updatedProblem == null)
+            throw new NotFoundException($"TourProblem {problemId} not found");
+
+        var dto = new TourProblemDto
+        {
+            Id = updatedProblem.Id,
+            TourId = updatedProblem.TourId,
+            ReporterId = updatedProblem.ReporterId,
+
+            Category = (API.Dtos.ProblemCategory)updatedProblem.Category,
+            Priority = (API.Dtos.ProblemPriority)updatedProblem.Priority,
+            Description = updatedProblem.Description,
+            OccurredAt = updatedProblem.OccurredAt,
+            CreatedAt = updatedProblem.CreatedAt,
+            IsResolved = updatedProblem.IsResolved,
+            Comments = new List<CommentDto>()
+        };
+
+        return dto;
     }
 }

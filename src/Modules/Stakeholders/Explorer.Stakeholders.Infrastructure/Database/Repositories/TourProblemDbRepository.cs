@@ -111,5 +111,20 @@ public class TourProblemDbRepository : ITourProblemRepository
             .ToList();
     }
 
+    public void MarkResolved(long problemId, bool isResolved)
+    {
+        // 1. Dohvatanje entiteta (koristeći Get, koje će baciti NotFoundException ako ne postoji)
+        var problem = Get(problemId);
 
+        // 2. Direktno ažuriranje svojstva entiteta
+        problem.IsResolved = isResolved;
+
+        // 3. Informisanje DbContext-a da je entitet izmenjen
+        // Entitet je već praćen nakon poziva Get(), ali eksplicitno pozivanje Update() je sigurnije
+        // ako Get() ne vrši praćenje ili ako želite da budete sigurni.
+        DbContext.Update(problem);
+
+        // 4. Sačuvaj promene u bazi
+        DbContext.SaveChanges();
+    }
 }
