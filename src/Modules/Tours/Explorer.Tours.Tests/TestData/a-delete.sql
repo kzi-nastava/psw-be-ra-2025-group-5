@@ -6,3 +6,6 @@ DELETE FROM tours."Equipment";
 DELETE FROM tours."Facilities";
 DELETE FROM tours."TouristPreferences";
 DELETE FROM tours."ShoppingCarts";
+DELETE FROM tours."TourExecutions"; 
+DELETE FROM tours."KeyPointCompletions"; 
+DELETE FROM tours."KeyPoints"; 
