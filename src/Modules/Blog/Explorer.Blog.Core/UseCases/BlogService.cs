@@ -58,6 +58,19 @@ namespace Explorer.Blog.Core.UseCases
             return _mapper.Map<List<BlogPostDto>>(result);
         }
 
+        public List<BlogPostDto> GetByStatus(string status)
+        {
+            var result = _blogRepository.GetAll();
+
+            if (Enum.TryParse<BlogPost.BlogStatus>(status, true, out var parsedStatus))
+            {
+                var filtered = result.Where(post => post.Status == parsedStatus).ToList();
+                return _mapper.Map<List<BlogPostDto>>(filtered);
+            }
+
+            return new List<BlogPostDto>();
+        }
+
         public BlogPostDto Create(CreateBlogPostDto dto, long authorId)
         {
             var post = new BlogPost(

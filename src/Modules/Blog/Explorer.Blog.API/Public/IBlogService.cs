@@ -12,6 +12,7 @@ namespace Explorer.Blog.API.Public
         List<BlogPostDto> GetAll(long userId);
         BlogPostDto GetById(long id);
         List<BlogPostDto> GetByAuthor(long authorId);
+        List<BlogPostDto> GetByStatus(string status);
         BlogPostDto Create(CreateBlogPostDto dto, long authorId);
         BlogPostDto Update(long id, UpdateBlogPostDto dto, long authorId);
         BlogImageDto AddImage(long postId, BlogImageDto dto);

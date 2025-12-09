@@ -51,6 +51,13 @@ public class BlogController : ControllerBase
         return Ok(posts);
     }
 
+    [HttpGet("status/{status}")]
+    public IActionResult GetByStatus(string status)
+    {
+        var posts = _blogService.GetByStatus(status);
+        return Ok(posts);
+    }
+
     [HttpPost]
     public IActionResult Create([FromBody] CreateBlogPostDto dto)
     {
