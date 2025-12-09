@@ -133,7 +133,7 @@ namespace Explorer.Blog.Core.Domain
             long score = GetScore();
             int commentCount = Comments.Count;
 
-            if (score < -1)
+            if (score < -10)
             {
                 Status = BlogStatus.ReadOnly;
                 return;
@@ -143,7 +143,7 @@ namespace Explorer.Blog.Core.Domain
             {
                 Status = BlogStatus.Famous;
             }
-            else if (score > 100 && commentCount > 10)
+            else if (score > 100 || commentCount > 10)
             {
                 Status = BlogStatus.Active;
             }
