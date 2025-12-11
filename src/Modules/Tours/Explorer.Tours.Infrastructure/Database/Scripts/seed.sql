@@ -4,7 +4,7 @@ DELETE FROM tours."Facilities";
 DELETE FROM tours."Monument";
 DELETE FROM tours."Equipment";
 DELETE FROM tours."TouristEquipment";
-DELETE FROM tour."ShoppingCart";
+DELETE FROM tour."ShoppingCarts";
 
 INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (1, 4, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}', '["Adventure","Nature"]');
