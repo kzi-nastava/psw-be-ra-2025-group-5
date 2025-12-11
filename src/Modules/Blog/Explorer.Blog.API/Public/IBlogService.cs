@@ -24,5 +24,7 @@ namespace Explorer.Blog.API.Public
         BlogPostDto Archive(long id, long authorId);
         BlogPostDto UpdateDraft(long id, UpdateDraftBlogPostDto dto, long authorId);
         BlogPostDto Vote(long blogId, long userId, string voteType);
+        BlogPostDto CreateAndPublish(CreateAndPublishBlogPostDto dto, long authorId);
+
     }
 }

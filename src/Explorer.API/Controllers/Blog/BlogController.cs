@@ -168,5 +168,13 @@ public class BlogController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("publish")]
+    public IActionResult CreateAndPublish([FromBody] CreateAndPublishBlogPostDto dto)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.CreateAndPublish(dto, authorId);
+        return Ok(result);
+    }
+
 }
 

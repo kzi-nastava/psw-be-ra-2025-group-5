@@ -28,3 +28,7 @@ INSERT INTO blog."BlogVotes" ("Id", "UserId", "BlogPostId", "VoteDate", "VoteTyp
 (11, 4, 6, '2023-11-16 10:00:00', -1),
 (12, 5, 6, '2023-11-16 10:15:00', -1),
 (13, 6, 6, '2023-11-16 10:30:00', -1);
+
+SELECT setval(pg_get_serial_sequence('blog."BlogPosts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM blog."BlogPosts"));
+SELECT setval(pg_get_serial_sequence('blog."Comments"', 'CommentId'), (SELECT COALESCE(MAX("CommentId"),0) FROM blog."Comments"));
+SELECT setval(pg_get_serial_sequence('blog."BlogVotes"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM blog."BlogVotes"));

@@ -279,6 +279,51 @@ namespace Explorer.Blog.Tests.Integration
             stored.Status.ShouldBe(BlogPost.BlogStatus.Famous);
         }
 
+        [Fact]
+        public void Successfully_creates_and_publishes_blog_with_images()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            // Arrange
+            var dto = new CreateAndPublishBlogPostDto
+            {
+                Title = "Test Create & Publish",
+                Description = "Opis",
+                Images = new List<BlogImageDto>
+        {
+            new BlogImageDto
+            {
+                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
+                ContentType = "image/png",
+                Order = 0
+            },
+            new BlogImageDto
+            {
+                Base64 = Convert.ToBase64String(new byte[] { 4, 5, 6 }),
+                ContentType = "image/jpeg",
+                Order = 1
+            }
+        }
+            };
+
+            // Act
+            var result = service.CreateAndPublish(dto, authorId: 1);
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Id.ShouldBeGreaterThan(0);
+            result.Title.ShouldBe(dto.Title);
+            result.Description.ShouldBe(dto.Description);
+            result.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+
+            result.Images.Count.ShouldBe(2);
+
+        }
+
+
     }
+
 }
 

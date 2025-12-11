@@ -144,8 +144,6 @@ namespace Explorer.Blog.Core.UseCases
             var post = _blogRepository.GetById(postId);
             if (post == null) throw new Exception("Post not found");
 
-            if (post.Status != BlogStatus.Draft)
-                throw new InvalidOperationException("Cannot add images unless post is in Draft");
             try
             {
                 byte[] bytes = null;
@@ -279,5 +277,53 @@ namespace Explorer.Blog.Core.UseCases
             return _mapper.Map<BlogPostDto>(blog);
         }
 
+        public BlogPostDto CreateAndPublish(CreateAndPublishBlogPostDto dto, long authorId)
+        {
+            var post = new BlogPost(
+                authorId: authorId,
+                title: dto.Title,
+                description: dto.Description,
+                createdAt: DateTime.UtcNow
+            );
+
+            _blogRepository.Create(post);
+
+            foreach (var imgDto in dto.Images)
+            {
+                byte[] bytes = null;
+
+                if (!string.IsNullOrWhiteSpace(imgDto.Base64))
+                {
+                    var base64 = imgDto.Base64.Contains(",")
+                        ? imgDto.Base64.Split(',')[1]
+                        : imgDto.Base64;
+
+                    bytes = Convert.FromBase64String(base64);
+                }
+                else
+                {
+                    throw new Exception("Base64 data missing for one of the images");
+                }
+
+                var image = new BlogImage(
+                    blogPostId: post.Id,
+                    data: bytes,
+                    contentType: imgDto.ContentType,
+                    order: imgDto.Order
+                );
+
+                _blogRepository.AddImage(image);
+            }
+
+            _domainService.Publish(post);
+            _blogRepository.Update(post);
+
+            var result = _mapper.Map<BlogPostDto>(post);
+            result.Images = GetImagesByPostId(post.Id);
+            return result;
+        }
+
     }
+
 }
+
