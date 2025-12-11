@@ -1,7 +1,7 @@
 ﻿using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.API.Dtos;
-using AutoMapper; 
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +25,38 @@ namespace Explorer.Tours.Core.UseCases
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        private void EnsureNotExpired(TourExecution execution)
+        {
+            if (execution.LastActivity.AddDays(7) < DateTime.UtcNow)
+            {
+                execution.AbandonTour();
+                _repo.Update(execution);
+                throw new InvalidOperationException("Cannot continue the tour. More than 7 days have passed since last activity.");
+            }
+        }
+
+        public void ExpireOldTours()
+        {
+            var threshold = DateTime.UtcNow.AddDays(-7);
+
+            var oldExecutions = _repo.GetAllActiveOlderThan(threshold);
+
+            foreach (var ex in oldExecutions)
+            {
+                ex.AbandonTour();
+                _repo.Update(ex);
+            }
+        }
+
         public StartExecutionResultDto StartExecution(long userId, long tourId)
         {
             // TODO: dodati proveru kupovine 
             var existing = _repo.GetActiveForUser(userId, tourId);
+
             if (existing != null)
             {
+                EnsureNotExpired(existing);
+
                 var existingNext = GetNextKeyPointForExecution(existing);
                 return new StartExecutionResultDto
                 {
@@ -39,6 +65,8 @@ namespace Explorer.Tours.Core.UseCases
                     StartTime = existing.StartTime
                 };
             }
+
+
             var execution = TourExecution.StartNew(userId, tourId);
             _repo.Add(execution);
             var tour = _tourRepo.Get(tourId);
@@ -58,6 +86,11 @@ namespace Explorer.Tours.Core.UseCases
 
             var execution = _repo.Get(executionId);
             if (execution == null) throw new KeyNotFoundException("TourExecution not found.");
+
+            if (execution != null)
+            {
+                EnsureNotExpired(execution);
+            }
 
             execution.UpdateActivity();
 
@@ -168,7 +201,7 @@ namespace Explorer.Tours.Core.UseCases
 
         private double HaversineDistanceMeters(double lat1, double lon1, double lat2, double lon2)
         {
-            const double EarthRadiusMeters = 6371000.0; 
+            const double EarthRadiusMeters = 6371000.0;
 
             var dLat = ToRad(lat2 - lat1);
             var dLon = ToRad(lon2 - lon1);
