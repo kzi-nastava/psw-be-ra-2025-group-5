@@ -18,10 +18,11 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
         {
             _dbContext = dbContext;
         }
-        public List<BlogPost> GetAll() => _dbContext.BlogPosts.Include(x => x.Images).ToList();
+        public List<BlogPost> GetAll() => _dbContext.BlogPosts.Include(x => x.Images).Include(b => b.Votes).ToList();
         public BlogPost? GetById(long id) => _dbContext.BlogPosts
         .Include(b => b.Images)
         .Include(b => b.Comments)
+        .Include(b => b.Votes)
         .FirstOrDefault(blog => blog.Id == id);
 
 

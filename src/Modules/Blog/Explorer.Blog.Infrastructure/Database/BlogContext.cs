@@ -9,6 +9,7 @@ public class BlogContext : DbContext
     public DbSet<BlogPost> BlogPosts { get; set; }
     public DbSet<BlogImage> BlogImages { get; set; }
     public DbSet<Comment> Comments { get; set; }
+    public DbSet<BlogVote> Votes { get; set; }
     public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +27,7 @@ public class BlogContext : DbContext
                 .IsRequired()
                 .HasConversion<string>();
             b.HasMany(x => x.Images).WithOne().HasForeignKey(i => i.BlogPostId).OnDelete(DeleteBehavior.Cascade);
+            b.HasMany(x => x.Votes).WithOne().HasForeignKey(v => v.BlogPostId).OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<BlogImage>(i =>
@@ -54,6 +56,13 @@ public class BlogContext : DbContext
              .OnDelete(DeleteBehavior.Cascade);
         });
 
-
+        modelBuilder.Entity<BlogVote>(v =>
+        {
+            v.ToTable("BlogVotes");
+            v.HasKey(x => x.Id);
+            v.Property(x => x.UserId).IsRequired();
+            v.Property(x => x.VoteDate).IsRequired();
+            v.Property(x => x.VoteType).HasConversion<string>();
+        });
     }
 }

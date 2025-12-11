@@ -51,6 +51,13 @@ public class BlogController : ControllerBase
         return Ok(posts);
     }
 
+    [HttpGet("status/{status}")]
+    public IActionResult GetByStatus(string status)
+    {
+        var posts = _blogService.GetByStatus(status);
+        return Ok(posts);
+    }
+
     [HttpPost]
     public IActionResult Create([FromBody] CreateBlogPostDto dto)
     {
@@ -149,6 +156,15 @@ public class BlogController : ControllerBase
     {
         var authorId = GetUserIdFromToken();
         var result = _blogService.UpdateDraft(id, dto, authorId);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}/vote/{voteType}")]
+    public ActionResult<BlogPostDto> Vote(long id, VoteType voteType)
+    {
+        var userId = GetUserIdFromToken();
+        var result = _blogService.Vote(id, userId, voteType.ToString());
+
         return Ok(result);
     }
 

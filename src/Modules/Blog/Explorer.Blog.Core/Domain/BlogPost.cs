@@ -17,8 +17,8 @@ namespace Explorer.Blog.Core.Domain
             Published, 
             Archived,
             Active,
-            Famous
-
+            Famous,
+            ReadOnly
         }
 
         public long AuthorId { get; set; }
@@ -28,6 +28,7 @@ namespace Explorer.Blog.Core.Domain
         public DateTime? LastUpdatedAt { get; set; }        
         public List<Comment> Comments { get; set; } = new();  
         public List<BlogImage>? Images { get; set; } = new();
+        public List<BlogVote> Votes { get; private set; } = new();
         public BlogStatus Status { get; set; } = BlogStatus.Draft;
 
         public BlogPost(long authorId, string title, string description, DateTime createdAt)
@@ -54,16 +55,16 @@ namespace Explorer.Blog.Core.Domain
 
             Comments.Add(comment);
 
-            UpdateStatusByComments();
+            UpdateStatus();
         }
 
-        public void UpdateStatusByComments()
+        /*public void UpdateStatusByComments()
         {
             if (Comments.Count > 30)
                 Status = BlogStatus.Famous;
             else if (Comments.Count > 10)
                 Status = BlogStatus.Active;
-        }
+        }*/
 
         public void RemoveComment(long commentId, long requestingUserId)
         {
@@ -75,6 +76,7 @@ namespace Explorer.Blog.Core.Domain
                 throw new UnauthorizedAccessException("Cannot delete this comment");
 
             Comments.Remove(comment);
+            UpdateStatus();
         }
 
         public void UpdateComment(long commentId, string newContent, long requestingUserId)
@@ -96,6 +98,59 @@ namespace Explorer.Blog.Core.Domain
                 throw new InvalidOperationException("Only draft blogs can be published.");
 
             Status = BlogStatus.Published;
+        }
+
+        public void Vote(long userId, VoteType voteType)
+        {
+            if(Status == BlogStatus.Published || Status == BlogStatus.Active || Status == BlogStatus.Famous)
+            {
+                var existingVote = Votes.FirstOrDefault(v => v.UserId == userId);
+                if (existingVote != null)
+                {
+                    Votes.Remove(existingVote);
+                    var newVote = new BlogVote(userId, Id, voteType);
+                    Votes.Add(newVote);
+                }
+                else
+                {
+                    var newVote = new BlogVote(userId, Id, voteType);
+                    Votes.Add(newVote);
+                }
+            }
+            UpdateStatus();
+        }
+
+        public long GetScore()
+        {
+            return Votes.Sum(v => (int)v.VoteType);
+        }
+
+        private void UpdateStatus()
+        {
+            if (Status == BlogStatus.Draft || Status == BlogStatus.Archived || Status == BlogStatus.ReadOnly)
+                return;
+
+            long score = GetScore();
+            int commentCount = Comments.Count;
+
+            if (score < -10)
+            {
+                Status = BlogStatus.ReadOnly;
+                return;
+            }
+
+            if (score > 500 && commentCount > 30)
+            {
+                Status = BlogStatus.Famous;
+            }
+            else if (score > 100 || commentCount > 10)
+            {
+                Status = BlogStatus.Active;
+            }
+            else
+            {
+                Status = BlogStatus.Published;
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Explorer.Blog.Core.Mappers
             // Mapiranje BlogPost sa posebnom logikom za Status
             CreateMap<BlogPost, BlogPostDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.VoteScore, opt => opt.MapFrom(src => src.GetScore()))
                 .ReverseMap();
 
             CreateMap<BlogImage, BlogImageDto>()
@@ -22,6 +23,8 @@ namespace Explorer.Blog.Core.Mappers
 
             // Mapiranje komentara (feat/blog-comments)
             CreateMap<Comment, CommentBlogDto>();
+
+            CreateMap<BlogVote, BlogVoteDto>().ReverseMap();
         }
     }
 }

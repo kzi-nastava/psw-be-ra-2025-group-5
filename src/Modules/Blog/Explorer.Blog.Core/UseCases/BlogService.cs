@@ -30,6 +30,9 @@ namespace Explorer.Blog.Core.UseCases
             var filtered = result.Where(post =>
                 post.Status == BlogPost.BlogStatus.Published ||
                 post.Status == BlogPost.BlogStatus.Archived ||
+                post.Status == BlogPost.BlogStatus.Active ||
+                post.Status == BlogPost.BlogStatus.Famous ||
+                post.Status == BlogPost.BlogStatus.ReadOnly ||
                 (post.Status == BlogPost.BlogStatus.Draft && post.AuthorId == userId)
             ).ToList();
 
@@ -53,6 +56,19 @@ namespace Explorer.Blog.Core.UseCases
         {
             var result = _blogRepository.GetByAuthor(authorId);
             return _mapper.Map<List<BlogPostDto>>(result);
+        }
+
+        public List<BlogPostDto> GetByStatus(string status)
+        {
+            var result = _blogRepository.GetAll();
+
+            if (Enum.TryParse<BlogPost.BlogStatus>(status, true, out var parsedStatus))
+            {
+                var filtered = result.Where(post => post.Status == parsedStatus).ToList();
+                return _mapper.Map<List<BlogPostDto>>(filtered);
+            }
+
+            return new List<BlogPostDto>();
         }
 
         public BlogPostDto Create(CreateBlogPostDto dto, long authorId)
@@ -88,6 +104,15 @@ namespace Explorer.Blog.Core.UseCases
 
                 case BlogStatus.Archived:
                     throw new InvalidOperationException("Cannot modify archived blog");
+
+                case BlogStatus.Active:
+                    throw new InvalidOperationException("Cannot modify active blog");
+
+                case BlogStatus.Famous:
+                    throw new InvalidOperationException("Cannot modify famous blog");
+
+                case BlogStatus.ReadOnly:
+                    throw new InvalidOperationException("Cannot modify closed blog");
 
                 default:
                     throw new InvalidOperationException("Unknown blog state");
@@ -240,6 +265,18 @@ namespace Explorer.Blog.Core.UseCases
             _blogRepository.Update(post);
 
             return _mapper.Map<BlogPostDto>(post);
+        }
+
+        public BlogPostDto Vote(long blogId, long userId, string voteTypeStr)
+        {
+            var voteType = Enum.Parse<VoteType>(voteTypeStr, true);
+
+            var blog = _blogRepository.GetById(blogId) ?? throw new KeyNotFoundException("Blog not found");
+
+            blog.Vote(userId, voteType);
+            _blogRepository.Update(blog);
+
+            return _mapper.Map<BlogPostDto>(blog);
         }
 
     }

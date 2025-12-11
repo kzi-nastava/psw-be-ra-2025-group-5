@@ -12,6 +12,7 @@ namespace Explorer.Blog.API.Public
         List<BlogPostDto> GetAll(long userId);
         BlogPostDto GetById(long id);
         List<BlogPostDto> GetByAuthor(long authorId);
+        List<BlogPostDto> GetByStatus(string status);
         BlogPostDto Create(CreateBlogPostDto dto, long authorId);
         BlogPostDto Update(long id, UpdateBlogPostDto dto, long authorId);
         BlogImageDto AddImage(long postId, BlogImageDto dto);
@@ -22,6 +23,6 @@ namespace Explorer.Blog.API.Public
         BlogPostDto Publish(long id, long authorId);
         BlogPostDto Archive(long id, long authorId);
         BlogPostDto UpdateDraft(long id, UpdateDraftBlogPostDto dto, long authorId);
-
+        BlogPostDto Vote(long blogId, long userId, string voteType);
     }
 }
