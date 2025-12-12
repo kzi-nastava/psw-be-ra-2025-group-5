@@ -49,7 +49,7 @@ public class ShoppingCartController : ControllerBase
     [HttpPut("{touristId:long}/checkout")]
     public ActionResult<ShoppingCartDto> Checkout(long touristId)
     {
-        var result = _ShoppingCartService.ClearShoppingCart(touristId);
+        var result = _ShoppingCartService.Checkout(touristId);
         return Ok(result);
     }
 }

@@ -61,11 +61,14 @@ public class ShoppingCartService : IShoppingCartService
         return _mapper.Map<ShoppingCartDto>(result);
     }
 
-    public ShoppingCartDto ClearShoppingCart(long touristId)
+    public ShoppingCartDto Checkout(long touristId)
     {
         var cart = _ShoppingCartRepository.GetByTourist(touristId);
         foreach (var item in cart.Items)
+        {
+            if (_TourRepository.Get(item.TourId).Status != TourStatus.Published) continue;
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
+        }
 
         cart.ClearShoppingCart();
 
