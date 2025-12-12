@@ -120,7 +120,7 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
         }
 
         [HttpPut("{id}/problem-resolved")]
-        [Authorize(Policy = "touristPolicy")]
+        [Authorize(Policy = "touristOrAdminPolicy")]
         public ActionResult MarkResolved([FromRoute] long id, [FromQuery] bool isResolved)
         {
             return Ok(_tourProblemService.MarkResolved(id, isResolved));
