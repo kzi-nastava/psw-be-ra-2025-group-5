@@ -17,5 +17,7 @@ namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces
         PagedResult<TourProblem> GetPagedByTourIds(List<long> tourIds, int page, int pageSize);
         void MarkResolved(long problemId, bool isResolved);
         void UpdateDeadline(long problemId, DateTimeOffset? deadline);
+        List<TourProblem> GetByTourId(long tourId);
+
     }
 }

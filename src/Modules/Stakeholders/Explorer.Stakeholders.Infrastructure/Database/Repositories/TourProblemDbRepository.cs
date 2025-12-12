@@ -130,4 +130,12 @@ public class TourProblemDbRepository : ITourProblemRepository
         DbContext.Entry(problem).Property(p => p.Deadline).CurrentValue = deadline;
         DbContext.SaveChanges();
     }
+
+    public List<TourProblem> GetByTourId(long tourId)
+    {
+        return _dbSet
+            .Where(p => p.TourId == tourId)
+            .ToList();
+    }
+
 }

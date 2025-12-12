@@ -1,4 +1,7 @@
-﻿using Explorer.Tours.API.Public;
+﻿using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.API.Public;
+using Explorer.Tours.Core.Domain;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.Core.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,17 +13,32 @@ namespace Explorer.API.Controllers.Administrator.Administration
     [ApiController]
     public class TourController : ControllerBase
     {
-        private readonly ITourService _tourService;
+        private readonly ITourRepository _tourRepository;
+        private readonly ITourProblemRepository _tourProblemRepository;
 
-        public TourController(ITourService TourService)
+        public TourController(ITourRepository tourRepository, ITourProblemRepository tourProblemRepository)
         {
-            _tourService = TourService;
+            _tourRepository = tourRepository;
+            _tourProblemRepository = tourProblemRepository;
         }
 
         [HttpPost("{id}/close")]
-        public IActionResult CloseTour(long id)
+        public ActionResult CloseTour(long id)
         {
-            _tourService.CloseTour(id);
+            var tour = _tourRepository.Get(id);
+            if (tour == null) return NotFound();
+
+            if (tour.Status == TourStatus.Closed)
+                return BadRequest("Tour is already closed");
+
+            var problems = _tourProblemRepository.GetByTourId(id);
+            var unresolvedExpired = problems
+                .Where(p => !p.IsResolved && p.Deadline.HasValue && p.Deadline <= DateTimeOffset.UtcNow);
+
+            if (!unresolvedExpired.Any())
+                return BadRequest("Cannot close tour: no unresolved problems with expired deadline.");
+
+            _tourRepository.Close(id);
             return Ok();
         }
 

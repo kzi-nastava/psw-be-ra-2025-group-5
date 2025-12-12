@@ -6,6 +6,7 @@ using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 
+
 namespace Explorer.Tours.Core.UseCases;
 
 public class TourService : ITourService
