@@ -169,4 +169,9 @@ public class TourProblemService : ITourProblemService
 
         return dto;
     }
+
+    public void SetDeadline(long problemId, DateTimeOffset? deadline)
+    {
+        _repository.UpdateDeadline(problemId, deadline);
+    }
 }

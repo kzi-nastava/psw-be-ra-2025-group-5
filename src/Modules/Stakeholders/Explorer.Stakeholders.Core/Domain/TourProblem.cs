@@ -32,6 +32,7 @@ public class TourProblem : AggregateRoot
     public DateTimeOffset CreatedAt { get; }
     public List<long> Comments { get; private set; } = new List<long>();
     public bool IsResolved { get; set; }
+    public DateTimeOffset? Deadline { get; private set; }
     private TourProblem() { }
 
     public TourProblem(
@@ -41,7 +42,8 @@ public class TourProblem : AggregateRoot
         ProblemPriority priority,
         string description,
         DateTimeOffset occurredAt,
-        DateTimeOffset? createdAt = null)
+        DateTimeOffset? createdAt = null,
+        DateTimeOffset? deadline = null)
     {
         if (tourId == 0) throw new ArgumentOutOfRangeException(nameof(tourId));
         if (reporterId == 0) throw new ArgumentOutOfRangeException(nameof(reporterId));
@@ -55,6 +57,7 @@ public class TourProblem : AggregateRoot
         OccurredAt = occurredAt;
         CreatedAt = createdAt ?? DateTimeOffset.UtcNow;
         Comments = new List<long>();
+        Deadline = deadline;
         IsResolved = false;
     }
 
