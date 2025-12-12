@@ -148,17 +148,23 @@ public class ShoppingCartCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-        var controller = CreateController(scope);
+        var cartController = CreateController(scope);
+        var tokenController = CreateTokenController(scope);
 
         // Act
-        var result = ((ObjectResult)controller.Checkout(-4).Result)?.Value as ShoppingCartDto;
+        var result = ((ObjectResult)cartController.Checkout(-5).Result)?.Value as ShoppingCartDto;
+        var token = ((ObjectResult)tokenController.GetByTourAndTourist(-1, -5).Result)?.Value as TourPurchaseTokenDto;
 
         // Assert - Response
         result.ShouldNotBeNull();
         result.Id.ShouldNotBe(0);
-        result.TouristId.ShouldBe(-4);
+        result.TouristId.ShouldBe(-5);
         result.Items.Count.ShouldBe(0);
         result.Total.ShouldBe(0);
+
+        token.ShouldNotBeNull();
+        token.TouristId.ShouldBe(-5);
+        token.TourId.ShouldBe(-1);
     }
 
     private static ShoppingCartController CreateController(IServiceScope scope)
@@ -172,6 +178,14 @@ public class ShoppingCartCommandTests : BaseToursIntegrationTest
     private static TourController CreateTourController(IServiceScope scope)
     {
         return new TourController(scope.ServiceProvider.GetRequiredService<ITourService>())
+        {
+            ControllerContext = BuildContext("-1")
+        };
+    }
+
+    private static TourPurchaseTokenController CreateTokenController(IServiceScope scope)
+    {
+        return new TourPurchaseTokenController(scope.ServiceProvider.GetRequiredService<ITourPurchaseTokenService>())
         {
             ControllerContext = BuildContext("-1")
         };
