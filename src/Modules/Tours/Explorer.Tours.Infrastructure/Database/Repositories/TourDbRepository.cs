@@ -20,7 +20,7 @@ public class TourDbRepository : ITourRepository
 
     public PagedResult<Tour> GetPaged(int page, int pageSize)
     {
-        var query = _dbSet.Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images);
+        var query = _dbSet.Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images);
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
         return task.Result;
@@ -29,7 +29,7 @@ public class TourDbRepository : ITourRepository
     public PagedResult<Tour> GetPagedByAuthor(long authorId, int page, int pageSize)
     {
         var query = _dbSet
-            .Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images)
+            .Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images)
             .Where(t => t.AuthorId == authorId);
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
@@ -38,13 +38,13 @@ public class TourDbRepository : ITourRepository
 
     public List<Tour> GetAll()
     {
-        return _dbSet.Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images).ToList();
+        return _dbSet.Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images).ToList();
     }
 
     public Tour Get(long id)
     {
         var entity = _dbSet
-            .Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images)
+            .Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images)
             .FirstOrDefault(t => t.Id == id);
         if (entity == null) throw new NotFoundException("Not found: " + id);
         return entity;
@@ -61,7 +61,7 @@ public class TourDbRepository : ITourRepository
     {
         // 1. Učitaj postojeći tour SA TRACKING-om
         var existingTour = _dbSet
-            .Include(t => t.KeyPoints).Include(t => t.Reviews).ThenInclude(r => r.Images)
+            .Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images)
             .AsNoTracking() // ← Ne pratimo promene za sada
             .FirstOrDefault(t => t.Id == entity.Id);
 
@@ -173,6 +173,24 @@ public class TourDbRepository : ITourRepository
     {
         var tour = Get(tourId);
         tour.RemoveReview(reviewId);
+
+        DbContext.Update(tour);
+        DbContext.SaveChanges();
+    }
+
+    public void AddDuration(long tourId, TourDuration duration)
+    {
+        var tour = Get(tourId);
+        tour.AddDuration(duration);
+
+        DbContext.Update(tour);
+        DbContext.SaveChanges();
+    }
+
+    public void RemoveDuration(long tourId, TourDuration duration)
+    {
+        var tour = Get(tourId);
+        tour.RemoveDuration(duration);
 
         DbContext.Update(tour);
         DbContext.SaveChanges();

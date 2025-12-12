@@ -12,13 +12,13 @@ public interface ITourService
     TourDto Create(CreateTourDto tour);
     TourDto Update(long id, UpdateTourDto tour);
     void Delete(long id);
-    
+
     // KeyPoint operacije
     TourDto AddKeyPoint(long tourId, CreateKeyPointDto keyPoint);
     TourDto UpdateKeyPoint(long tourId, long keyPointId, CreateKeyPointDto keyPoint);
     TourDto RemoveKeyPoint(long tourId, long keyPointId);
     TourDto ReorderKeyPoints(long tourId, ReorderKeyPointsDto reorderDto);
-    
+
     // Status operacije
     TourDto Publish(long tourId);
     TourDto Archive(long tourId);
@@ -33,4 +33,8 @@ public interface ITourService
     TourDto AddReview(long tourId, TourReviewDto dto);
     public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto);
     TourDto RemoveReview(long tourId, long reviewId);
+
+    // Duration operacije
+    TourDto AddDuration(long tourId, TourDurationDto durationDto);
+    TourDto RemoveDuration(long tourId, long durationId);
 }

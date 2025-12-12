@@ -20,12 +20,16 @@ public class Tour : AggregateRoot
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
     public List<TourReview> Reviews { get; private set; }
+    public List<TourDuration> Durations { get; private set; }
+    //public List<TourRequiredEquipment> RequiredEquipment { get; private set; }
 
     private Tour() 
     {
         Tags = new List<string>();
         KeyPoints = new List<KeyPoint>();
         Reviews = new List<TourReview>();
+        Durations = new List<TourDuration>();
+        //RequiredEquipment = new List<TourRequiredEquipment>();
     }
 
     public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
@@ -190,4 +194,67 @@ public class Tour : AggregateRoot
         Reviews.Remove(review);
     }
 
+    public void AddDuration(TourDuration duration)
+    {
+        if (Durations.Contains(duration))
+            throw new InvalidOperationException("Duration already exists for this tour.");
+
+        Durations.Add(duration);
+    }
+
+    public void RemoveDuration(TourDuration duration)
+    {
+        if (!Durations.Remove(duration))
+            throw new NotFoundException($"Duration not found.");
+    }
+
+    //public void AddRequiredEquipment(TourRequiredEquipment equipment)
+    //{
+    //    if (RequiredEquipment.Contains(equipment))
+    //        throw new InvalidOperationException("Equipment already exists for this tour.");
+
+    //    RequiredEquipment.Add(equipment);
+    //}
+
+    //public void RemoveRequiredEquipment(TourRequiredEquipment equipment)
+    //{
+    //    if (!RequiredEquipment.Remove(equipment))
+    //        throw new NotFoundException($"Equipment not found.");
+    //}
+
+    //public void PublishTour()
+    //{
+    //    if (Name == null || Name.Trim() == "")
+    //        throw new InvalidOperationException("Tour must have a name to be published.");
+
+    //    if (Description == null || Description.Trim() == "")
+    //        throw new InvalidOperationException("Tour must have a description to be published.");
+
+    //    if (Difficulty == null)
+    //        throw new InvalidOperationException("Tour must have a difficulty to be published.");
+
+    //    if (Tags.Count == 0)
+    //        throw new InvalidOperationException("Tour must have at least one tag to be published.");
+
+    //    if (KeyPoints.Count < 2)
+    //        throw new InvalidOperationException("Tour must have at least two key points to be published.");
+
+    //    if (Durations.Count < 1)
+    //        throw new InvalidOperationException("Tour must have at least one duration to be published.");
+
+    //    if (Status == TourStatus.Published)
+    //        throw new InvalidOperationException("Tour is already published.");
+
+    //    Status = TourStatus.Published;
+    //    PublishedDate = DateTime.UtcNow;
+    //}
+
+    //public void ArchiveTour()
+    //{
+    //    if (Status == TourStatus.Published)
+    //    {
+    //        Status = TourStatus.Archived;
+    //        ArchivedDate = DateTime.UtcNow;
+    //    }
+    //}
 }

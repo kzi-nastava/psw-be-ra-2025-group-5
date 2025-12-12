@@ -72,5 +72,12 @@ public class ToursProfile : Profile
             .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images))
             .ReverseMap()
             .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)));
+
+        CreateMap<TourDuration, TourDurationDto>()
+            .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => src.TransportType.ToString()));
+
+        CreateMap<TourDurationDto, TourDuration>()
+            .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TransportType>(src.TransportType)));
+
     }
 }

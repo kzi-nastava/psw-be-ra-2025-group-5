@@ -243,4 +243,15 @@ public class TourService : ITourService
         return _mapper.Map<TourDto>(updatedTour);
     }
 
+    // Duration operacije
+
+    public TourDto AddDuration(long tourId, TourDurationDto durationDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public TourDto RemoveDuration(long tourId, long durationId)
+    {
+        throw new NotImplementedException();
+    }
 }
