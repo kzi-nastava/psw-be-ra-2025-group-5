@@ -88,6 +88,10 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                     .IsRequired()
                     .HasDefaultValueSql("NOW()"); // PostgreSQL funkcija za trenutno vreme
 
+                builder.Property(tp => tp.IsResolved)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+
                 // Foreign key ka User entitetu
                 builder.HasOne<User>()
                     .WithMany()
@@ -96,7 +100,6 @@ namespace Explorer.Stakeholders.Infrastructure.Database
 
                 builder.Property(tp => tp.Comments)
                     .HasColumnType("bigint[]");
-
 
                 // Index za brže pretraživanje po reporteru
                 builder.HasIndex(tp => tp.ReporterId);

@@ -57,7 +57,10 @@ namespace Explorer.Stakeholders.Core.Mappers
                             : new List<byte[]>())
                 );
 
-            CreateMap<TourProblemDto, TourProblem>().ReverseMap();
+            CreateMap<TourProblem, TourProblemDto>()
+                .ForMember(dest => dest.Comments, opt => opt.Ignore());
+
+            CreateMap<TourProblemDto, TourProblem>();
 
             // ========================= Position <-> PositionDto =========================
             CreateMap<PositionDto, Position>().ReverseMap();

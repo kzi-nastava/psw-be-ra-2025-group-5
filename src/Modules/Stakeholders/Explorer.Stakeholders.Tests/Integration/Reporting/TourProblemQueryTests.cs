@@ -24,7 +24,7 @@ public class TourProblemQueryTests : BaseStakeholdersIntegrationTest
     [Fact]
     public void Retrieves_all()
     {
-     // Arrange
+        // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
 

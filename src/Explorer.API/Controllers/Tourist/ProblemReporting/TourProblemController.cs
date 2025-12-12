@@ -119,5 +119,28 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
             return Ok(comments);
         }
 
+        [HttpPut("{id}/problem-resolved")]
+        [Authorize(Policy = "touristPolicy")]
+        public ActionResult MarkResolved([FromRoute] long id, [FromQuery] bool isResolved)
+        {
+            return Ok(_tourProblemService.MarkResolved(id, isResolved));
+        }
+
+        [HttpGet("{id:long}")]
+        [Authorize(Policy = "authorTouristAdminPolicy")]
+        public ActionResult<TourProblemDto> GetById(long id)
+        {
+            long userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+            bool isAdmin = User.IsInRole("administrator");
+
+            var problem = _tourProblemService.GetById(id);
+            var tour = _tourRepository.Get(problem.TourId);
+
+            if (userId != problem.ReporterId && userId != tour.AuthorId && !isAdmin)
+                return Forbid();
+
+            return Ok(problem);
+        }
+
     }
 }
