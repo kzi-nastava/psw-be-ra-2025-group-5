@@ -3,7 +3,7 @@ using Explorer.Tours.Core.Domain.Shared;
 
 namespace Explorer.Tours.Core.Domain;
 
-public enum TourStatus { Draft, Published, Archived };
+public enum TourStatus { Draft, Published, Archived, Closed };
 public enum TourDifficulty { Easy, Medium, Hard };
 
 public class Tour : Entity

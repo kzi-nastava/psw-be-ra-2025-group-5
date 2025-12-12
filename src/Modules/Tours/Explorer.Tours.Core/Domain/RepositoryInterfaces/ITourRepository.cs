@@ -11,4 +11,5 @@ public interface ITourRepository
     Tour Update(Tour map);
     void Delete(long id);
     Tour Get(long id);
+    void Close(long tourId);
 }
