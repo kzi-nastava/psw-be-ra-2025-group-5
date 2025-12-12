@@ -34,5 +34,7 @@ public class ShoppingCart : AggregateRoot
         Items.Remove(item);
     }
 
+    public void ClearShoppingCart() => Items.Clear();
+
     public double CalculateTotal() => Items.Sum(i => i.ItemPrice);
 }

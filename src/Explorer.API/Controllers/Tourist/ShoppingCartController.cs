@@ -1,4 +1,5 @@
-﻿using Explorer.Tours.API.Dtos;
+﻿using Explorer.BuildingBlocks.Core.Domain;
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.Shopping;
 using Explorer.Tours.Core.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +22,8 @@ public class ShoppingCartController : ControllerBase
     [HttpGet("{touristId:long}")]
     public ActionResult<ShoppingCart> GetByTourist(long touristId)
     {
-        return Ok(_ShoppingCartService.GetByTourist(touristId));
+        var result = _ShoppingCartService.GetByTourist(touristId);
+        return result is not null ? Ok(result) : NotFound();
     }
 
     [HttpPost]
@@ -41,6 +43,14 @@ public class ShoppingCartController : ControllerBase
     public ActionResult<ShoppingCartDto> RemoveOrderItem(long touristId, long tourId)
     {
         var result = _ShoppingCartService.RemoveOrderItem(touristId, tourId);
+        return Ok(result);
+    }
+
+    [HttpPut("{touristId:long}/checkout")]
+    public ActionResult<ShoppingCartDto> Checkout(long touristId)
+    {
+        // TODO: Create purchase tokens for all items in cart
+        var result = _ShoppingCartService.ClearShoppingCart(touristId);
         return Ok(result);
     }
 }
