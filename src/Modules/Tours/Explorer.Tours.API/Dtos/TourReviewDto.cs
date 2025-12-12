@@ -16,7 +16,7 @@ namespace Explorer.Tours.API.Dtos
         public double Progress { get; set; }
         public long TouristID { get; set; }
         public long TourID { get; set; }
-        public string TouristName { get; set; }
+        public string TouristUsername { get; set; }
         
     }
 }

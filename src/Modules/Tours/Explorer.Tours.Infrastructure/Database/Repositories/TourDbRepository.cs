@@ -148,11 +148,11 @@ public class TourDbRepository : ITourRepository
         return task.Result;
     }
 
-    public TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images = null)
+    public TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, string username, List<ReviewImage>? images = null)
     {
         var tour = Get(tourId);
 
-        var review = tour.AddReview(grade, comment, reviewTime, progress, touristId, images);
+        var review = tour.AddReview(grade, comment, reviewTime, progress, touristId, images, username);
 
         DbContext.Update(tour);
         DbContext.SaveChanges();

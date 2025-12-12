@@ -1,12 +1,15 @@
 ﻿using Explorer.API.Controllers.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.Stakeholders.Core.Domain;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
+using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using System.Net.Sockets;
 
 namespace Explorer.Tours.Tests.Integration.TouristPreferences
 {
@@ -27,17 +30,18 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             anyTour.ShouldNotBeNull("Nema ture u bazi za testiranje. Dodaj seed podatke.");
 
             var tourId = anyTour.Id;
-
+            long userId = -21;
+            string username = "";
             var newReview = new TourReviewDto
             {
-                TouristID = 1, // pretpostavka: postoji turist sa ID = 1 u seed-u
+                TouristID = -21, // pretpostavka: postoji turist sa ID = 1 u seed-u
                 Grade = 5,
                 Comment = "Sjajna tura!",
                 Progress = 100.0
             };
 
             // Act
-            var actionResult = controller.Create(tourId, newReview).Result;
+            var actionResult = controller.Create(tourId, userId, username, newReview).Result;
             var objectResult = actionResult as ObjectResult;
             var createdTour = objectResult?.Value as TourDto;
 
@@ -69,17 +73,18 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
 
             // Arrange — nepostojeći tourId
             long invalidTourId = -123;
-
+            long userId = -21;
+            string username = "";
             var dto = new TourReviewDto
             {
-                TouristID = 1,
+                TouristID = -21,
                 Grade = 5,
                 Comment = "Test",
                 Progress = 100
             };
 
             // Act & Assert - service should throw NotFoundException before controller returns
-            Should.Throw<NotFoundException>(() => controller.Create(invalidTourId, dto));
+            Should.Throw<NotFoundException>(() => controller.Create(invalidTourId, userId, username, dto));
         }
 
         [Fact]
@@ -96,13 +101,14 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             // Prvo kreiramo recenziju koju ćemo menjati
             var original = new TourReviewDto
             {
-                TouristID = 1,
+                TouristID = -21,
                 Grade = 3,
                 Comment = "Ok tura",
                 Progress = 50
             };
-
-            var createResult = controller.Create(tour.Id, original).Result as ObjectResult;
+            long userId = -21;
+            string username = "";
+            var createResult = controller.Create(tour.Id, userId, username, original).Result as ObjectResult;
             var createdTour = createResult?.Value as TourDto;
 
             createdTour.ShouldNotBeNull();
@@ -113,14 +119,14 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             // Novi podaci za update (ID se prosleđuje kroz rutu)
             var updatedDto = new TourReviewDto
             {
-                TouristID = createdReview.TouristID,
+                TouristID = -21,
                 Grade = 4,
                 Comment = "Izmenjen komentar",
                 Progress = 100
             };
 
             // Act
-            var updateResult = controller.Update(tour.Id, createdReview.Id, updatedDto).Result as ObjectResult;
+            var updateResult = controller.Update(tour.Id, userId, createdReview.Id, updatedDto).Result as ObjectResult;
             var updatedTour = updateResult?.Value as TourDto;
 
             // Assert - response
@@ -150,17 +156,17 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
 
             var invalidId = -123;  // ne postoji u seed bazi
             var tourId = 1;        // pretpostavka: postoji tura sa ID=1
-
+            long userId = -21;
             var updateDto = new TourReviewDto
             {
-                TouristID = 1,
+                TouristID = -21,
                 Grade = 4,
                 Comment = "Nece uspeti",
                 Progress = 80
             };
 
             // Act & Assert
-            Should.Throw<NotFoundException>(() => controller.Update(tourId, invalidId, updateDto));
+            Should.Throw<NotFoundException>(() => controller.Update(tourId, userId, invalidId, updateDto));
         }
 
         [Fact]
@@ -169,20 +175,21 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
             var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-
+            long userId = -21;
             // Arrange — kreiramo review koji ćemo obrisati
             var tour = dbContext.Tours.Include(t => t.Reviews).FirstOrDefault();
             tour.ShouldNotBeNull();
 
             var newReview = new TourReviewDto
             {
-                TouristID = 1,
+                TouristID = -21,
                 Grade = 5,
                 Comment = "Brisanje test",
                 Progress = 100
             };
 
-            var createResult = controller.Create(tour.Id, newReview).Result as ObjectResult;
+            string username = "";
+            var createResult = controller.Create(tour.Id, userId, username, newReview).Result as ObjectResult;
             var createdTour = createResult?.Value as TourDto;
             createdTour.ShouldNotBeNull();
             var created = createdTour.Reviews.Last();

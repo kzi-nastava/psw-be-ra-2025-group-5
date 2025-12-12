@@ -157,6 +157,10 @@ public class ToursContext : DbContext
              .HasForeignKey(tr => tr.TourID)
              .OnDelete(DeleteBehavior.Cascade)
              .IsRequired();
+
+            b.Property(tr => tr.TouristUsername)
+             .HasDefaultValue("") 
+             .IsRequired(false);
         });
     }
 

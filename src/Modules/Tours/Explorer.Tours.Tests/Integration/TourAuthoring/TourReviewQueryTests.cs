@@ -25,14 +25,14 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
 
             var tour = db.Tours.Include(t => t.Reviews).FirstOrDefault();
             tour.ShouldNotBeNull();
-
+            string username = "";
             if (tour.Reviews.Count < 3)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    controller.Create(tour.Id, new TourReviewDto
+                    controller.Create(tour.Id, -21, username, new TourReviewDto
                     {
-                        TouristID = 1,
+                        TouristID = -21,
                         Grade = 5,
                         Comment = "Auto-gen",
                         Progress = 100

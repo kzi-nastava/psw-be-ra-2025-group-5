@@ -32,20 +32,20 @@ namespace Explorer.API.Controllers.Tourist
         }
 
         [HttpPost]
-        public ActionResult<TourDto> Create(long tourId, [FromBody] TourReviewDto dto)
+        public ActionResult<TourDto> Create(long tourId, [FromQuery] long userId, [FromQuery] string username, [FromBody] TourReviewDto dto)
         {
-            var result = _tourService.AddReview(tourId, dto);
+            var result = _tourService.AddReview(tourId, userId, username, dto);
             return Ok(result);
         }
 
-        [HttpPut("{reviewId}")]
-        public ActionResult<TourDto> Update(long tourId, long reviewId, [FromBody] TourReviewDto dto)
+        [HttpPut("{reviewId:long}")]
+        public ActionResult<TourDto> Update(long tourId, [FromQuery] long userId, long reviewId, [FromBody] TourReviewDto dto)
         {
-            var result = _tourService.UpdateReview(tourId, reviewId, dto);
+            var result = _tourService.UpdateReview(tourId, userId, reviewId, dto);
             return Ok(result);
         }
 
-        [HttpDelete("{reviewId}")]
+        [HttpDelete("{reviewId:long}")]
         public IActionResult Delete(long tourId, long reviewId)
         {
             _tourService.RemoveReview(tourId, reviewId);

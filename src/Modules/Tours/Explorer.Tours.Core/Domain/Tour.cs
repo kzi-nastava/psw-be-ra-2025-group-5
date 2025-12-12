@@ -161,9 +161,9 @@ public class Tour : AggregateRoot
         Price = price;
     }
 
-    public TourReview AddReview(int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images)
+    public TourReview AddReview(int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images, string username)
     {
-        var review = new TourReview(grade, comment, reviewTime, progress, touristId, this.Id, images);
+        var review = new TourReview(grade, comment, reviewTime, progress, touristId, this.Id, images, username);
         Reviews.Add(review);
         return review;
     }

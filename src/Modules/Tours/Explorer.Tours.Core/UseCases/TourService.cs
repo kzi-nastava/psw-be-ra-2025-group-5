@@ -1,15 +1,19 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using System;
+using System.Reflection.Metadata;
 
 namespace Explorer.Tours.Core.UseCases;
 
 public class TourService : ITourService
 {
     private readonly ITourRepository _tourRepository;
+    private readonly ITourExecutionRepository _tourExecutionRepository;
     private readonly IMapper _mapper;
 
     public TourService(ITourRepository repository, IMapper mapper)
@@ -199,13 +203,24 @@ public class TourService : ITourService
         return dto;
     }
 
-    public TourDto AddReview(long tourId, TourReviewDto dto)
+    public TourDto AddReview(long tourId, long userId, string username, TourReviewDto dto)
     {
         var tour = _tourRepository.Get(tourId);
-
-        // Mapiranje DTO -> TourReview entitet preko AutoMapper-a
+        var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
         var review = _mapper.Map<TourReview>(dto);
 
+        int total = tour.KeyPoints.Count;
+        int completed = execution.CompletedKeyPoints.Count;
+        
+        var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
+
+        if (timeSinceLastActivity > TimeSpan.FromDays(7))
+            throw new Exception("Too much time has passed since your last activity on this tour.");
+
+        review.UpdatePercentage(100 * completed / total);
+        review.AddUsername(username);
+        review.TouristID = userId;
+        review.TourID = tourId;
         tour.AddReview(review);
 
         var updatedTour = _tourRepository.Update(tour);
@@ -213,12 +228,17 @@ public class TourService : ITourService
     }
 
     // Update review
-    public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto)
+    public TourDto UpdateReview(long tourId, long userId, long reviewId, TourReviewDto dto)
     {
         var tour = _tourRepository.Get(tourId);
+        var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
         if (tour == null)
             throw new KeyNotFoundException($"Tour {tourId} not found.");
 
+        var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
+
+        if (timeSinceLastActivity > TimeSpan.FromDays(7))
+            throw new Exception("Too much time has passed since your last activity on this tour.");
         List<ReviewImage>? images = null;
         if (dto.Images != null && dto.Images.Any())
         {
