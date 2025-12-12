@@ -10,13 +10,15 @@ public class ShoppingCartService : IShoppingCartService
 {
     private readonly IShoppingCartRepository _ShoppingCartRepository;
     private readonly ITourRepository _TourRepository;
+    private readonly ITourPurchaseTokenService _TokenService;
     private readonly IMapper _mapper;
 
-    public ShoppingCartService(IShoppingCartRepository repository, ITourRepository tourRepository, IMapper mapper)
+    public ShoppingCartService(IShoppingCartRepository repository, ITourRepository tourRepository, IMapper mapper, ITourPurchaseTokenService tokenService)
     {
         _ShoppingCartRepository = repository;
         _TourRepository = tourRepository;
         _mapper = mapper;
+        _TokenService = tokenService;
     }
 
     public List<ShoppingCartDto> GetAll()
@@ -62,6 +64,9 @@ public class ShoppingCartService : IShoppingCartService
     public ShoppingCartDto ClearShoppingCart(long touristId)
     {
         var cart = _ShoppingCartRepository.GetByTourist(touristId);
+        foreach (var item in cart.Items)
+            _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
+
         cart.ClearShoppingCart();
 
         var result = _ShoppingCartRepository.Update(cart);

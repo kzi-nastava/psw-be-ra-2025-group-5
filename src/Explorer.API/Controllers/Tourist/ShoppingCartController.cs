@@ -49,7 +49,6 @@ public class ShoppingCartController : ControllerBase
     [HttpPut("{touristId:long}/checkout")]
     public ActionResult<ShoppingCartDto> Checkout(long touristId)
     {
-        // TODO: Create purchase tokens for all items in cart
         var result = _ShoppingCartService.ClearShoppingCart(touristId);
         return Ok(result);
     }
