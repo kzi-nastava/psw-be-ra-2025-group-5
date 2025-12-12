@@ -20,12 +20,12 @@ public class TourPurchaseTokenQueryTests : BaseToursIntegrationTest
         var controller = CreateController(scope);
 
         // Act
-        var result = ((ObjectResult)controller.GetByTourAndTourist(-1, -21).Result)?.Value as TourPurchaseTokenDto;
+        var result = ((ObjectResult)controller.GetByTourAndTourist(-1, -2).Result)?.Value as TourPurchaseTokenDto;
 
         // Assert
         result.ShouldNotBeNull();
         result.Id.ShouldBe(-1);
-        result.TouristId.ShouldBe(-21);
+        result.TouristId.ShouldBe(-2);
         result.TourId.ShouldBe(-1);
     }
 

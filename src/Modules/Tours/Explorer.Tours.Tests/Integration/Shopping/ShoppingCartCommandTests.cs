@@ -167,6 +167,43 @@ public class ShoppingCartCommandTests : BaseToursIntegrationTest
         token.TourId.ShouldBe(-1);
     }
 
+    [Fact]
+    public void Checkout_with_archived_tour()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var cartController = CreateController(scope);
+        var tokenController = CreateTokenController(scope);
+
+        // Act
+        cartController.AddOrderItem(-5, -4);
+        var result = ((ObjectResult)cartController.Checkout(-5).Result)?.Value as ShoppingCartDto;
+        var token = tokenController.GetByTourAndTourist(-4, -5).Result;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.Id.ShouldNotBe(0);
+        result.TouristId.ShouldBe(-5);
+        result.Items.Count.ShouldBe(0);
+        result.Total.ShouldBe(0);
+
+        token.ShouldNotBeNull();
+        token.ShouldBeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public void Checkout_fails_tour_already_bought()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var controller = CreateController(scope);
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => controller.Checkout(-2));
+    }
+
     private static ShoppingCartController CreateController(IServiceScope scope)
     {
         return new ShoppingCartController(scope.ServiceProvider.GetRequiredService<IShoppingCartService>())
