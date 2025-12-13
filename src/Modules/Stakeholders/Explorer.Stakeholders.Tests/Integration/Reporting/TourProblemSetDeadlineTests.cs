@@ -34,7 +34,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             // Act
             var dto = new SetDeadlineDto { Deadline = newDeadline };
             var result = controller.SetDeadline(problemId, dto);
-            result.Result.ShouldBeOfType<OkResult>();
+            result.Result.ShouldBeOfType<OkObjectResult>();
 
             // Assert database
             dbContext.ChangeTracker.Clear();
@@ -55,7 +55,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
 
             // Act & Assert
             var result = controller.SetDeadline(problemId, dto);
-            result.Result.ShouldBeOfType<OkResult>();
+            result.Result.ShouldBeOfType<OkObjectResult>();
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var dto = new SetDeadlineDto { Deadline = newDeadline };
 
             var result = controller.SetDeadline(problemId, dto);
-            result.Result.ShouldBeOfType<OkResult>();
+            result.Result.ShouldBeOfType<OkObjectResult>();
         }
 
         private static TourProblemController CreateController(IServiceScope scope, string userId, string role)
