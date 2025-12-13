@@ -96,7 +96,8 @@ public class TourProblemService : ITourProblemService
                     return dto;
                 })
                 .ToList(),
-            IsResolved = problem.IsResolved
+            IsResolved = problem.IsResolved,
+            Deadline = problem.Deadline
         };
 
         return dto;
@@ -137,7 +138,8 @@ public class TourProblemService : ITourProblemService
                     return _mapper.Map<CommentDto>(comment);
                 })
                 .ToList(),
-            IsResolved = problem.IsResolved
+            IsResolved = problem.IsResolved,
+            Deadline = problem.Deadline
         }).ToList();
 
         return new PagedResult<TourProblemDto>(items, result.TotalCount);
@@ -164,7 +166,8 @@ public class TourProblemService : ITourProblemService
             OccurredAt = updatedProblem.OccurredAt,
             CreatedAt = updatedProblem.CreatedAt,
             IsResolved = updatedProblem.IsResolved,
-            Comments = new List<CommentDto>()
+            Comments = new List<CommentDto>(),
+            Deadline = updatedProblem.Deadline
         };
 
         return dto;
@@ -172,6 +175,13 @@ public class TourProblemService : ITourProblemService
 
     public void SetDeadline(long problemId, DateTimeOffset? deadline)
     {
+        if (!deadline.HasValue)
+            throw new ArgumentException("Deadline cannot be null.");
+
+        if (deadline.Value <= DateTimeOffset.UtcNow)
+            throw new InvalidOperationException("Cannot set a deadline in the past.");
+
         _repository.UpdateDeadline(problemId, deadline);
     }
+
 }

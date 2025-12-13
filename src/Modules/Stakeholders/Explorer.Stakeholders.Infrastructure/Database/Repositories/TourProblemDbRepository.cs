@@ -131,6 +131,7 @@ public class TourProblemDbRepository : ITourProblemRepository
         DbContext.SaveChanges();
     }
 
+
     public List<TourProblem> GetByTourId(long tourId)
     {
         return _dbSet

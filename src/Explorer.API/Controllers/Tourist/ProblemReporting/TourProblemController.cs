@@ -142,12 +142,12 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
             return Ok(problem);
         }
 
-        [HttpPost("{id}/deadline")]
+        [HttpPut("{id}/deadline")]
         [Authorize(Policy = "administratorPolicy")]
         public ActionResult<TourProblemDto> SetDeadline(long id, [FromBody] SetDeadlineDto dto)
         {
             _tourProblemService.SetDeadline(id, dto.Deadline);
-            return Ok();
+            return Ok(_tourProblemService.GetById(id));
         }
     }
 }
