@@ -40,6 +40,14 @@ public class ToursContext : DbContext
     private static void ConfigureTour(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tour>()
+                    .OwnsMany(t => t.Durations, d =>
+                    {
+                        d.WithOwner().HasForeignKey("TourId");
+                        d.Property<long>("Id");
+                        d.HasKey("Id");
+                    });
+
+        modelBuilder.Entity<Tour>()
             .HasMany(t => t.KeyPoints)
             .WithOne()
             .HasForeignKey("TourId")
