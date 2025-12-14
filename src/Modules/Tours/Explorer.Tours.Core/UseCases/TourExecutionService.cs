@@ -1,7 +1,8 @@
 ﻿using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.API.Dtos;
-using AutoMapper; 
+using AutoMapper;
+using Explorer.Tours.API.Public.Shopping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +18,24 @@ namespace Explorer.Tours.Core.UseCases
         private readonly ITourRepository _tourRepo;
         private readonly IMapper _mapper;
         private const double DefaultThresholdMeters = 20.0;
+        private readonly ITourPurchaseTokenService _tokenService;
 
-        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper)
+        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper, ITourPurchaseTokenService tokenService)
         {
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
             _tourRepo = tourRepo ?? throw new ArgumentNullException(nameof(tourRepo));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _tokenService = tokenService; 
         }
 
         public StartExecutionResultDto StartExecution(long userId, long tourId)
         {
-            // TODO: dodati proveru kupovine 
+            var token = _tokenService.GetByTourAndTourist(tourId, userId);
+            if (token == null)
+            {
+                throw new InvalidOperationException("Tour has not been purchased.");
+            }
+
             var existing = _repo.GetActiveForUser(userId, tourId);
             if (existing != null)
             {
@@ -39,10 +47,13 @@ namespace Explorer.Tours.Core.UseCases
                     StartTime = existing.StartTime
                 };
             }
+
             var execution = TourExecution.StartNew(userId, tourId);
             _repo.Add(execution);
+
             var tour = _tourRepo.Get(tourId);
             var nextKeyPoint = tour?.KeyPoints.OrderBy(k => k.Position).FirstOrDefault();
+
             return new StartExecutionResultDto
             {
                 ExecutionId = execution.Id,
@@ -50,6 +61,7 @@ namespace Explorer.Tours.Core.UseCases
                 StartTime = execution.StartTime
             };
         }
+
 
         public CheckProximityDto CheckProximity(long executionId, LocationDto location)
         {
