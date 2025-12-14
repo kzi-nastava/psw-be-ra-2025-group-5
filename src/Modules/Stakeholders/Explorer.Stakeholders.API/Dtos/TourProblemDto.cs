@@ -26,6 +26,8 @@ public class TourProblemDto
     public List<CommentDto> Comments { get; set; } = new();
     public bool IsResolved { get; set; }
     public DateTimeOffset? Deadline { get; set; }
+    public string TourStatus { get; set; } = string.Empty;
+
 }
 
 public enum ProblemCategory

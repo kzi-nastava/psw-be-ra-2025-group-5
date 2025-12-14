@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Tours.Core.Domain;
 
 namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces
 {
@@ -18,6 +19,5 @@ namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces
         void MarkResolved(long problemId, bool isResolved);
         void UpdateDeadline(long problemId, DateTimeOffset? deadline);
         List<TourProblem> GetByTourId(long tourId);
-
     }
 }

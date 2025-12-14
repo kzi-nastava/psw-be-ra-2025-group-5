@@ -42,5 +42,14 @@ namespace Explorer.API.Controllers.Administrator.Administration
             return Ok();
         }
 
+        [HttpGet("{id}/tour-status")]
+        public ActionResult GetTourStatus(long id)
+        {
+            var tour = _tourRepository.Get(id);
+            if (tour == null) return NotFound();
+
+            return Ok(new { status = tour.Status });
+        }
+
     }
 }
