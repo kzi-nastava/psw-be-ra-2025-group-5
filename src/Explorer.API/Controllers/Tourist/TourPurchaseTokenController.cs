@@ -19,7 +19,7 @@ public class TourPurchaseTokenController : Controller
     }
 
     [HttpGet("{touristId:long}")]
-    public ActionResult<TourPurchaseToken> GetByTourAndTourist(long tourId, long touristId)
+    public ActionResult<TourPurchaseToken> GetByTourAndTourist([FromQuery] long tourId, [FromRoute] long touristId)
     {
         var result = _TokenService.GetByTourAndTourist(tourId, touristId);
         return result is not null ? Ok(result) : NotFound();
