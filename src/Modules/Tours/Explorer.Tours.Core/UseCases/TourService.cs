@@ -6,6 +6,7 @@ using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
 
 namespace Explorer.Tours.Core.UseCases;
@@ -207,52 +208,47 @@ public class TourService : ITourService
     {
         var tour = _tourRepository.Get(tourId);
         var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
-        var review = _mapper.Map<TourReview>(dto);
 
-        int total = tour.KeyPoints.Count;
-        int completed = execution.CompletedKeyPoints.Count;
-        
         var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
-
         if (timeSinceLastActivity > TimeSpan.FromDays(7))
             throw new Exception("Too much time has passed since your last activity on this tour.");
 
-        review.UpdatePercentage(100 * completed / total);
-        review.AddUsername(username);
-        review.TouristID = userId;
-        review.TourID = tourId;
-        tour.AddReview(review);
+        int total = tour.KeyPoints.Count;
+        int completed = execution.CompletedKeyPoints.Count;
+        var progress = total == 0 ? 0 : (100.0 * completed / total);
+
+        var review = tour.AddReview( dto.Grade, dto.Comment, DateTime.UtcNow, progress, userId, images: null,username);
 
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
     }
 
-    // Update review
     public TourDto UpdateReview(long tourId, long userId, long reviewId, TourReviewDto dto)
     {
         var tour = _tourRepository.Get(tourId);
         var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
-        if (tour == null)
-            throw new KeyNotFoundException($"Tour {tourId} not found.");
 
         var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
-
         if (timeSinceLastActivity > TimeSpan.FromDays(7))
             throw new Exception("Too much time has passed since your last activity on this tour.");
+
         List<ReviewImage>? images = null;
+
         if (dto.Images != null && dto.Images.Any())
         {
-            images = _mapper.Map<List<ReviewImage>>(dto.Images);
+            images = dto.Images
+                .OrderBy(i => i.Order)
+                .Select((img, index) =>
+                    new ReviewImage( reviewId, Convert.FromBase64String(img.Data), img.ContentType, index))
+                .ToList();
         }
 
         tour.UpdateReview(reviewId, dto.Grade, dto.Comment, dto.Progress, images);
 
         var updatedTour = _tourRepository.Update(tour);
-
         return _mapper.Map<TourDto>(updatedTour);
     }
 
-    // Remove review
     public TourDto RemoveReview(long tourId, long reviewId)
     {
         var tour = _tourRepository.Get(tourId);
