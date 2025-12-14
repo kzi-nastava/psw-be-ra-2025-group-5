@@ -88,6 +88,9 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                     .IsRequired()
                     .HasDefaultValueSql("NOW()"); // PostgreSQL funkcija za trenutno vreme
 
+                builder.Property(tp => tp.Deadline)
+                    .IsRequired(false);
+
                 builder.Property(tp => tp.IsResolved)
                     .IsRequired()
                     .HasDefaultValue(false);

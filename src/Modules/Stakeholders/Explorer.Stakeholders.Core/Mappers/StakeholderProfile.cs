@@ -58,7 +58,21 @@ namespace Explorer.Stakeholders.Core.Mappers
                 );
 
             CreateMap<TourProblem, TourProblemDto>()
-                .ForMember(dest => dest.Comments, opt => opt.Ignore());
+                .ForMember(dest => dest.Comments, opt => opt.Ignore())
+                .ConstructUsing(src => new TourProblemDto
+                {
+                    Id = src.Id,
+                    TourId = src.TourId,
+                    ReporterId = src.ReporterId,
+                    Category = (API.Dtos.ProblemCategory)src.Category,
+                    Priority = (API.Dtos.ProblemPriority)src.Priority,
+                    Description = src.Description,
+                    OccurredAt = src.OccurredAt,
+                    CreatedAt = src.CreatedAt,
+                    IsResolved = src.IsResolved,
+                    Deadline = src.Deadline,
+                    Comments = new List<CommentDto>()
+                });
 
             CreateMap<TourProblemDto, TourProblem>();
 
