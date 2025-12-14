@@ -81,6 +81,24 @@ namespace Explorer.Stakeholders.Core.Mappers
 
             CreateMap<Comment, CommentDto>();
 
+            // ========================= Notification <-> NotificationDto =========================
+            CreateMap<Notification, NotificationDto>()
+                .ForMember(
+                    dest => dest.Type,
+                    opt => opt.MapFrom(src => src.Type.ToString())
+                );
+
+            CreateMap<NotificationDto, Notification>()
+                .ConstructUsing(dto => new Notification(
+                    dto.UserId,
+                    Enum.Parse<NotificationType>(dto.Type, true),
+                    dto.Title,
+                    dto.Message,
+                    dto.TourProblemId,
+                    dto.TourId,
+                    dto.ActionUrl
+                ));
+
         }
     }
 }

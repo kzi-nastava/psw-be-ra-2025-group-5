@@ -13,6 +13,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<TourProblem> TourProblems { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -28,6 +29,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureAppRating(modelBuilder);
             ConfigureTourProblem(modelBuilder);
             ConfigurePosition(modelBuilder);
+            ConfigureNotification(modelBuilder);
         }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -130,6 +132,52 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 .HasOne<User>()
                 .WithOne()
                 .HasForeignKey<Position>(l => l.TouristId);
+        }
+
+        private static void ConfigureNotification(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Notification>(builder =>
+            {
+                builder.HasKey(n => n.Id);
+
+                builder.Property(n => n.UserId)
+                    .IsRequired();
+
+                builder.Property(n => n.Type)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(n => n.Title)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                builder.Property(n => n.Message)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                builder.Property(n => n.IsRead)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+
+                builder.Property(n => n.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(n => n.TourProblemId)
+                    .IsRequired(false);
+
+                builder.Property(n => n.TourId)
+                    .IsRequired(false);
+
+                builder.Property(n => n.ActionUrl)
+                    .HasMaxLength(500)
+                    .IsRequired(false);
+
+                builder.HasIndex(n => n.UserId);
+                builder.HasIndex(n => n.IsRead);
+                builder.HasIndex(n => n.CreatedAt);
+                builder.HasIndex(n => n.TourProblemId);
+                builder.HasIndex(n => n.TourId);
+            });
         }
 
     }

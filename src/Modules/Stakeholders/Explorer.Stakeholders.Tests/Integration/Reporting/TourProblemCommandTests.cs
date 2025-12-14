@@ -1,9 +1,10 @@
 ﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.API.Public;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -160,7 +161,10 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
 
     private static TourProblemController CreateController(IServiceScope scope)
     {
-     return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>(), scope.ServiceProvider.GetRequiredService<ITourRepository>())
+     return new TourProblemController(
+            scope.ServiceProvider.GetRequiredService<ITourProblemService>(), 
+            scope.ServiceProvider.GetRequiredService<ITourService>(),
+            scope.ServiceProvider.GetRequiredService<INotificationService>())
         {
         ControllerContext = BuildContext("-21")
         };
