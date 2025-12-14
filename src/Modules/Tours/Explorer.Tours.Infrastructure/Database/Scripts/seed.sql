@@ -4,7 +4,8 @@ DELETE FROM tours."Facilities";
 DELETE FROM tours."Monument";
 DELETE FROM tours."Equipment";
 DELETE FROM tours."TouristEquipment";
-DELETE FROM tour."ShoppingCarts";
+DELETE FROM tours."ShoppingCarts";
+DELETE FROM tours."TourPurchaseTokens";
 
 INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (1, 4, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}', '["Adventure","Nature"]');
@@ -53,7 +54,8 @@ INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (
 INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (2, 4, 2);
 INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (3, 5, 3);
 
-INSERT INTO tours."ShoppingCart" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
+INSERT INTO tours."ShoppingCarts" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
+INSERT INTO tours."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (1, 4, 5);
 
 SELECT setval(pg_get_serial_sequence('tours."TouristPreferences"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristPreferences"));
 SELECT setval(pg_get_serial_sequence('tours."Tours"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Tours"));
@@ -61,5 +63,5 @@ SELECT setval(pg_get_serial_sequence('tours."Facilities"', 'Id'), (SELECT COALES
 SELECT setval(pg_get_serial_sequence('tours."Monument"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Monument"));
 SELECT setval(pg_get_serial_sequence('tours."Equipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Equipment"));
 SELECT setval(pg_get_serial_sequence('tours."TouristEquipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristEquipment"));
-SELECT setval(pg_get_serial_sequence('tours."ShoppingCart"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."ShoppingCart"));
-
+SELECT setval(pg_get_serial_sequence('tours."ShoppingCarts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."ShoppingCarts"));
+SELECT setval(pg_get_serial_sequence('tours."TourPurchaseTokens"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourPurchaseTokens"));

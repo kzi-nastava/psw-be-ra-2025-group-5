@@ -9,5 +9,5 @@ public interface IShoppingCartService
     ShoppingCartDto Create(CreateShoppingCartDto ShoppingCart);
     ShoppingCartDto AddOrderItem(long touristId, long tourId);
     ShoppingCartDto RemoveOrderItem(long touristId, long tourId);
-    ShoppingCartDto ClearShoppingCart(long touristId);
+    ShoppingCartDto Checkout(long touristId);
 }
