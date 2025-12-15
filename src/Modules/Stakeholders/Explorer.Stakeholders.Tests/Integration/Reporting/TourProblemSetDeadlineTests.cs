@@ -1,8 +1,9 @@
 ﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.API.Public;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,9 +77,10 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
         private static TourProblemController CreateController(IServiceScope scope, string userId, string role)
         {
             var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
-            var tourRepository = scope.ServiceProvider.GetRequiredService<ITourRepository>();
+            var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
+            var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-            return new TourProblemController(tourProblemService, tourRepository)
+            return new TourProblemController(tourProblemService, tourService, notificationService)
             {
                 ControllerContext = new ControllerContext
                 {

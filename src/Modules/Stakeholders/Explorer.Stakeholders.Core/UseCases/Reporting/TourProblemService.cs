@@ -2,6 +2,7 @@
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
@@ -13,12 +14,18 @@ public class TourProblemService : ITourProblemService
 {
     private readonly ITourProblemRepository _repository;
     private readonly IUserRepository _userRepository;
+    private readonly INotificationService _notificationService;
     private readonly IMapper _mapper;
 
-    public TourProblemService(ITourProblemRepository repository, IUserRepository userRepository, IMapper mapper)
+    public TourProblemService(
+        ITourProblemRepository repository, 
+        IUserRepository userRepository, 
+        INotificationService notificationService,
+        IMapper mapper)
     {
         _repository = repository;
         _userRepository = userRepository;
+        _notificationService = notificationService;
         _mapper = mapper;
     }
 

@@ -1,7 +1,7 @@
 ﻿using Explorer.API.Controllers.Administrator.Administration;
+using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.API.Public;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,7 @@ namespace Explorer.Tours.Tests.Integration.Administration
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope, "admin1", "administrator");
             long tourId = -1;
-            var tourRepository = scope.ServiceProvider.GetRequiredService<ITourRepository>();
+            var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
 
             // Act
             var result = controller.CloseTour(tourId);
@@ -34,8 +34,8 @@ namespace Explorer.Tours.Tests.Integration.Administration
             badRequest.ShouldNotBeNull();
             badRequest.Value.ShouldBe("Cannot close tour: no unresolved problems with expired deadline.");
 
-            var tour = tourRepository.Get(tourId);
-            tour.Status.ShouldNotBe(TourStatus.Closed);
+            var tour = tourService.GetById(tourId);
+            tour.Status.ShouldNotBe("Closed");
         }
 
         [Fact]
@@ -44,9 +44,9 @@ namespace Explorer.Tours.Tests.Integration.Administration
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope, "admin1", "administrator");
             long tourId = -3;
-            var tourRepository = scope.ServiceProvider.GetRequiredService<ITourRepository>();
+            var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
 
-            tourRepository.Close(tourId);
+            tourService.CloseTour(tourId);
 
             // Act
             var result = controller.CloseTour(tourId);
@@ -59,10 +59,11 @@ namespace Explorer.Tours.Tests.Integration.Administration
 
         private static TourController CreateController(IServiceScope scope, string userId, string role)
         {
-            var tourRepo = scope.ServiceProvider.GetRequiredService<ITourRepository>();
+            var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
             var problemRepo = scope.ServiceProvider.GetRequiredService<ITourProblemRepository>();
+            var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-            return new TourController(tourRepo, problemRepo)
+            return new TourController(tourService, problemRepo, notificationService)
             {
                 ControllerContext = new ControllerContext
                 {

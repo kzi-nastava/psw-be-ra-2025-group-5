@@ -66,4 +66,10 @@ public class TourService : ITourService
         _TourRepository.Close(tourId);
     }
 
+    public TourDto GetById(long id)
+    {
+        var tour = _TourRepository.Get(id);
+        return _mapper.Map<TourDto>(tour);
+    }
+
 }

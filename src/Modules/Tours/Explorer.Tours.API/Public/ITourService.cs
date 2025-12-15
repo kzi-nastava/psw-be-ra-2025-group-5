@@ -12,4 +12,5 @@ public interface ITourService
     TourDto Update(TourDto Tour);
     void Delete(long id);
     void CloseTour(long tourId);
+    TourDto GetById(long id);
 }

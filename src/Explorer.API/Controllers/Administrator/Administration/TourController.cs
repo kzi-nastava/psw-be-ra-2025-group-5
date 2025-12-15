@@ -1,8 +1,6 @@
-﻿using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+﻿using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.API.Public;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
-using Explorer.Tours.Core.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,22 +11,27 @@ namespace Explorer.API.Controllers.Administrator.Administration
     [ApiController]
     public class TourController : ControllerBase
     {
-        private readonly ITourRepository _tourRepository;
+        private readonly ITourService _tourService;
         private readonly ITourProblemRepository _tourProblemRepository;
+        private readonly INotificationService _notificationService;
 
-        public TourController(ITourRepository tourRepository, ITourProblemRepository tourProblemRepository)
+        public TourController(
+            ITourService tourService,
+            ITourProblemRepository tourProblemRepository,
+            INotificationService notificationService)
         {
-            _tourRepository = tourRepository;
+            _tourService = tourService;
             _tourProblemRepository = tourProblemRepository;
+            _notificationService = notificationService;
         }
 
         [HttpPost("{id}/close")]
         public ActionResult CloseTour(long id)
         {
-            var tour = _tourRepository.Get(id);
+            var tour = _tourService.GetById(id);
             if (tour == null) return NotFound();
 
-            if (tour.Status == TourStatus.Closed)
+            if (tour.Status == "Closed")
                 return BadRequest("Tour is already closed");
 
             var problems = _tourProblemRepository.GetByTourId(id);
@@ -38,14 +41,29 @@ namespace Explorer.API.Controllers.Administrator.Administration
             if (!unresolvedExpired.Any())
                 return BadRequest("Cannot close tour: no unresolved problems with expired deadline.");
 
-            _tourRepository.Close(id);
+            _tourService.CloseTour(id);
+
+            try
+            {
+                _notificationService.CreateTourClosedNotification(
+                    authorId: tour.AuthorId,
+                    tourId: id,
+                    tourName: tour.Name,
+                    reason: "Unresolved problems with expired deadline"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send notification: {ex.Message}");
+            }
+
             return Ok();
         }
 
         [HttpGet("{id}/tour-status")]
         public ActionResult GetTourStatus(long id)
         {
-            var tour = _tourRepository.Get(id);
+            var tour = _tourService.GetById(id);
             if (tour == null) return NotFound();
 
             return Ok(new { status = tour.Status });
