@@ -53,7 +53,7 @@ public class ProfileController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
+        }   
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);

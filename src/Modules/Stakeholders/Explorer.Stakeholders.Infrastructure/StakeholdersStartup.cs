@@ -1,13 +1,17 @@
 using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
+using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.Core.Mappers;
 using Explorer.Stakeholders.Core.UseCases;
 using Explorer.Stakeholders.Core.UseCases.Reporting;
+using Explorer.Stakeholders.Core.UseCases.Statistics;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories;
+using Explorer.Tours.API.Internal.Statistics;
+using Explorer.Tours.Infrastructure.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -34,6 +38,9 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IAppRatingService, AppRatingService>();
             services.AddScoped<ITourProblemService, TourProblemService>();
             services.AddScoped<IPositionService, PositionService>();
+            services.AddScoped<ITouristStatisticsService, TouristStatisticsService>();
+            services.AddScoped<ITourStatisticsDbRepository, TourStatisticsDbRepository>();
+
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
