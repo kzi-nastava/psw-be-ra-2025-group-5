@@ -35,5 +35,11 @@ namespace Explorer.API.Controllers.Administrator.Administration
         {
             return Ok(_userService.Block(id));
         }
+
+        [HttpPost("{id}/unblock")]
+        public ActionResult<UserDto> UnblockUser(long id)
+        {
+            return Ok(_userService.Unblock(id));
+        }
     }
 }

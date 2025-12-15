@@ -12,5 +12,6 @@ namespace Explorer.Stakeholders.Core.UseCases
         UserDto Create(CreateUserDto userDto);
         List<UserDto> GetAll();
         UserDto Block(long id);
+        UserDto Unblock(long id);
     }
 }
