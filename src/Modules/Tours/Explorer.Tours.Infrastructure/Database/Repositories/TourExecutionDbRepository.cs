@@ -44,7 +44,14 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories
                                      && x.TourId == tourId
                                      && x.Status == TourExecutionStatus.Active);
         }
-
+        public IEnumerable<TourExecution> GetByUserId(long userId)
+        {
+            return _context.TourExecutions
+                .Include(e => e.CompletedKeyPoints)
+                .Where(e => e.UserId == userId)
+                .OrderByDescending(e => e.LastActivity)
+                .ToList();
+        }
 
         public IEnumerable<TourExecution> GetAllActiveOlderThan(DateTime olderThan)
         {
