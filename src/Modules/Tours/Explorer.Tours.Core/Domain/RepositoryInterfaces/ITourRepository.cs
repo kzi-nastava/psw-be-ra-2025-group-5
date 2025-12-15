@@ -10,4 +10,6 @@ public interface ITourRepository
     Tour Create(Tour map);
     Tour Update(Tour map);
     void Delete(long id);
+    Tour Get(long id);
+    void Close(long tourId);
 }

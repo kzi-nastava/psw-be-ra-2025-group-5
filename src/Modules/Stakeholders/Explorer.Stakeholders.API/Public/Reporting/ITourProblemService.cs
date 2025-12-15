@@ -9,5 +9,13 @@ namespace Explorer.Stakeholders.API.Public.Reporting
         TourProblemDto Create(TourProblemDto problem);
         TourProblemDto Update(TourProblemDto problem);
         void Delete(long id);
+        CommentDto AddComment(long problemId, long authorId, string content);
+        TourProblemDto GetById(long id);
+        List<CommentDto> GetComments(long id);
+        PagedResult<TourProblemDto> GetPagedByReporterId(long reporterId, int page, int pageSize);
+        PagedResult<TourProblemDto> GetPagedByTourIds(List<long> tourIds, int page, int pageSize);
+        TourProblemDto MarkResolved(long problemId, bool isResolved);
+        void SetDeadline(long problemId, DateTimeOffset? deadline);
+
     }
 }
