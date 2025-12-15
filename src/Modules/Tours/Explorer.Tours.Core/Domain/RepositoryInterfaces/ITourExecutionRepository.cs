@@ -14,6 +14,8 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
         TourExecution GetActiveForUser(long userId, long tourId);
         // za auto proveru isteka ture
         IEnumerable<TourExecution> GetAllActiveOlderThan(DateTime olderThan);
+        IEnumerable<TourExecution> GetByUserId(long userId);
+
 
     }
 }
