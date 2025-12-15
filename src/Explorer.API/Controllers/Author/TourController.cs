@@ -74,9 +74,9 @@ public class TourController : ControllerBase
     }
 
     [HttpDelete("{tourId:long}/keypoints/{keyPointId:long}")]
-    public ActionResult<TourDto> RemoveKeyPoint(long tourId, long keyPointId)
+    public ActionResult<TourDto> RemoveKeyPoint(long tourId, long keyPointId, [FromQuery] double tourLength)
     {
-        var result = _tourService.RemoveKeyPoint(tourId, keyPointId);
+        var result = _tourService.RemoveKeyPoint(tourId, keyPointId, tourLength);
         return Ok(result);
     }
 

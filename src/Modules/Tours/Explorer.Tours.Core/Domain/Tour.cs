@@ -22,6 +22,7 @@ public class Tour : AggregateRoot
     public List<TourReview> Reviews { get; private set; }
     public List<TourDuration> Durations { get; private set; }
     //public List<TourRequiredEquipment> RequiredEquipment { get; private set; }
+    public double TourLength { get; set; }
 
     private Tour() 
     {
@@ -30,6 +31,7 @@ public class Tour : AggregateRoot
         Reviews = new List<TourReview>();
         Durations = new List<TourDuration>();
         //RequiredEquipment = new List<TourRequiredEquipment>();
+        TourLength = 0;
     }
 
     public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
@@ -48,7 +50,9 @@ public class Tour : AggregateRoot
         Price = price;
         Status = TourStatus.Draft;
         KeyPoints = new List<KeyPoint>();
+        Durations = new List<TourDuration>();
         Reviews = new List<TourReview>();
+        TourLength = 0;
     }
 
     public void AddKeyPoint(string name, string description, Location location, byte[]? image, string? secret)
@@ -206,6 +210,11 @@ public class Tour : AggregateRoot
     {
         if (!Durations.Remove(duration))
             throw new NotFoundException($"Duration not found.");
+    }
+
+    public void UpdateTourLength(double length)
+    {
+        TourLength = length;
     }
 
     //public void AddRequiredEquipment(TourRequiredEquipment equipment)

@@ -43,8 +43,6 @@ public class ToursContext : DbContext
                     .OwnsMany(t => t.Durations, d =>
                     {
                         d.WithOwner().HasForeignKey("TourId");
-                        d.Property<long>("Id");
-                        d.HasKey("Id");
                     });
 
         modelBuilder.Entity<Tour>()
