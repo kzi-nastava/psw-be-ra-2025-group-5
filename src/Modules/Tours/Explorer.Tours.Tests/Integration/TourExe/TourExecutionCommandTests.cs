@@ -57,6 +57,9 @@ public class TourExecutionCommandTests : BaseToursIntegrationTest
         var tour = CreateTestTour(dbContext);
         long userId = -1;
 
+        dbContext.TourPurchaseTokens.Add(new TourPurchaseToken(tour.Id, -1));
+        dbContext.SaveChanges();
+
         // Act
         var result = ((ObjectResult)controller.Start(tour.Id).Result)?.Value as StartExecutionResultDto;
 
@@ -144,6 +147,27 @@ public class TourExecutionCommandTests : BaseToursIntegrationTest
         stored.EndTime.ShouldNotBeNull();
     }
 
+    [Fact]
+    public void StartExecution_Fails_When_Tour_Not_Purchased()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var controller = CreateController(scope);
+
+        // Arrange
+        var tour = CreateTestTour(dbContext);
+        var countBefore = dbContext.TourExecutions.Count();
+
+        // Act
+        Should.Throw<InvalidOperationException>(() =>
+            controller.Start(tour.Id)
+        );
+
+        // Assert
+        dbContext.TourExecutions.Count().ShouldBe(countBefore);
+    }
+
+
     private static TourExecutionController CreateController(IServiceScope scope)
     {
         return new TourExecutionController(scope.ServiceProvider.GetRequiredService<ITourExecutionService>())
@@ -151,4 +175,10 @@ public class TourExecutionCommandTests : BaseToursIntegrationTest
             ControllerContext = BuildContext("-1")
         };
     }
+    private void CreatePurchaseToken(ToursContext dbContext, long tourId, long touristId)
+    {
+        dbContext.TourPurchaseTokens.Add(new TourPurchaseToken(tourId, touristId));
+        dbContext.SaveChanges();
+    }
+
 }

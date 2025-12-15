@@ -45,5 +45,15 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories
                                      && x.Status == TourExecutionStatus.Active);
         }
 
+
+        public IEnumerable<TourExecution> GetAllActiveOlderThan(DateTime olderThan)
+        {
+
+            return _context.TourExecutions
+                .Where(e => e.Status == TourExecutionStatus.Active &&
+                e.LastActivity < olderThan)
+                .ToList();
+
+        }
     }
 }
