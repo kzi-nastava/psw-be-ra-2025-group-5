@@ -20,7 +20,7 @@ public class ToursContext : DbContext
     public DbSet<TourExecution> TourExecutions { get; set; }
     public DbSet<TourReview> TourReviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
-
+    public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 

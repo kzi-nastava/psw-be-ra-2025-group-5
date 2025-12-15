@@ -14,7 +14,7 @@ public class ReviewImage: Entity
     public string ContentType { get; set; } = null!;
     public int Order { get; set; }
 
-    protected ReviewImage() { } // EF Core
+    protected ReviewImage() { } 
 
     public ReviewImage(long reviewId, byte[] data, string contentType, int order)
     {

@@ -15,12 +15,15 @@ public class TourService : ITourService
 {
     private readonly ITourRepository _tourRepository;
     private readonly ITourExecutionRepository _tourExecutionRepository;
+    private readonly ITourPurchaseTokenRepository _purchaseTokenRepository;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper)
+    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken)
     {
         _tourRepository = repository;
         _mapper = mapper;
+        _tourExecutionRepository = execution;
+        _purchaseTokenRepository = purchaseToken;
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
@@ -206,6 +209,10 @@ public class TourService : ITourService
 
     public TourDto AddReview(long tourId, long userId, string username, TourReviewDto dto)
     {
+        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        if (purchaseToken == null)
+            throw new InvalidOperationException("User has not purchased this tour.");
+
         var tour = _tourRepository.Get(tourId);
         var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
 
