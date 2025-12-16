@@ -224,7 +224,19 @@ public class TourService : ITourService
         int completed = execution.CompletedKeyPoints.Count;
         var progress = total == 0 ? 0 : (100.0 * completed / total);
 
-        var review = tour.AddReview( dto.Grade, dto.Comment, DateTime.UtcNow, progress, userId, images: null,username);
+        List<ReviewImage>? images = null;
+    if (dto.Images != null && dto.Images.Any())
+    {
+        images = dto.Images
+            .OrderBy(i => i.Order)
+            .Select((img, index) =>
+                new ReviewImage(0, Convert.FromBase64String(img.Data), img.ContentType, index))
+            .ToList();
+    }
+
+    // Koristi repozitorijumovu AddReview i prosledi slike
+    var review = _tourRepository.AddReview(tourId, dto.Grade, dto.Comment, DateTime.UtcNow, progress, userId, username, images);
+
 
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);

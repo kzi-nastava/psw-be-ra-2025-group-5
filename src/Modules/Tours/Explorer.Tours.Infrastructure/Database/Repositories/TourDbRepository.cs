@@ -152,24 +152,15 @@ public class TourDbRepository : ITourRepository
     {
         var tour = Get(tourId);
 
-        // 1. Dodaj review BEZ slika
-        var review = tour.AddReview(grade, comment, reviewTime, progress, touristId,images: null, username);
+        // 2. Kreiraj review sa slikama ODMAH - koristite pravi konstruktor
+        var review = new TourReview(grade, comment, reviewTime, progress, touristId, tourId, images, username);
 
+        // 3. Dodaj review u turu
+        tour.Reviews.Add(review);
+
+        // 4. ISTO KAO U UpdateReview - koristi DbContext.Update i SaveChanges
         DbContext.Update(tour);
         DbContext.SaveChanges();
-
-        if (images != null && images.Any())
-        {
-            var orderedImages = images
-                .OrderBy(i => i.Order)
-                .Select((img, index) =>
-                    new ReviewImage(review.Id,img.Data,img.ContentType, index)).ToList();
-
-            foreach (var image in orderedImages)
-                review.AddImage(image);
-
-            DbContext.SaveChanges();
-        }
 
         return review;
     }
