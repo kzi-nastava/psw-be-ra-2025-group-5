@@ -197,6 +197,12 @@ namespace Explorer.Tours.Core.UseCases
             return null;
         }
 
+        public List<TourExecutionDto> GetExecutionsForUser(long userId)
+        {
+            var executions = _repo.GetByUserId(userId);
+            return _mapper.Map<List<TourExecutionDto>>(executions);
+        }
+
         private void ValidateCoordinates(double lat, double lon)
         {
             if (double.IsNaN(lat) || double.IsNaN(lon))

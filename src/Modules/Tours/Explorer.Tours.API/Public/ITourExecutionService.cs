@@ -14,7 +14,7 @@ namespace Explorer.Tours.API.Public
         void CompleteExecution(long executionId);
         void AbandonExecution(long executionId);
         TourExecutionDto GetExecution(long executionId);
-
+        List<TourExecutionDto> GetExecutionsForUser(long userId);
         void ExpireOldTours();
     }
 }

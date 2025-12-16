@@ -53,6 +53,36 @@ public class TourExecutionQueryTests : BaseToursIntegrationTest
         result.ShouldBeOfType<NotFoundResult>();
     }
 
+    [Fact]
+    public void GetForUser_ReturnsOnlyExecutionsForLoggedInUser()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        dbContext.TourExecutions.RemoveRange(dbContext.TourExecutions);
+        dbContext.SaveChanges();
+
+        var execution1 = TourExecution.StartNew(userId: -1, tourId: 1);
+        var execution2 = TourExecution.StartNew(userId: -1, tourId: 2);
+        var executionOtherUser = TourExecution.StartNew(userId: -2, tourId: 3);
+
+        dbContext.TourExecutions.AddRange(execution1, execution2, executionOtherUser);
+        dbContext.SaveChanges();
+
+        var controller = CreateController(scope);
+
+        // Act
+        var result = ((ObjectResult)controller.GetForUser().Result)?.Value as List<TourExecutionDto>;
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Count.ShouldBe(2);
+
+        result.All(e => e.UserId == -1).ShouldBeTrue();
+    }
+
+
     private static TourExecutionController CreateController(IServiceScope scope)
     {
         return new TourExecutionController(scope.ServiceProvider.GetRequiredService<ITourExecutionService>())
