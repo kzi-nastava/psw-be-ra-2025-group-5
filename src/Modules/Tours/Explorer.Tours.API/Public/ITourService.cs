@@ -16,7 +16,7 @@ public interface ITourService
     // KeyPoint operacije
     TourDto AddKeyPoint(long tourId, CreateKeyPointDto keyPoint);
     TourDto UpdateKeyPoint(long tourId, long keyPointId, CreateKeyPointDto keyPoint);
-    TourDto RemoveKeyPoint(long tourId, long keyPointId);
+    TourDto RemoveKeyPoint(long tourId, long keyPointId, double tourLength);
     TourDto ReorderKeyPoints(long tourId, ReorderKeyPointsDto reorderDto);
 
     // Status operacije
@@ -36,5 +36,5 @@ public interface ITourService
 
     // Duration operacije
     TourDto AddDuration(long tourId, TourDurationDto durationDto);
-    TourDto RemoveDuration(long tourId, long durationId);
+    TourDto RemoveDuration(long tourId, TourDurationDto durationDto);
 }

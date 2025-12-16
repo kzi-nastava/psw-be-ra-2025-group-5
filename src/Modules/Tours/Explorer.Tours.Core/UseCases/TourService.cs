@@ -58,6 +58,29 @@ public class TourService : ITourService
         var difficulty = Enum.Parse<Domain.TourDifficulty>(dto.Difficulty, true);
         
         tour.Update(dto.Name, dto.Description, difficulty, dto.Tags, dto.Price);
+
+        // Sync Durations
+        var existingDurations = tour.Durations.ToList();
+        var newDurationsDto = dto.Durations ?? new List<TourDurationDto>();
+        var newDurations = newDurationsDto.Select(d => _mapper.Map<TourDuration>(d)).ToList();
+
+        // Add new durations
+        foreach (var duration in newDurations)
+        {
+            if (!existingDurations.Contains(duration))
+            {
+                tour.AddDuration(duration);
+            }
+        }
+
+        // Remove old durations
+        foreach (var existingDuration in existingDurations)
+        {
+            if (!newDurations.Contains(existingDuration))
+            {
+                tour.RemoveDuration(existingDuration);
+            }
+        }
         
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
@@ -81,6 +104,11 @@ public class TourService : ITourService
             keyPointDto.Image,
             keyPointDto.Secret);
 
+        if (tour.KeyPoints.Count > 1)
+        {
+            tour.UpdateTourLength(keyPointDto.TourLength);
+        }
+
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
@@ -98,16 +126,29 @@ public class TourService : ITourService
             keyPointDto.Secret,
             location);
 
+        if (tour.KeyPoints.Count > 1)
+        {
+            tour.UpdateTourLength(keyPointDto.TourLength);
+        }
+
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
 
-    public TourDto RemoveKeyPoint(long tourId, long keyPointId)
+    public TourDto RemoveKeyPoint(long tourId, long keyPointId, double tourLength)
     {
         var tour = _tourRepository.Get(tourId);
         tour.RemoveKeyPoint(keyPointId);
+        if (tour.KeyPoints.Count < 2)
+        {
+            tour.UpdateTourLength(0.0);
+        }
+        else
+        {
+            tour.UpdateTourLength(tourLength);
+        }
 
-        var result = _tourRepository.Update(tour);
+            var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
 
@@ -115,6 +156,7 @@ public class TourService : ITourService
     {
         var tour = _tourRepository.Get(tourId);
         tour.ReorderKeyPoints(reorderDto.OrderedKeyPointIds);
+        tour.UpdateTourLength(reorderDto.TourLength);
 
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
@@ -247,11 +289,19 @@ public class TourService : ITourService
 
     public TourDto AddDuration(long tourId, TourDurationDto durationDto)
     {
-        throw new NotImplementedException();
+        var tour = _tourRepository.Get(tourId);
+        var duration = _mapper.Map<TourDuration>(durationDto);
+        tour.AddDuration(duration);
+        var result = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(result);
     }
 
-    public TourDto RemoveDuration(long tourId, long durationId)
+    public TourDto RemoveDuration(long tourId, TourDurationDto durationDto)
     {
-        throw new NotImplementedException();
+        var tour = _tourRepository.Get(tourId);
+        var duration = _mapper.Map<TourDuration>(durationDto);
+        tour.RemoveDuration(duration);
+        var result = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(result);
     }
 }

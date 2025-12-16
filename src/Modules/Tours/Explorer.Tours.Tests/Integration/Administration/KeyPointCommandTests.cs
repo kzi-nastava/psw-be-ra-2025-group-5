@@ -253,7 +253,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         var initialCount = addResult.KeyPoints.Count;
 
         // Act
-        var result = ((ObjectResult)controller.RemoveKeyPoint(tourId, keyPointIdToDelete).Result)?.Value as TourDto;
+        var result = ((ObjectResult)controller.RemoveKeyPoint(tourId, keyPointIdToDelete,0.0).Result)?.Value as TourDto;
 
         // Assert
         result.ShouldNotBeNull();
@@ -280,7 +280,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         var tourId = createdTour.Id;
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() => controller.RemoveKeyPoint(tourId, -9999));
+        Should.Throw<InvalidOperationException>(() => controller.RemoveKeyPoint(tourId, -9999,0.0));
     }
 
     [Fact]
@@ -304,7 +304,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         controller.Publish(tourId);
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() => controller.RemoveKeyPoint(tourId, keyPointId));
+        Should.Throw<InvalidOperationException>(() => controller.RemoveKeyPoint(tourId, keyPointId, 0.0));
     }
 
     [Fact]
