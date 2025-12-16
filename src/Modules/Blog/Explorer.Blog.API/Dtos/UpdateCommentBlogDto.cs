@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Explorer.Blog.API.Dtos
 {
-    public class UpdateBlogPostDto
+    public class UpdateCommentBlogDto
     {
-        public string Description { get; set; }
+        public string Content { get; set; }        
     }
 }

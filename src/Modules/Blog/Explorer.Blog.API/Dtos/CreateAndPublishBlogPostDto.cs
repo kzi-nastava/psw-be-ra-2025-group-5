@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Explorer.Blog.API.Dtos
 {
-    public class UpdateBlogPostDto
+    public class CreateAndPublishBlogPostDto
     {
+        public string Title { get; set; }
         public string Description { get; set; }
+        public List<BlogImageDto> Images { get; set; } = new();
     }
 }

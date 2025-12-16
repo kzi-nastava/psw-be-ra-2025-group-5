@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Explorer.BuildingBlocks.Core.Domain;
 
-namespace Explorer.Stakeholders.Core.Domain
+namespace Explorer.Blog.Core.Domain
 {
     public class Comment
     {
@@ -28,6 +27,10 @@ namespace Explorer.Stakeholders.Core.Domain
 
         private void Validate()
         {
+            if (AuthorId == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(AuthorId));
+            }
             if (string.IsNullOrWhiteSpace(Content))
             {
                 throw new ArgumentException("The comment is empty.", nameof(Content));
@@ -44,4 +47,5 @@ namespace Explorer.Stakeholders.Core.Domain
         }
 
     }
+
 }

@@ -23,22 +23,38 @@ public class BlogController : ControllerBase
     [HttpGet]
     public IActionResult GetAll()
     {
-        var posts = _blogService.GetAll();
+        var userId = GetUserIdFromToken();
+        var posts = _blogService.GetAll(userId);
         return Ok(posts);
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetPost(int id)
+    [HttpGet("{id:long}")]
+    public IActionResult GetPost(long id)
     {
         var post = _blogService.GetById(id);
         if (post == null) return NotFound();
+
+        var userId = GetUserIdFromToken(); 
+        if (post.Status == "Draft" && post.AuthorId != userId)
+        {
+            return Forbid();
+        }
+
         return Ok(post);
     }
+
 
     [HttpGet("author/{authorId:long}")]
     public IActionResult GetByAuthor(long authorId)
     {
         var posts = _blogService.GetByAuthor(authorId);
+        return Ok(posts);
+    }
+
+    [HttpGet("status/{status}")]
+    public IActionResult GetByStatus(string status)
+    {
+        var posts = _blogService.GetByStatus(status);
         return Ok(posts);
     }
 
@@ -119,6 +135,46 @@ public class BlogController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:long}/publish")]
+    public IActionResult Publish(long id)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.Publish(id, authorId);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}/archive")]
+    public IActionResult Archive(long id)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.Archive(id, authorId);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}/draft")]
+    public IActionResult UpdateDraft(long id, [FromBody] UpdateDraftBlogPostDto dto)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.UpdateDraft(id, dto, authorId);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}/vote/{voteType}")]
+    public ActionResult<BlogPostDto> Vote(long id, VoteType voteType)
+    {
+        var userId = GetUserIdFromToken();
+        var result = _blogService.Vote(id, userId, voteType.ToString());
+
+        return Ok(result);
+    }
+
+    [HttpPost("publish")]
+    public IActionResult CreateAndPublish([FromBody] CreateAndPublishBlogPostDto dto)
+    {
+        var authorId = GetUserIdFromToken();
+        var result = _blogService.CreateAndPublish(dto, authorId);
+        return Ok(result);
+    }
 
 }
 
