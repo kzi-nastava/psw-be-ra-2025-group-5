@@ -6,6 +6,7 @@ DELETE FROM tours."Equipment";
 DELETE FROM tours."TouristEquipment";
 DELETE FROM tours."ShoppingCarts";
 DELETE FROM tours."TourPurchaseTokens";
+DELETE FROM tours."TourReviews";
 
 INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (1, 4, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}', '["Adventure","Nature"]');
@@ -57,6 +58,14 @@ INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (
 INSERT INTO tours."ShoppingCarts" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
 INSERT INTO tours."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (1, 4, 5);
 
+-- TourReviews
+INSERT INTO tours."TourReviews" 
+("Grade", "Comment", "ReviewTime", "Progress", "TouristID", "TourID", "TouristUsername")
+VALUES
+(5, 'Amazing tour!', NOW(), 100, 4, 1, 'turista1'),
+(4, 'Very informative', NOW(), 100, 5, 2, 'turista2'),
+(3, 'It was ok', NOW(), 75, 6, 3, 'turista3');
+
 SELECT setval(pg_get_serial_sequence('tours."TouristPreferences"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristPreferences"));
 SELECT setval(pg_get_serial_sequence('tours."Tours"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Tours"));
 SELECT setval(pg_get_serial_sequence('tours."Facilities"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Facilities"));
@@ -65,3 +74,4 @@ SELECT setval(pg_get_serial_sequence('tours."Equipment"', 'Id'), (SELECT COALESC
 SELECT setval(pg_get_serial_sequence('tours."TouristEquipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristEquipment"));
 SELECT setval(pg_get_serial_sequence('tours."ShoppingCarts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."ShoppingCarts"));
 SELECT setval(pg_get_serial_sequence('tours."TourPurchaseTokens"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourPurchaseTokens"));
+SELECT setval(pg_get_serial_sequence('tours."TourReviews"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourReviews"));

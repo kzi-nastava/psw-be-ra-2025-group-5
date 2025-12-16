@@ -29,8 +29,9 @@ public interface ITourService
     TourDto GetPublished(long id);
     KeyPointDto GetKeyPoint(long tourId, long keyPointId);
 
-    // Review operacije
-    TourDto AddReview(long tourId, TourReviewDto dto);
-    public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto);
+    // Review 
+    TourDto AddReview(long tourId, long userId, string username, TourReviewDto dto);
+    public TourDto UpdateReview(long tourId, long userId, long reviewId, TourReviewDto dto);
     TourDto RemoveReview(long tourId, long reviewId);
+    public int GetReviewButtonState(long tourId, long userId);
 }

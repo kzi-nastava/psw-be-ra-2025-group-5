@@ -14,7 +14,7 @@ public interface ITourRepository
     void Delete(long id);
     PagedResult<Tour> GetPagedByStatus(TourStatus status, int page, int pageSize);
     // metode za review
-    TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images = null);
+    TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, string username, List<ReviewImage>? images = null);
     void UpdateReview(long tourId, long reviewId, int grade, string? comment, double progress, List<ReviewImage>? images = null);
     void RemoveReview(long tourId, long reviewId);
 

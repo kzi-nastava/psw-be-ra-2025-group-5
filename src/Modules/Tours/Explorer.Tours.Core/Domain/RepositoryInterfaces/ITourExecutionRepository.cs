@@ -16,6 +16,7 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
         IEnumerable<TourExecution> GetAllActiveOlderThan(DateTime olderThan);
         IEnumerable<TourExecution> GetByUserId(long userId);
 
+        TourExecution GetActiveOrCompletedForUser(long userId, long tourId);
 
     }
 }

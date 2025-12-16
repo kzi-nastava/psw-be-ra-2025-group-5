@@ -148,14 +148,28 @@ public class TourDbRepository : ITourRepository
         return task.Result;
     }
 
-    public TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images = null)
+    public TourReview AddReview(long tourId, int grade, string? comment, DateTime? reviewTime, double progress, long touristId, string username, List<ReviewImage>? images = null)
     {
         var tour = Get(tourId);
 
-        var review = tour.AddReview(grade, comment, reviewTime, progress, touristId, images);
+        // 1. Dodaj review BEZ slika
+        var review = tour.AddReview(grade, comment, reviewTime, progress, touristId,images: null, username);
 
         DbContext.Update(tour);
         DbContext.SaveChanges();
+
+        if (images != null && images.Any())
+        {
+            var orderedImages = images
+                .OrderBy(i => i.Order)
+                .Select((img, index) =>
+                    new ReviewImage(review.Id,img.Data,img.ContentType, index)).ToList();
+
+            foreach (var image in orderedImages)
+                review.AddImage(image);
+
+            DbContext.SaveChanges();
+        }
 
         return review;
     }
@@ -163,7 +177,22 @@ public class TourDbRepository : ITourRepository
     public void UpdateReview(long tourId, long reviewId, int grade, string? comment, double progress, List<ReviewImage>? images = null)
     {
         var tour = Get(tourId);
-        tour.UpdateReview(reviewId, grade, comment, progress, images);
+        var review = tour.Reviews.First(r => r.Id == reviewId);
+
+        // 1. Update osnovnih podataka
+        review.UpdateGrade(grade);
+        review.UpdateComment(comment);
+        review.UpdatePercentage(progress);
+
+        // 2. Ako postoje slike – zameni ih kompletno
+        if (images != null)
+        {
+            review.ReplaceImages(
+                images
+                    .OrderBy(i => i.Order)
+                    .Select((img, index) => new ReviewImage(review.Id, img.Data, img.ContentType, index)).ToList()
+            );
+        }
 
         DbContext.Update(tour);
         DbContext.SaveChanges();

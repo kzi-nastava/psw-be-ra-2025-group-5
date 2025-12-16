@@ -14,4 +14,5 @@ public class TourDto
     public DateTime? ArchivedDate { get; set; }
     public List<KeyPointDto> KeyPoints { get; set; }
     public List<TourReviewDto> Reviews { get; set; }
+    public double AverageRating { get; set; }
 }

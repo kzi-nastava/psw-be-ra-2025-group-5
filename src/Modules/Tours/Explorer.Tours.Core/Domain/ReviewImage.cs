@@ -9,18 +9,35 @@ namespace Explorer.Tours.Core.Domain;
 
 public class ReviewImage: Entity
 {
-    public string ImagePath { get; set; } = null!;
     public long ReviewId { get; set; }
+    public byte[] Data { get; set; } = null!;
+    public string ContentType { get; set; } = null!;
+    public int Order { get; set; }
 
-    public ReviewImage() { }
+    protected ReviewImage() { } 
 
-    public ReviewImage(string imagePath)
+    public ReviewImage(long reviewId, byte[] data, string contentType, int order)
     {
-        ImagePath = imagePath;
+        ReviewId = reviewId;
+        Data = data;
+        ContentType = contentType;
+        Order = order;
+
+        Validate();
     }
 
-    public void UpdatePath(string path)
+    private void Validate()
     {
-        ImagePath = path;
+        if (ReviewId <= 0)
+            throw new ArgumentException("Invalid ReviewId");
+
+        if (Data == null || Data.Length == 0)
+            throw new ArgumentException("Image data is required");
+
+        if (string.IsNullOrWhiteSpace(ContentType))
+            throw new ArgumentException("ContentType is required");
+
+        if (Order < 0)
+            throw new ArgumentException("Order must be >= 0");
     }
 }

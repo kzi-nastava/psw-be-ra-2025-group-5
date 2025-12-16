@@ -1,21 +1,29 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using System;
+using System.Linq;
+using System.Reflection.Metadata;
 
 namespace Explorer.Tours.Core.UseCases;
 
 public class TourService : ITourService
 {
     private readonly ITourRepository _tourRepository;
+    private readonly ITourExecutionRepository _tourExecutionRepository;
+    private readonly ITourPurchaseTokenRepository _purchaseTokenRepository;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper)
+    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken)
     {
         _tourRepository = repository;
         _mapper = mapper;
+        _tourExecutionRepository = execution;
+        _purchaseTokenRepository = purchaseToken;
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
@@ -199,40 +207,55 @@ public class TourService : ITourService
         return dto;
     }
 
-    public TourDto AddReview(long tourId, TourReviewDto dto)
+    public TourDto AddReview(long tourId, long userId, string username, TourReviewDto dto)
     {
+        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        if (purchaseToken == null)
+            throw new InvalidOperationException("User has not purchased this tour.");
+
         var tour = _tourRepository.Get(tourId);
+        var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
 
-        // Mapiranje DTO -> TourReview entitet preko AutoMapper-a
-        var review = _mapper.Map<TourReview>(dto);
+        var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
+        if (timeSinceLastActivity > TimeSpan.FromDays(7))
+            throw new Exception("Too much time has passed since your last activity on this tour.");
 
-        tour.AddReview(review);
+        int total = tour.KeyPoints.Count;
+        int completed = execution.CompletedKeyPoints.Count;
+        var progress = total == 0 ? 0 : (100.0 * completed / total);
+
+        var review = tour.AddReview( dto.Grade, dto.Comment, DateTime.UtcNow, progress, userId, images: null,username);
 
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
     }
 
-    // Update review
-    public TourDto UpdateReview(long tourId, long reviewId, TourReviewDto dto)
+    public TourDto UpdateReview(long tourId, long userId, long reviewId, TourReviewDto dto)
     {
         var tour = _tourRepository.Get(tourId);
-        if (tour == null)
-            throw new KeyNotFoundException($"Tour {tourId} not found.");
+        var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
+
+        var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
+        if (timeSinceLastActivity > TimeSpan.FromDays(7))
+            throw new Exception("Too much time has passed since your last activity on this tour.");
 
         List<ReviewImage>? images = null;
+
         if (dto.Images != null && dto.Images.Any())
         {
-            images = _mapper.Map<List<ReviewImage>>(dto.Images);
+            images = dto.Images
+                .OrderBy(i => i.Order)
+                .Select((img, index) =>
+                    new ReviewImage( reviewId, Convert.FromBase64String(img.Data), img.ContentType, index))
+                .ToList();
         }
 
         tour.UpdateReview(reviewId, dto.Grade, dto.Comment, dto.Progress, images);
 
         var updatedTour = _tourRepository.Update(tour);
-
         return _mapper.Map<TourDto>(updatedTour);
     }
 
-    // Remove review
     public TourDto RemoveReview(long tourId, long reviewId)
     {
         var tour = _tourRepository.Get(tourId);
@@ -241,6 +264,34 @@ public class TourService : ITourService
 
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
+    }
+
+    public int GetReviewButtonState(long tourId, long userId)
+    {
+        // 0 = ne ispunjava uslove
+        // 1 = može da ostavi recenziju (Leave)
+        // 2 = može da izmeni recenziju (Edit)
+
+        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        if (purchaseToken == null)
+            return 0;
+
+        var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
+        if (execution == null || (DateTime.UtcNow - execution.LastActivity) > TimeSpan.FromDays(7))
+            return 0;
+
+        var tour = _tourRepository.Get(tourId);
+        
+        int total = tour.KeyPoints.Count;
+        int completed = execution.CompletedKeyPoints.Count;
+        double progress = total == 0 ? 100 : (100.0 * completed / total);
+        if (progress < 35)
+            return 0;
+        
+
+        bool hasReview = tour.Reviews.Any(r => r.TouristID == userId);
+
+        return hasReview ? 2 : 1;
     }
 
 }
