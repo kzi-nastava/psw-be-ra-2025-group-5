@@ -55,5 +55,13 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories
                 .ToList();
 
         }
+
+        public TourExecution GetActiveOrCompletedForUser(long userId, long tourId)
+        {
+            return _context.TourExecutions
+                .Include(x => x.CompletedKeyPoints)
+                .FirstOrDefault(x => x.UserId == userId
+                                     && x.TourId == tourId);
+        }
     }
 }

@@ -51,5 +51,12 @@ namespace Explorer.API.Controllers.Tourist
             _tourService.RemoveReview(tourId, reviewId);
             return NoContent();
         }
+
+        [HttpGet("can-review")]
+        public ActionResult<int> CanReview(long tourId, [FromQuery] long userId)
+        {
+            var canReview = _tourService.GetReviewButtonState(tourId, userId);
+            return Ok(canReview);
+        }
     }
 }

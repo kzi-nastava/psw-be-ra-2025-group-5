@@ -214,7 +214,7 @@ public class TourService : ITourService
             throw new InvalidOperationException("User has not purchased this tour.");
 
         var tour = _tourRepository.Get(tourId);
-        var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
+        var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
 
         var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
         if (timeSinceLastActivity > TimeSpan.FromDays(7))
@@ -233,7 +233,7 @@ public class TourService : ITourService
     public TourDto UpdateReview(long tourId, long userId, long reviewId, TourReviewDto dto)
     {
         var tour = _tourRepository.Get(tourId);
-        var execution = _tourExecutionRepository.GetActiveForUser(userId, tourId);
+        var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
 
         var timeSinceLastActivity = DateTime.UtcNow - execution.LastActivity;
         if (timeSinceLastActivity > TimeSpan.FromDays(7))
@@ -264,6 +264,34 @@ public class TourService : ITourService
 
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
+    }
+
+    public int GetReviewButtonState(long tourId, long userId)
+    {
+        // 0 = ne ispunjava uslove
+        // 1 = može da ostavi recenziju (Leave)
+        // 2 = može da izmeni recenziju (Edit)
+
+        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        if (purchaseToken == null)
+            return 0;
+
+        var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
+        //if (execution == null || (DateTime.UtcNow - execution.LastActivity) > TimeSpan.FromDays(7))
+        //    return 0;
+
+        var tour = _tourRepository.Get(tourId);
+        
+        int total = tour.KeyPoints.Count;
+        int completed = execution.CompletedKeyPoints.Count;
+        double progress = total == 0 ? 100 : (100.0 * completed / total);
+        if (progress < 35)
+            return 0;
+        
+
+        bool hasReview = tour.Reviews.Any(r => r.TouristID == userId);
+
+        return hasReview ? 2 : 1;
     }
 
 }
