@@ -36,5 +36,5 @@ public interface ITourService
 
     // Duration operacije
     TourDto AddDuration(long tourId, TourDurationDto durationDto);
-    TourDto RemoveDuration(long tourId, long durationId);
+    TourDto RemoveDuration(long tourId, TourDurationDto durationDto);
 }
