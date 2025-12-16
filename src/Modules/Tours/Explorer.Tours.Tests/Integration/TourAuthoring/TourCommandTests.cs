@@ -23,7 +23,7 @@ public class TourCommandTests : BaseToursIntegrationTest
         var updatedEntity = TourDtoBuilder.CreateValid();
         var prop = typeof(CreateTourDto).GetProperty(field);
         prop?.SetValue(updatedEntity, value);
-        
+
         Type exception = typeof(ArgumentException);
 
         // Act & Assert
@@ -86,7 +86,7 @@ public class TourCommandTests : BaseToursIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-        
+
         var updatedEntity = new UpdateTourDto
         {
             Name = "Updated Zlatibor Tour",
@@ -172,4 +172,246 @@ public class TourCommandTests : BaseToursIntegrationTest
             ControllerContext = BuildContext("-1")
         };
     }
+
+
+
+    //[Theory]
+    //[InlineData(-6, 422, TourStatus.Archived)]
+    //[InlineData(-5, 422, TourStatus.Published)]
+    //[InlineData(-4, 200, TourStatus.Published)]
+    //public void Publishes(long tourId, int expectedResponseCode, TourStatus expectedStatus)
+    //{
+    //    // Arrange
+    //    using var scope = Factory.Services.CreateScope();
+    //    var controller = CreateController(scope);
+    //    var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+    //    var newKeyPoint1 = new CreateKeyPointDto
+    //    {
+    //        Name = "New Key Point",
+    //        Description = "Test description",
+    //        Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
+    //        Image = null,
+    //        Secret = "Test secret"
+    //    };
+
+    //    var newKeyPoint2 = new CreateKeyPointDto
+    //    {
+    //        Name = "New Key Point",
+    //        Description = "Test description",
+    //        Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
+    //        Image = null,
+    //        Secret = "Test secret"
+    //    };
+
+
+
+    //    controller.AddKeyPoint(tourId, newKeyPoint1);
+    //    controller.AddKeyPoint(tourId, newKeyPoint2);
+
+    //    // Act
+    //    var result = (ObjectResult)controller.Publish(tourId).Result;
+
+    //    // Assert - Response
+    //    result.ShouldNotBeNull();
+    //    result.StatusCode.ShouldBe(expectedResponseCode);
+
+    //    // Assert - Database
+    //    var storedEntity = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
+    //    storedEntity.ShouldNotBeNull();
+    //    storedEntity.Status.ShouldBe(expectedStatus);
+    //}
+
+    //[Theory]
+    //[InlineData(-6, 422, TourStatus.Archived)]
+    //[InlineData(-5, 200, TourStatus.Archived)]
+    //[InlineData(-4, 422, TourStatus.Draft)]
+    //public void Archives(long tourId, int expectedResponseCode, TourStatus expectedStatus)
+    //{
+    //    // Arrange
+    //    using var scope = Factory.Services.CreateScope();
+    //    var controller = CreateController(scope);
+    //    var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+    //    // Act
+    //    //var result = (ObjectResult)controller.Archive(tourId).Result;
+
+    //    // Assert - Response
+    //    //result.ShouldNotBeNull();
+    //    //result.StatusCode.ShouldBe(expectedResponseCode);
+
+
+    //    Should.Throw<InvalidOperationException>(() => controller.Archive(tourId));
+
+    //    // Assert - Database
+    //    var storedEntity = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
+    //    storedEntity.ShouldNotBeNull();
+    //    storedEntity.Status.ShouldBe(expectedStatus);
+    //}
+
+    //[Theory]
+    //[InlineData(-6, 200, TourStatus.Published)]
+    //[InlineData(-5, 422, TourStatus.Published)]
+    //[InlineData(-4, 422, TourStatus.Draft)]
+    //public void Reactivates(long tourId, int expectedResponseCode, TourStatus expectedStatus)
+    //{
+    //    // Arrange
+    //    using var scope = Factory.Services.CreateScope();
+    //    var controller = CreateController(scope);
+    //    var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+    //    // Act
+    //    var result = (ObjectResult)controller.Reactivate(tourId).Result;
+
+    //    // Assert - Response
+    //    result.ShouldNotBeNull();
+    //    result.StatusCode.ShouldBe(expectedResponseCode);
+
+    //    // Assert - Database
+    //    var storedEntity = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
+    //    storedEntity.ShouldNotBeNull();
+    //    storedEntity.Status.ShouldBe(expectedStatus);
+    //}
+
+    [Theory]
+    [InlineData(-2, TourStatus.Published)] // Draft tour
+    [InlineData(-3, TourStatus.Published)] // Draft tour
+    public void Publishes(long tourId, TourStatus expectedStatus)
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        // Dodaj KeyPoints samo ako je Draft
+        AddKeyPoints(controller, tourId);
+
+        // Dodaj Durations kroz Update
+        AddDurations(controller, tourId);
+
+        // Act
+        var result = (ObjectResult)controller.Publish(tourId).Result;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+
+        // Assert - Database
+        var storedEntity = dbContext.Tours.First(t => t.Id == tourId);
+        storedEntity.Status.ShouldBe(expectedStatus);
+    }
+
+    [Theory]
+    [InlineData(-2, TourStatus.Archived)]
+    [InlineData(-3, TourStatus.Archived)]
+    public void Archives(long tourId, TourStatus expectedStatus)
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        // Prvo publish ako je Draft
+        var tour = dbContext.Tours.First(t => t.Id == tourId);
+        if (tour.Status == TourStatus.Draft)
+        {
+            AddKeyPoints(controller, tourId);
+            AddDurations(controller, tourId);
+            controller.Publish(tourId);
+        }
+
+        // Act
+        var result = (ObjectResult)controller.Archive(tourId).Result;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+
+        // Assert - Database
+        var storedEntity = dbContext.Tours.First(t => t.Id == tourId);
+        storedEntity.Status.ShouldBe(expectedStatus);
+    }
+
+    [Theory]
+    [InlineData(-2, TourStatus.Published)]
+    [InlineData(-3, TourStatus.Published)]
+    public void Reactivates(long tourId, TourStatus expectedStatus)
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        // Prvo publish i archive ako je Draft
+        var tour = dbContext.Tours.First(t => t.Id == tourId);
+        if (tour.Status == TourStatus.Draft)
+        {
+            AddKeyPoints(controller, tourId);
+            AddDurations(controller, tourId);
+            controller.Publish(tourId);
+            controller.Archive(tourId);
+        }
+        else if (tour.Status == TourStatus.Published)
+        {
+            controller.Archive(tourId);
+        }
+
+        // Act
+        var result = (ObjectResult)controller.Reactivate(tourId).Result;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+
+        // Assert - Database
+        var storedEntity = dbContext.Tours.First(t => t.Id == tourId);
+        storedEntity.Status.ShouldBe(expectedStatus);
+    }
+
+    // --- Pomoćne funkcije ---
+
+    private void AddKeyPoints(TourController controller, long tourId)
+    {
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var tour = dbContext.Tours.First(t => t.Id == tourId);
+
+        if (tour.Status != TourStatus.Draft) return; // samo Draft
+
+        var kp1 = new CreateKeyPointDto
+        {
+            Name = "KP1",
+            Description = "Description1",
+            Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
+            Image = null,
+            Secret = "Secret1"
+        };
+        var kp2 = new CreateKeyPointDto
+        {
+            Name = "KP2",
+            Description = "Description2",
+            Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 },
+            Image = null,
+            Secret = "Secret2"
+        };
+
+        controller.AddKeyPoint(tourId, kp1);
+        controller.AddKeyPoint(tourId, kp2);
+    }
+
+    private void AddDurations(TourController controller, long tourId)
+    {
+        var updateDto = new UpdateTourDto
+        {
+            Name = "Updated Tour Name",
+            Description = "Updated description",
+            Difficulty = "Easy",
+            Tags = new List<string> { "Tag1" },
+            Price = 0,
+            Durations = new List<TourDurationDto>
+        {
+            new TourDurationDto { TransportType = "Walking", DurationMinutes = 60 }
+        }
+        };
+
+        controller.Update(tourId, updateDto);
+    }
+
 }

@@ -28,6 +28,23 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         };
     }
 
+    private static UpdateTourDto UpdateTestTour()
+    {
+        return new UpdateTourDto
+        {
+            Name = "Test Tour for KeyPoints",
+            Description = "Test description",
+            Difficulty = "Easy",
+            Tags = new List<string> { "Test" },
+            Price = 0,
+            Durations = new List<TourDurationDto>
+            {
+                new TourDurationDto { TransportType = "Bicycle", DurationMinutes = 20 },
+                new TourDurationDto { TransportType = "Walking", DurationMinutes = 120 }
+            }
+        };
+    }
+
     [Fact]
     public void Adds_key_point()
     {
@@ -142,7 +159,9 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
+        var updatedTour = ((ObjectResult)controller.Update(tourId, UpdateTestTour()).Result)?.Value as TourDto;
+
         var kp1 = new CreateKeyPointDto { Name = "KP1", Description = "Description 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "KP2", Description = "Description 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
         controller.AddKeyPoint(tourId, kp1);
@@ -293,7 +312,9 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
+        var updatedTour = ((ObjectResult)controller.Update(tourId, UpdateTestTour()).Result)?.Value as TourDto;
+
         var kp1 = new CreateKeyPointDto { Name = "KP1", Description = "Desc 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "KP2", Description = "Desc 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
         

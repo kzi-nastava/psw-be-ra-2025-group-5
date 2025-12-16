@@ -124,11 +124,14 @@ public class Tour : AggregateRoot
         if (Status != TourStatus.Draft)
             throw new InvalidOperationException("Only draft tours can be published.");
 
-        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description))
-            throw new InvalidOperationException("Tour must have name and description to be published.");
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description) || Difficulty == null || Tags.Count == 0)
+            throw new InvalidOperationException("Tour must have name, description, difficulty, and at least one tag to be published.");
 
         if (KeyPoints.Count < 2)
             throw new InvalidOperationException("Tour must have at least 2 key points to be published.");
+
+        if (Durations.Count < 1)
+            throw new InvalidOperationException("Tour must have at least one duration to be published.");
 
         Status = TourStatus.Published;
         PublishedDate = DateTime.UtcNow;
@@ -229,41 +232,5 @@ public class Tour : AggregateRoot
     //{
     //    if (!RequiredEquipment.Remove(equipment))
     //        throw new NotFoundException($"Equipment not found.");
-    //}
-
-    //public void PublishTour()
-    //{
-    //    if (Name == null || Name.Trim() == "")
-    //        throw new InvalidOperationException("Tour must have a name to be published.");
-
-    //    if (Description == null || Description.Trim() == "")
-    //        throw new InvalidOperationException("Tour must have a description to be published.");
-
-    //    if (Difficulty == null)
-    //        throw new InvalidOperationException("Tour must have a difficulty to be published.");
-
-    //    if (Tags.Count == 0)
-    //        throw new InvalidOperationException("Tour must have at least one tag to be published.");
-
-    //    if (KeyPoints.Count < 2)
-    //        throw new InvalidOperationException("Tour must have at least two key points to be published.");
-
-    //    if (Durations.Count < 1)
-    //        throw new InvalidOperationException("Tour must have at least one duration to be published.");
-
-    //    if (Status == TourStatus.Published)
-    //        throw new InvalidOperationException("Tour is already published.");
-
-    //    Status = TourStatus.Published;
-    //    PublishedDate = DateTime.UtcNow;
-    //}
-
-    //public void ArchiveTour()
-    //{
-    //    if (Status == TourStatus.Published)
-    //    {
-    //        Status = TourStatus.Archived;
-    //        ArchivedDate = DateTime.UtcNow;
-    //    }
     //}
 }
