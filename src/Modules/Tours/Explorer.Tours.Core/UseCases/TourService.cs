@@ -277,8 +277,8 @@ public class TourService : ITourService
             return 0;
 
         var execution = _tourExecutionRepository.GetActiveOrCompletedForUser(userId, tourId);
-        //if (execution == null || (DateTime.UtcNow - execution.LastActivity) > TimeSpan.FromDays(7))
-        //    return 0;
+        if (execution == null || (DateTime.UtcNow - execution.LastActivity) > TimeSpan.FromDays(7))
+            return 0;
 
         var tour = _tourRepository.Get(tourId);
         
