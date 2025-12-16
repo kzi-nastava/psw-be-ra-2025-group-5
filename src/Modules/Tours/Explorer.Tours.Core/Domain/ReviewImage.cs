@@ -28,8 +28,6 @@ public class ReviewImage: Entity
 
     private void Validate()
     {
-        if (ReviewId <= 0)
-            throw new ArgumentException("Invalid ReviewId");
 
         if (Data == null || Data.Length == 0)
             throw new ArgumentException("Image data is required");
