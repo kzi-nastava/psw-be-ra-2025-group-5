@@ -2,6 +2,6 @@
 
 public interface ITourStatisticsDbRepository
 {
-    IReadOnlyCollection<TourStatisticsItemDto> GetPurchasedTours(long userId);
+    int GetPurchasedToursCount(long userId);
     IReadOnlyCollection<TourStatisticsItemDto> GetCompletedTours(long userId);
 }

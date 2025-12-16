@@ -34,7 +34,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<ITokenGenerator, JwtGenerator>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IClubService, ClubService>();      
+            services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IAppRatingService, AppRatingService>();
             services.AddScoped<ITourProblemService, TourProblemService>();
             services.AddScoped<IPositionService, PositionService>();
@@ -47,7 +47,7 @@ namespace Explorer.Stakeholders.Infrastructure
         {
             services.AddScoped<IPersonRepository, PersonDbRepository>();
             services.AddScoped<IUserRepository, UserDbRepository>();
-            services.AddScoped<IClubRepository, ClubDbRepository>();          
+            services.AddScoped<IClubRepository, ClubDbRepository>();
             services.AddScoped<IAppRatingRepository, AppRatingDbRepository>();
             services.AddScoped<ITourProblemRepository, TourProblemDbRepository>();
             services.AddScoped<IPositionRepository, PositionDbRepository>();

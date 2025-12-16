@@ -15,19 +15,19 @@ namespace Explorer.Stakeholders.Core.UseCases.Statistics
 
         public API.Internal.Statistics.TouristStatisticsDto GetStatistics(long userId)
         {
-            var purchasedTours = _tourStatisticsProvider.GetPurchasedTours(userId);
+            var purchasedTours = _tourStatisticsProvider.GetPurchasedToursCount(userId);
             var completedTours = _tourStatisticsProvider.GetCompletedTours(userId);
 
             return new API.Internal.Statistics.TouristStatisticsDto
             {
-                PurchasedToursCount = purchasedTours.Count,
+                PurchasedToursCount = purchasedTours,
                 CompletedToursCount = completedTours.Count,
-                MostCommonTag = purchasedTours
+                MostCommonTag = completedTours
                     .SelectMany(t => t.Tags)
                     .GroupBy(t => t)
                     .OrderByDescending(g => g.Count())
                     .FirstOrDefault()?.Key,
-                MostCommonDifficulty = purchasedTours
+                MostCommonDifficulty = completedTours
                     .GroupBy(t => t.Difficulty)
                     .OrderByDescending(g => g.Count())
                     .FirstOrDefault()?.Key
