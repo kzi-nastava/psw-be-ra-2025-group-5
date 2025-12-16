@@ -107,9 +107,15 @@ namespace Explorer.Blog.Core.Domain
                 var existingVote = Votes.FirstOrDefault(v => v.UserId == userId);
                 if (existingVote != null)
                 {
-                    Votes.Remove(existingVote);
-                    var newVote = new BlogVote(userId, Id, voteType);
-                    Votes.Add(newVote);
+                    if (existingVote.VoteType == voteType)
+                    {
+                        Votes.Remove(existingVote);
+                    } else
+                    {
+                        Votes.Remove(existingVote);
+                        var newVote = new BlogVote(userId, Id, voteType);
+                        Votes.Add(newVote);
+                    }    
                 }
                 else
                 {
