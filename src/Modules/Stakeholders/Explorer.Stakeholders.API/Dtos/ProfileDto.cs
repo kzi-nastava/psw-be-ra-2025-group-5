@@ -1,4 +1,6 @@
-﻿namespace Explorer.Stakeholders.API.Dtos;
+﻿using Explorer.Stakeholders.API.Internal.Statistics;
+
+namespace Explorer.Stakeholders.API.Dtos;
 
 public class ProfileDto
 {
@@ -10,4 +12,6 @@ public class ProfileDto
     public string Motto { get; set; }
 
     public string? ProfileImageBase64 { get; set; }
+
+    public TouristStatisticsDto Statistics { get; set; }
 }
