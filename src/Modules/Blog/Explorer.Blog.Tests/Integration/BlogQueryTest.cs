@@ -106,9 +106,6 @@ namespace Explorer.Blog.Tests.Integration
                 HttpContext = new DefaultHttpContext { User = user }
             };
         }
-
-
-
         private static BlogController CreateController(IServiceScope scope)
         {
             var serviceProvider = scope.ServiceProvider;
@@ -119,5 +116,7 @@ namespace Explorer.Blog.Tests.Integration
                 ControllerContext = BuildContext("1") 
             };
         }
+        
+
     }
 }

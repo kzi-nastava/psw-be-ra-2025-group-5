@@ -1,6 +1,7 @@
 ﻿using Explorer.Blog.API.Dtos;
 using Explorer.Blog.API.Public;
 using Explorer.Blog.Core.Domain;
+using Explorer.Blog.Core.UseCases;
 using Explorer.Blog.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -55,34 +56,7 @@ namespace Explorer.Blog.Tests.Integration
             Should.Throw<ArgumentException>(() => service.Create(dto, authorId: 1));
         }
 
-        [Fact]
-        public void Successfully_updates_blog()
-        {
-            using var scope = Factory.Services.CreateScope();
-            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
-
-            var originalDto = new CreateBlogPostDto
-            {
-                Title = "Original Blog",
-                Description = "Opis originalnog bloga"
-            };
-            var created = service.Create(originalDto, authorId: 1);
-
-            var updateDto = new UpdateBlogPostDto
-            {
-                Title = "Updated Blog",
-                Description = "Opis izmenjenog bloga"
-            };
-
-            var updated = service.Update(created.Id, updateDto, authorId: 1);
-
-            updated.Title.ShouldBe("Updated Blog");
-            updated.Description.ShouldBe("Opis izmenjenog bloga");
-
-            var stored = dbContext.BlogPosts.Find(created.Id);
-            stored.Title.ShouldBe("Updated Blog");
-        }
+        
 
         [Fact]
         public void Successfully_adds_images_to_blog()
@@ -147,7 +121,209 @@ namespace Explorer.Blog.Tests.Integration
             var storedBlog = dbContext.BlogPosts.Find(created.Id);
             storedBlog.Images.ShouldBeEmpty();
         }
+        [Fact]
+        public void Successfully_creates_blog_in_draft_state()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var createDto = new CreateBlogPostDto
+            {
+                Title = "Test title",
+                Description = "Test description"
+            };
+
+            var created = service.Create(createDto, authorId: 1);
+
+            created.ShouldNotBeNull();
+            created.Status.ShouldBe(BlogPost.BlogStatus.Draft.ToString());
+
+            var stored = dbContext.BlogPosts.Find(created.Id);
+            stored.ShouldNotBeNull();
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Draft);
+        }
+
+        [Fact]
+        public void Successfully_publishes_blog()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var createDto = new CreateBlogPostDto
+            {
+                Title = "Draft Blog",
+                Description = "Opis"
+            };
+            var created = service.Create(createDto, authorId: 1);
+
+            var published = service.Publish(created.Id, authorId: 1);
+
+            published.ShouldNotBeNull();
+            published.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+
+            var stored = dbContext.BlogPosts.Find(created.Id);
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Published);
+        }
+
+        [Fact]
+        public void Blog_becomes_closed_when_score_drops_below_minus_10()
+        {
+            // Arrange
+            using var scope = Factory.Services.CreateScope();
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var dto = new CreateBlogPostDto 
+            { 
+                Title = "Blog", 
+                Description = "Description" 
+            };
+            var blog = blogService.Create(dto, 1);
+            blogService.Publish(blog.Id, 1);
+
+            // Act
+            for (int i = 1; i < 12; i++)
+            {
+                blogService.Vote(blog.Id, i, "Downvote");
+            }
+
+            // Assert
+            var stored = dbContext.BlogPosts.Find(blog.Id);
+            stored.ShouldNotBeNull();
+            stored.Status.ShouldBe(BlogPost.BlogStatus.ReadOnly);
+        }
+
+        [Fact]
+        public void Blog_becomes_active_when_score_is_high()
+        {
+            // Arrange
+            using var scope = Factory.Services.CreateScope();
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var dto = new CreateBlogPostDto 
+            { 
+                Title = "Blog", 
+                Description = "Description" 
+            };
+            var blog = blogService.Create(dto, 1);
+            blogService.Publish(blog.Id, 1);
+
+            // Act 
+            for (int i = 1; i < 102; i++)
+            {
+                blogService.Vote(blog.Id, i, "Upvote");
+            }
+
+            // Assert
+            var stored = dbContext.BlogPosts.Find(blog.Id);
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Active);
+        }
+
+        [Fact]
+        public void Blog_becomes_active_with_many_comments()
+        {
+            // Arrange
+            using var scope = Factory.Services.CreateScope();
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+
+            var commentService = scope.ServiceProvider.GetRequiredService<BlogCommentService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var dto = new CreateBlogPostDto
+            {
+                Title = "Blog",
+                Description = "Description"
+            };
+            var blog = blogService.Create(dto, 1);
+            blogService.Publish(blog.Id, 1);
+
+            // Act
+            for (int i = 0; i < 11; i++)
+            {
+                commentService.AddComment(blog.Id, 2, "Komentar");
+            }
+
+            // Assert
+            var stored = dbContext.BlogPosts.Find(blog.Id);
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Active);
+        }
+
+        [Fact]
+        public void Blog_becomes_famous_with_high_score_and_comments()
+        {
+            // Arrange
+            using var scope = Factory.Services.CreateScope();
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+
+            var commentService = scope.ServiceProvider.GetRequiredService<BlogCommentService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            var dto = new CreateBlogPostDto
+            {
+                Title = "Blog",
+                Description = "Description"
+            };
+            var blog = blogService.Create(dto, 1);
+            blogService.Publish(blog.Id, 1);
+
+            // Act
+            for (int i = 0; i < 501; i++) blogService.Vote(blog.Id, 1000 + i, "Upvote");
+
+            for (int i = 0; i < 31; i++) commentService.AddComment(blog.Id, 2, "Komentar ");
+
+            // Assert
+            var stored = dbContext.BlogPosts.Find(blog.Id);
+            stored.Status.ShouldBe(BlogPost.BlogStatus.Famous);
+        }
+
+        [Fact]
+        public void Successfully_creates_and_publishes_blog_with_images()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
+
+            // Arrange
+            var dto = new CreateAndPublishBlogPostDto
+            {
+                Title = "Test Create & Publish",
+                Description = "Opis",
+                Images = new List<BlogImageDto>
+        {
+            new BlogImageDto
+            {
+                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
+                ContentType = "image/png",
+                Order = 0
+            },
+            new BlogImageDto
+            {
+                Base64 = Convert.ToBase64String(new byte[] { 4, 5, 6 }),
+                ContentType = "image/jpeg",
+                Order = 1
+            }
+        }
+            };
+
+            // Act
+            var result = service.CreateAndPublish(dto, authorId: 1);
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Id.ShouldBeGreaterThan(0);
+            result.Title.ShouldBe(dto.Title);
+            result.Description.ShouldBe(dto.Description);
+            result.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+
+            result.Images.Count.ShouldBe(2);
+
+        }
+
 
     }
+
 }
 

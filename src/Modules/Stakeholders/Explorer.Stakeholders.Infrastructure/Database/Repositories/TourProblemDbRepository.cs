@@ -25,6 +25,24 @@ public class TourProblemDbRepository : ITourProblemRepository
         return task.Result;
     }
 
+    public PagedResult<TourProblem> GetPagedByReporterId(long reporterId, int page, int pageSize)
+    {
+        var filteredQuery = _dbSet.Where(p => p.ReporterId == reporterId);
+
+        var task = filteredQuery.GetPagedById(page, pageSize);
+        task.Wait();
+        return task.Result;
+    }
+
+    public PagedResult<TourProblem> GetPagedByTourIds(List<long> tourIds, int page, int pageSize)
+    {
+        var filteredQuery = _dbSet.Where(p => tourIds.Contains(p.TourId));
+
+        var task = filteredQuery.GetPagedById(page, pageSize);
+        task.Wait();
+        return task.Result;
+    }
+
     public TourProblem Get(long id)
     {
         var entity = _dbSet.Find(id);
@@ -77,7 +95,7 @@ public class TourProblemDbRepository : ITourProblemRepository
     public void AddComment(Comment comment)
     {
         DbContext.Comments.Add(comment);
-        DbContext.SaveChanges(); 
+        DbContext.SaveChanges();
     }
     public Comment GetCommentById(long commentId)
     {
@@ -93,5 +111,32 @@ public class TourProblemDbRepository : ITourProblemRepository
             .ToList();
     }
 
+    public void MarkResolved(long problemId, bool isResolved)
+    {
+        var problem = Get(problemId);
+
+        problem.IsResolved = isResolved;
+
+        DbContext.Update(problem);
+        DbContext.SaveChanges();
+    }
+
+    public void UpdateDeadline(long problemId, DateTimeOffset? deadline)
+    {
+        var problem = _dbSet.Find(problemId);
+        if (problem == null)
+            throw new NotFoundException($"TourProblem {problemId} not found");
+
+        DbContext.Entry(problem).Property(p => p.Deadline).CurrentValue = deadline;
+        DbContext.SaveChanges();
+    }
+
+
+    public List<TourProblem> GetByTourId(long tourId)
+    {
+        return _dbSet
+            .Where(p => p.TourId == tourId)
+            .ToList();
+    }
 
 }

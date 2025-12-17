@@ -1,9 +1,10 @@
 ﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.API.Public;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -32,7 +33,8 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
             Priority = ProblemPriority.High,
             Description = "Problem sa bezbednošću na turi",
             OccurredAt = DateTimeOffset.UtcNow,
-            CreatedAt = DateTimeOffset.UtcNow
+            CreatedAt = DateTimeOffset.UtcNow,
+            IsResolved = false
         };
 
         // Act
@@ -81,9 +83,10 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
             ReporterId = -21,
             Category = ProblemCategory.Safety,
             Priority = ProblemPriority.Critical,
-        Description = "Ažurirani problem bezbednosti",
-          OccurredAt = DateTimeOffset.UtcNow,
-       CreatedAt = DateTimeOffset.UtcNow
+            Description = "Ažurirani problem bezbednosti",
+            OccurredAt = DateTimeOffset.UtcNow,
+            CreatedAt = DateTimeOffset.UtcNow,
+            IsResolved = false
         };
 
       // Act
@@ -117,8 +120,9 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
             Priority = ProblemPriority.Low,
             Description = "Test",
             OccurredAt = DateTimeOffset.UtcNow,
-            CreatedAt = DateTimeOffset.UtcNow
-      };
+            CreatedAt = DateTimeOffset.UtcNow,
+            IsResolved = false
+        };
 
 // Act & Assert
    Should.Throw<NotFoundException>(() => controller.Update(updatedEntity));
@@ -139,7 +143,7 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
         result.ShouldNotBeNull();
         result.StatusCode.ShouldBe(200);
 
-  // Assert - Database
+        // Assert - Database
         var storedEntity = dbContext.TourProblems.FirstOrDefault(i => i.Id == -33);
         storedEntity.ShouldBeNull();
     }
@@ -156,8 +160,11 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
     }
 
     private static TourProblemController CreateController(IServiceScope scope)
-  {
-     return new TourProblemController(scope.ServiceProvider.GetRequiredService<ITourProblemService>(), scope.ServiceProvider.GetRequiredService<ITourRepository>())
+    {
+     return new TourProblemController(
+            scope.ServiceProvider.GetRequiredService<ITourProblemService>(), 
+            scope.ServiceProvider.GetRequiredService<ITourService>(),
+            scope.ServiceProvider.GetRequiredService<INotificationService>())
         {
         ControllerContext = BuildContext("-21")
         };

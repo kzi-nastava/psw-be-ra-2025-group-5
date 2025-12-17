@@ -40,7 +40,8 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<ITouristStatisticsService, TouristStatisticsService>();
             services.AddScoped<ITourStatisticsDbRepository, TourStatisticsDbRepository>();
-
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IDiaryService, DiaryService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
@@ -51,6 +52,8 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IAppRatingRepository, AppRatingDbRepository>();
             services.AddScoped<ITourProblemRepository, TourProblemDbRepository>();
             services.AddScoped<IPositionRepository, PositionDbRepository>();
+            services.AddScoped<INotificationRepository, NotificationDbRepository>();
+            services.AddScoped<IDiaryRepository, DiaryRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
             dataSourceBuilder.EnableDynamicJson();

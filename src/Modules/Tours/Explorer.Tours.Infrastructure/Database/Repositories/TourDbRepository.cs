@@ -219,4 +219,18 @@ public class TourDbRepository : ITourRepository
         DbContext.Update(tour);
         DbContext.SaveChanges();
     }
+
+    public void Close(long tourId)
+    {
+        var tour = _dbSet.Find(tourId);
+        if (tour == null)
+            throw new NotFoundException($"Tour {tourId} not found");
+
+        if (tour.Status == TourStatus.Closed)
+            throw new InvalidOperationException("Tour is already closed");
+
+        DbContext.Entry(tour).Property(t => t.Status).CurrentValue = TourStatus.Closed;
+
+        DbContext.SaveChanges();
+    }
 }

@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Reflection.Metadata;
 
+
 namespace Explorer.Tours.Core.UseCases;
 
 public class TourService : ITourService
@@ -388,4 +389,16 @@ public class TourService : ITourService
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
+
+    public void CloseTour(long tourId) 
+    {
+        _tourRepository.Close(tourId);
+    }
+
+    public TourDto GetById(long id)
+    {
+        var tour = _tourRepository.Get(id);
+        return _mapper.Map<TourDto>(tour);
+    }
+
 }

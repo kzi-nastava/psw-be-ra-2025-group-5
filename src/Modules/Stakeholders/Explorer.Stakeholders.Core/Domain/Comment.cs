@@ -17,7 +17,7 @@ namespace Explorer.Stakeholders.Core.Domain
 
         public Comment(long authorId, string content)
         {
-            AuthorId = authorId; 
+            AuthorId = authorId;
             Content = content;
             CreatedAt = DateTimeOffset.UtcNow;
             UpdatedAt = null;
@@ -33,5 +33,15 @@ namespace Explorer.Stakeholders.Core.Domain
                 throw new ArgumentException("The comment is empty.", nameof(Content));
             }
         }
+
+        public void UpdateContent(string newContent)
+        {
+            if (string.IsNullOrWhiteSpace(newContent))
+                throw new ArgumentException("Content cannot be empty.");
+
+            Content = newContent;
+            UpdatedAt = DateTimeOffset.UtcNow;
+        }
+
     }
 }
