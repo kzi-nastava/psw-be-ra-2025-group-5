@@ -1,10 +1,9 @@
-﻿
-using Explorer.Stakeholders.API.Dtos;
+﻿using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Explorer.Stakeholders.API.Controllers;
+namespace Explorer.API.Controllers.Profile;
 
 
 [ApiController]
@@ -54,7 +53,7 @@ public class ProfileController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
+        }   
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);

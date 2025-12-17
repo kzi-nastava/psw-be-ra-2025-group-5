@@ -1,7 +1,10 @@
-ï»¿using Explorer.Tours.Core.Domain;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
+using TransportationType = Explorer.Tours.Core.Domain.TransportationType;
 
 namespace Explorer.Tours.Infrastructure.Database;
 
@@ -11,9 +14,14 @@ public class ToursContext : DbContext
     public DbSet<Tour> Tours { get; set; }
     public DbSet<Monument> Monument { get; set; }
     public DbSet<TouristEquipment> TouristEquipment { get; set; }
-
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
+    public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+    public DbSet<TourExecution> TourExecutions { get; set; }
+    public DbSet<TourReview> TourReviews { get; set; }
+    public DbSet<ReviewImage> ReviewImages { get; set; }
+    public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
+    public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -23,7 +31,67 @@ public class ToursContext : DbContext
         modelBuilder.Entity<Monument>().OwnsOne(m => m.Location);
         modelBuilder.Entity<TouristEquipment>().ToTable("TouristEquipment");
         
+        ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
+        ConfigureShoppingCart(modelBuilder);
+        ConfigureTourExecution(modelBuilder);
+        ConfigureReview(modelBuilder);
+    }
+
+    private static void ConfigureTour(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Tour>()
+                    .OwnsMany(t => t.Durations, d =>
+                    {
+                        d.WithOwner().HasForeignKey("TourId");
+                    });
+
+        modelBuilder.Entity<Tour>()
+            .HasMany(t => t.KeyPoints)
+            .WithOne()
+            .HasForeignKey("TourId")
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false); // TourId može biti null privremeno
+
+        modelBuilder.Entity<Tour>()
+            .Property(t => t.Tags)
+            .HasColumnType("text[]");
+
+        // Konfiguracija KeyPoint-a
+        modelBuilder.Entity<KeyPoint>()
+            .ToTable("KeyPoints");
+
+        // Konfiguracija Location kao JSON vrednosnog objekta
+        modelBuilder.Entity<KeyPoint>()
+            .Property(kp => kp.Location)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(new { v.Latitude, v.Longitude }, (JsonSerializerOptions)null),
+                v => JsonSerializer.Deserialize<LocationDto>(v, (JsonSerializerOptions)null) != null 
+                    ? new Location(JsonSerializer.Deserialize<LocationDto>(v, (JsonSerializerOptions)null).Latitude,
+                                   JsonSerializer.Deserialize<LocationDto>(v, (JsonSerializerOptions)null).Longitude)
+                    : null
+            )
+            .Metadata.SetValueComparer(new ValueComparer<Location>(
+                (l1, l2) => l1 != null && l2 != null && l1.Latitude == l2.Latitude && l1.Longitude == l2.Longitude,
+                l => HashCode.Combine(l.Latitude, l.Longitude),
+                l => new Location(l.Latitude, l.Longitude)
+            ));
+
+        // Konfiguracija Image kao bytea
+        modelBuilder.Entity<KeyPoint>()
+            .Property(kp => kp.Image)
+            .HasColumnType("bytea");
+
+        modelBuilder.Entity<Tour>()
+        .HasMany(t => t.RequiredEquipment)
+        .WithOne()
+        .HasForeignKey("TourId")
+        .OnDelete(DeleteBehavior.Cascade)
+        .IsRequired();
+
+        modelBuilder.Entity<RequiredEquipment>()
+            .ToTable("TourRequiredEquipment");
     }
 
     private static void ConfigureTouristPreferences(ModelBuilder modelBuilder)
@@ -48,5 +116,106 @@ public class ToursContext : DbContext
                 v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>()
             )
             .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
+    }
+
+    private static void ConfigureTourExecution(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourExecution>()
+            .ToTable("TourExecutions");
+
+        modelBuilder.Entity<TourExecution>()
+            .OwnsMany(e => e.CompletedKeyPoints, cb =>
+            {
+                cb.ToTable("KeyPointCompletions");
+
+                cb.WithOwner().HasForeignKey("TourExecutionId");
+
+                cb.Property<long>("Id");
+                cb.HasKey("Id");
+
+                cb.Property(kp => kp.KeyPointId).IsRequired();
+                cb.Property(kp => kp.CompletedAt).IsRequired();
+                cb.Property(kp => kp.DistanceTravelled).IsRequired();
+            });
+    }
+
+
+
+
+    private static void ConfigureReview(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ReviewImage>(b =>
+        {
+            b.ToTable("ReviewImages");
+
+            b.HasKey(ri => ri.Id);
+
+            b.Property(ri => ri.ReviewId)
+                .IsRequired();
+
+            b.Property(ri => ri.Data)
+                .HasColumnType("bytea")
+                .IsRequired();
+
+            b.Property(ri => ri.ContentType)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            b.Property(ri => ri.Order)
+                .IsRequired();
+
+            b.HasIndex(ri => new { ri.ReviewId, ri.Order })
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<TourReview>(b =>
+        {
+            b.ToTable("TourReviews");
+
+            b.OwnsOne(tr => tr.Progress, p =>
+            {
+                p.Property(pp => pp.Percentage)
+                    .HasColumnName("Progress")
+                    .IsRequired();
+            });
+
+            b.HasMany(tr => tr.Images)
+                .WithOne()
+                .HasForeignKey(ri => ri.ReviewId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            b.HasOne<Tour>()
+                .WithMany(t => t.Reviews)
+                .HasForeignKey(tr => tr.TourID)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            b.Property(tr => tr.TouristUsername)
+                .HasMaxLength(100)
+                .HasDefaultValue("")
+                .IsRequired(false);
+        });
+    }
+
+    // Helper klasa za deserijalizaciju Location-a
+    private class LocationDtopublic{
+        double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+    private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ShoppingCart>()
+        .Property(s => s.Items)
+        .HasColumnType("jsonb")
+        .HasConversion(
+            items => JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false }),
+            json => JsonSerializer.Deserialize<List<OrderItem>>(json, new JsonSerializerOptions()) ?? new List<OrderItem>(),
+            new ValueComparer<List<OrderItem>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()
+            )
+        );
     }
 }

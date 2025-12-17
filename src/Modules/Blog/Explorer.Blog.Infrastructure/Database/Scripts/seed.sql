@@ -1,3 +1,7 @@
+DELETE FROM blog."BlogPosts";
+DELETE FROM blog."Comments";
+DELETE FROM blog."BlogVotes";
+
 INSERT INTO blog."BlogPosts" ("Id", "AuthorId", "Title", "Description", "CreatedAt", "LastUpdatedAt", "Status") VALUES
 (1, 1, 'Journey Through the Alps', 'A fantastic description of the trip with beautiful photos and tips.', '2023-10-01 10:00:00', '2023-11-01 12:00:00', 'Famous'),
 (2, 2, 'Top 10 Cities in Europe', 'A list of must-see places for every tourist.', '2023-10-15 09:00:00', '2023-11-05 10:00:00', 'Active'),

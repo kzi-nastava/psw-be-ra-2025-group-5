@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using Explorer.Stakeholders.API.Controllers;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Infrastructure.Database;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Explorer.API.Controllers.Profile;
 
 namespace Explorer.Stakeholders.Tests.Integration.Profile;
 
