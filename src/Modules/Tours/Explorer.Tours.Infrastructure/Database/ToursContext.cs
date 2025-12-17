@@ -20,7 +20,7 @@ public class ToursContext : DbContext
     public DbSet<TourExecution> TourExecutions { get; set; }
     public DbSet<TourReview> TourReviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
-
+    public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -133,36 +133,57 @@ public class ToursContext : DbContext
 
     private static void ConfigureReview(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ReviewImage>()
-        .HasKey(ri => ri.Id);
+        modelBuilder.Entity<ReviewImage>(b =>
+        {
+            b.ToTable("ReviewImages");
 
-        modelBuilder.Entity<ReviewImage>()
-            .Property(ri => ri.ReviewId)
-            .IsRequired();
+            b.HasKey(ri => ri.Id);
 
-        // TourReview konfiguracija
+            b.Property(ri => ri.ReviewId)
+                .IsRequired();
+
+            b.Property(ri => ri.Data)
+                .HasColumnType("bytea")
+                .IsRequired();
+
+            b.Property(ri => ri.ContentType)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            b.Property(ri => ri.Order)
+                .IsRequired();
+
+            b.HasIndex(ri => new { ri.ReviewId, ri.Order })
+                .IsUnique();
+        });
+
         modelBuilder.Entity<TourReview>(b =>
         {
-            // Progress kao owned entity
+            b.ToTable("TourReviews");
+
             b.OwnsOne(tr => tr.Progress, p =>
             {
                 p.Property(pp => pp.Percentage)
-                 .HasColumnName("Progress")
-                 .IsRequired();
+                    .HasColumnName("Progress")
+                    .IsRequired();
             });
 
-            // Veza TourReview -> ReviewImages
             b.HasMany(tr => tr.Images)
-             .WithOne()
-             .HasForeignKey(ri => ri.ReviewId)
-             .OnDelete(DeleteBehavior.Cascade);
+                .WithOne()
+                .HasForeignKey(ri => ri.ReviewId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
 
-            // Veza Tour -> TourReviews
-            b.HasOne<Tour>()  // ili .WithMany() sa Tour entity
-             .WithMany(t => t.Reviews)
-             .HasForeignKey(tr => tr.TourID)
-             .OnDelete(DeleteBehavior.Cascade)
-             .IsRequired();
+            b.HasOne<Tour>()
+                .WithMany(t => t.Reviews)
+                .HasForeignKey(tr => tr.TourID)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            b.Property(tr => tr.TouristUsername)
+                .HasMaxLength(100)
+                .HasDefaultValue("")
+                .IsRequired(false);
         });
     }
 

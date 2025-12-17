@@ -57,4 +57,12 @@ public class TourExecutionController : ControllerBase
         return Ok(dto);
     }
 
+    [HttpGet]
+    public ActionResult<List<TourExecutionDto>> GetForUser()
+    {
+        long userId = long.Parse(User.FindFirst("id")!.Value);
+        var executions = _service.GetExecutionsForUser(userId);
+        return Ok(executions);
+    }
+
 }

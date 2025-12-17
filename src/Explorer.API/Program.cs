@@ -13,6 +13,7 @@ builder.Services.ConfigureAuth();
 builder.Services.RegisterModules();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddHostedService<TourExpirationWorker>();
 
 var app = builder.Build();
 

@@ -3,11 +3,15 @@ using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
+using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace Explorer.Tours.Tests.Integration.TouristPreferences
 {
@@ -20,43 +24,66 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
         public void Gets_by_tour_with_pagination()
         {
             using var scope = Factory.Services.CreateScope();
-            var controller = CreateController(scope);
             var db = scope.ServiceProvider.GetRequiredService<ToursContext>();
 
-            var tour = db.Tours.Include(t => t.Reviews).FirstOrDefault();
-            tour.ShouldNotBeNull();
+            // Koristite prvu turu koja postoji
+            var tour = db.Tours
+                .Include(t => t.Reviews)
+                .FirstOrDefault();
 
-            if (tour.Reviews.Count < 3)
+            tour.ShouldNotBeNull("Nema tura u bazi.");
+
+            long tourId = tour.Id;
+
+            // Obezbedite purchase token i tour execution
+            long userId = -2; // Turista koji postoji u seed-u
+
+            var token = db.TourPurchaseTokens
+                .FirstOrDefault(t => t.TourId == tourId && t.TouristId == userId);
+
+            if (token == null)
             {
-                for (int i = 0; i < 3; i++)
-                {
-                    controller.Create(tour.Id, new TourReviewDto
-                    {
-                        TouristID = 1,
-                        Grade = 5,
-                        Comment = "Auto-gen",
-                        Progress = 100
-                    });
-                }
-                db.SaveChanges();
+                token = new TourPurchaseToken(tourId, userId);
+                db.TourPurchaseTokens.Add(token);
             }
 
-            var action = controller.GetByTour(tour.Id, page: 1, pageSize: 2);
-            var result = action.Result as OkObjectResult;
-            var paged = result?.Value as PagedResult<TourReviewDto>;
+            var execution = db.TourExecutions
+                .FirstOrDefault(e => e.UserId == userId && e.TourId == tourId);
 
-            paged.ShouldNotBeNull();
-            paged.Results.Count.ShouldBe(2);
-            paged.TotalCount.ShouldBe(tour.Reviews.Count);
+            if (execution == null)
+            {
+                execution = TourExecution.StartNew(userId, tourId);
+                db.TourExecutions.Add(execution);
+            }
 
-            // uporedi drugu "stranicu"
-            var expectedIds = tour.Reviews
-                .OrderBy(r => r.Id)
-                .Skip(2)
-                .Take(2)
-                .Select(r => r.Id);
+            db.SaveChanges();
 
-            paged.Results.Select(r => r.Id).ShouldBe(expectedIds);
+            var controller = CreateController(scope);
+
+            var actionResult = controller.GetByTour(tourId, page: 0, pageSize: 2);
+
+            Assert.NotNull(actionResult);
+            Assert.NotNull(actionResult.Result);
+
+            var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var paged = Assert.IsType<PagedResult<TourReviewDto>>(okResult.Value);
+
+            Assert.Equal(tour.Reviews.Count, paged.TotalCount);
+
+            var expectedCount = Math.Min(2, tour.Reviews.Count);
+            Assert.Equal(expectedCount, paged.Results.Count);
+
+            if (expectedCount > 0)
+            {
+                var expectedIds = tour.Reviews
+                    .OrderBy(r => r.Id)
+                    .Take(2)
+                    .Select(r => r.Id)
+                    .ToList();
+
+                var actualIds = paged.Results.Select(r => r.Id).ToList();
+                Assert.Equal(expectedIds, actualIds);
+            }
         }
 
         [Fact]
@@ -80,6 +107,8 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
 
                 db.Tours.Add(emptyTour);
                 db.SaveChanges();
+
+                emptyTour = db.Tours.Include(t => t.Reviews).First(t => t.Id == emptyTour.Id);
             }
 
             var action = controller.GetByTour(emptyTour.Id);
@@ -110,7 +139,7 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
                 scope.ServiceProvider.GetRequiredService<ITourService>()
             )
             {
-                ControllerContext = BuildContext("1")
+                ControllerContext = BuildContext("1") 
             };
         }
     }

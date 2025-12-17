@@ -19,6 +19,8 @@ public class Tour : AggregateRoot
     public DateTime? PublishedDate { get; private set; }
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
+    public List<TourReview> Reviews { get; set; }
+    public double? AverageRating { get; private set; }
     public List<TourReview> Reviews { get; private set; }
     public List<TourDuration> Durations { get; private set; }
     //public List<TourRequiredEquipment> RequiredEquipment { get; private set; }
@@ -29,6 +31,7 @@ public class Tour : AggregateRoot
         Tags = new List<string>();
         KeyPoints = new List<KeyPoint>();
         Reviews = new List<TourReview>();
+        AverageRating = 0;
         Durations = new List<TourDuration>();
         //RequiredEquipment = new List<TourRequiredEquipment>();
         TourLength = 0;
@@ -52,6 +55,7 @@ public class Tour : AggregateRoot
         KeyPoints = new List<KeyPoint>();
         Durations = new List<TourDuration>();
         Reviews = new List<TourReview>();
+        AverageRating = 0;
         TourLength = 0;
     }
 
@@ -172,16 +176,18 @@ public class Tour : AggregateRoot
         Price = price;
     }
 
-    public TourReview AddReview(int grade, string? comment, DateTime? reviewTime, double progress, long touristId, List<ReviewImage>? images)
+    public TourReview AddReview(int grade, string? comment, DateTime? reviewTime, double progress, long touristId, string username, List<ReviewImage>? images = null)
     {
-        var review = new TourReview(grade, comment, reviewTime, progress, touristId, this.Id, images);
+        var review = new TourReview(grade, comment, reviewTime, progress, touristId, this.Id, images, username);
         Reviews.Add(review);
+        GetAverageGrade();
         return review;
     }
 
     public TourReview AddReview(TourReview review)
     {
         Reviews.Add(review);
+        GetAverageGrade();
         return review;
     }
 
@@ -190,6 +196,7 @@ public class Tour : AggregateRoot
         var review = Reviews.FirstOrDefault(r => r.Id == reviewId);
         if (review == null) throw new KeyNotFoundException("Review not found");
         review.Update(grade, comment, progress, images);
+        GetAverageGrade();
     }
 
     public void RemoveReview(long reviewId)
@@ -199,8 +206,16 @@ public class Tour : AggregateRoot
             throw new NotFoundException($"Review with id {reviewId} not found.");
 
         Reviews.Remove(review);
+        GetAverageGrade();
     }
 
+    public void GetAverageGrade()
+    {
+        if (Reviews.Any())
+            AverageRating = Reviews.Average(r => r.Grade);
+        else
+            AverageRating = 0;
+    }
     public void AddDuration(TourDuration duration)
     {
         if (Durations.Contains(duration))

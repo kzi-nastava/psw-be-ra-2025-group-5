@@ -44,6 +44,31 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories
                                      && x.TourId == tourId
                                      && x.Status == TourExecutionStatus.Active);
         }
+        public IEnumerable<TourExecution> GetByUserId(long userId)
+        {
+            return _context.TourExecutions
+                .Include(e => e.CompletedKeyPoints)
+                .Where(e => e.UserId == userId)
+                .OrderByDescending(e => e.LastActivity)
+                .ToList();
+        }
 
+        public IEnumerable<TourExecution> GetAllActiveOlderThan(DateTime olderThan)
+        {
+
+            return _context.TourExecutions
+                .Where(e => e.Status == TourExecutionStatus.Active &&
+                e.LastActivity < olderThan)
+                .ToList();
+
+        }
+
+        public TourExecution GetActiveOrCompletedForUser(long userId, long tourId)
+        {
+            return _context.TourExecutions
+                .Include(x => x.CompletedKeyPoints)
+                .FirstOrDefault(x => x.UserId == userId
+                                     && x.TourId == tourId);
+        }
     }
 }

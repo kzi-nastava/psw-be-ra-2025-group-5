@@ -12,5 +12,11 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces
         void Add(TourExecution execution);
         void Update(TourExecution execution);
         TourExecution GetActiveForUser(long userId, long tourId);
+        // za auto proveru isteka ture
+        IEnumerable<TourExecution> GetAllActiveOlderThan(DateTime olderThan);
+        IEnumerable<TourExecution> GetByUserId(long userId);
+
+        TourExecution GetActiveOrCompletedForUser(long userId, long tourId);
+
     }
 }

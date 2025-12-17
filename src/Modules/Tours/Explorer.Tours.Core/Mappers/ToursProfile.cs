@@ -61,15 +61,20 @@ public class ToursProfile : Profile
 
         CreateMap<CheckProximityResult, CheckProximityDto>(); 
 
-
         CreateMap<TourProgress, double>().ConvertUsing(tp => tp.Percentage);
         CreateMap<double, TourProgress>().ConvertUsing(d => new TourProgress(d));
 
-        CreateMap<ReviewImage, ReviewImageDto>().ReverseMap();
+        CreateMap<ReviewImage, ReviewImageDto>()
+            .ForMember(d => d.Data, opt => opt.MapFrom(s => Convert.ToBase64String(s.Data)))
+            .ForMember(d => d.ContentType, opt => opt.MapFrom(s => s.ContentType))
+            .ForMember(d => d.Order, opt => opt.MapFrom(s => s.Order));
+
+        CreateMap<ReviewImageDto, ReviewImage>()
+            .ConstructUsing(dto => new ReviewImage(0, Convert.FromBase64String(dto.Data), dto.ContentType, dto.Order));
 
         CreateMap<TourReview, TourReviewDto>()
             .ForMember(d => d.Progress, opt => opt.MapFrom(s => s.Progress.Percentage))
-            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images))
+            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images));
             .ReverseMap()
             .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)));
 
@@ -79,5 +84,14 @@ public class ToursProfile : Profile
         CreateMap<TourDurationDto, TourDuration>()
             .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TransportType>(src.TransportType)));
 
+            
+
+        CreateMap<TourReviewDto, TourReview>()
+            .ForMember(d => d.Progress,opt => opt.MapFrom(src => new TourProgress(src.Progress)))
+            .ForMember(d => d.Images,opt => opt.Ignore());
+            
+
+        CreateMap<TourPurchaseTokenDto, TourPurchaseToken>().ReverseMap();
+        CreateMap<CreateTourPurchaseTokenDto, TourPurchaseToken>();
     }
 }

@@ -15,15 +15,17 @@ public class TourReview: Entity
     public TourProgress Progress { get; private set; }
     public long TouristID { get; set; }
     public long TourID { get; set; }
+    public string? TouristUsername { get; set; }
 
     public TourReview()
     {
         Images = new List<ReviewImage>();
         ReviewTime = DateTime.MinValue;
         Progress = new TourProgress(0);
+        TouristUsername = string.Empty;
     }
     
-    public TourReview(int grade, string comment, DateTime? reviewTime, double progress, long touristID, long tourID, List<ReviewImage> images)
+    public TourReview(int grade, string comment, DateTime? reviewTime, double progress, long touristID, long tourID, List<ReviewImage> images, string username)
     {
         if (grade < 1 || grade > 5)
             throw new ArgumentException("Grade must be between 1 and 5.", nameof(grade));
@@ -38,6 +40,7 @@ public class TourReview: Entity
         Progress = new TourProgress(progress);
         ReviewTime = reviewTime ?? DateTime.UtcNow;
         Images = images ?? new List<ReviewImage>();
+        TouristUsername = username;
     }
 
     public void AddImage(ReviewImage image)
@@ -58,7 +61,12 @@ public class TourReview: Entity
 
     public void ReplaceImages(List<ReviewImage> newImages)
     {
-        Images = newImages;
+        Images.Clear();
+
+        foreach (var image in newImages.OrderBy(i => i.Order))
+        {
+            Images.Add(image);
+        }
     }
 
     public void UpdatePercentage(double newPercentage)
@@ -66,9 +74,10 @@ public class TourReview: Entity
         Progress = new TourProgress(newPercentage);
     }
 
-    public void AddImage(string imagePath)
+    public void AddImage(byte[] data, string contentType)
     {
-        Images.Add(new ReviewImage(imagePath));
+        var nextOrder = Images.Count == 0 ? 0 : Images.Max(i => i.Order) + 1;
+        Images.Add(new ReviewImage(Id, data, contentType, nextOrder));
     }
 
     public void RemoveImage(int imageId)
@@ -87,12 +96,12 @@ public class TourReview: Entity
 
         if (images != null)
         {
-            foreach (var img in images)
-            {
-                if (!Images.Any(i => i.ImagePath == img.ImagePath))
-                    Images.Add(new ReviewImage { ImagePath = img.ImagePath });
-            }
-            Images.RemoveAll(i => !images.Any(d => d.ImagePath == i.ImagePath));
+            ReplaceImages(images);
         }
+    }
+
+    public void AddUsername(string username)
+    {
+        TouristUsername = username;
     }
 }

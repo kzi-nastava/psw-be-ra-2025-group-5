@@ -13,6 +13,8 @@ namespace Explorer.Tours.API.Public
         CheckProximityDto CheckProximity(long executionId, LocationDto location);
         void CompleteExecution(long executionId);
         void AbandonExecution(long executionId);
-        TourExecutionDto GetExecution(long executionId); 
+        TourExecutionDto GetExecution(long executionId);
+        List<TourExecutionDto> GetExecutionsForUser(long userId);
+        void ExpireOldTours();
     }
 }

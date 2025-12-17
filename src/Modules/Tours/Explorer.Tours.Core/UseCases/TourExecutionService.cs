@@ -1,7 +1,8 @@
 ﻿using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.API.Dtos;
-using AutoMapper; 
+using AutoMapper;
+using Explorer.Tours.API.Public.Shopping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,20 +18,53 @@ namespace Explorer.Tours.Core.UseCases
         private readonly ITourRepository _tourRepo;
         private readonly IMapper _mapper;
         private const double DefaultThresholdMeters = 20.0;
+        private readonly ITourPurchaseTokenService _tokenService;
 
-        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper)
+        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper, ITourPurchaseTokenService tokenService)
         {
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
             _tourRepo = tourRepo ?? throw new ArgumentNullException(nameof(tourRepo));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _tokenService = tokenService; 
+        }
+
+        private void EnsureNotExpired(TourExecution execution)
+        {
+            if (execution.LastActivity.AddDays(7) < DateTime.UtcNow)
+            {
+                execution.AbandonTour();
+                _repo.Update(execution);
+                throw new InvalidOperationException("Cannot continue the tour. More than 7 days have passed since last activity.");
+            }
+        }
+
+        public void ExpireOldTours()
+        {
+            var threshold = DateTime.UtcNow.AddDays(-7);
+
+            var oldExecutions = _repo.GetAllActiveOlderThan(threshold);
+
+            foreach (var ex in oldExecutions)
+            {
+                ex.AbandonTour();
+                _repo.Update(ex);
+            }
         }
 
         public StartExecutionResultDto StartExecution(long userId, long tourId)
         {
-            // TODO: dodati proveru kupovine 
+            var token = _tokenService.GetByTourAndTourist(tourId, userId);
+            if (token == null)
+            {
+                throw new InvalidOperationException("Tour has not been purchased.");
+            }
+
             var existing = _repo.GetActiveForUser(userId, tourId);
+
             if (existing != null)
             {
+                EnsureNotExpired(existing);
+
                 var existingNext = GetNextKeyPointForExecution(existing);
                 return new StartExecutionResultDto
                 {
@@ -39,10 +73,13 @@ namespace Explorer.Tours.Core.UseCases
                     StartTime = existing.StartTime
                 };
             }
+
             var execution = TourExecution.StartNew(userId, tourId);
             _repo.Add(execution);
+
             var tour = _tourRepo.Get(tourId);
             var nextKeyPoint = tour?.KeyPoints.OrderBy(k => k.Position).FirstOrDefault();
+
             return new StartExecutionResultDto
             {
                 ExecutionId = execution.Id,
@@ -51,6 +88,7 @@ namespace Explorer.Tours.Core.UseCases
             };
         }
 
+
         public CheckProximityDto CheckProximity(long executionId, LocationDto location)
         {
             if (location == null) throw new ArgumentNullException(nameof(location));
@@ -58,6 +96,11 @@ namespace Explorer.Tours.Core.UseCases
 
             var execution = _repo.Get(executionId);
             if (execution == null) throw new KeyNotFoundException("TourExecution not found.");
+
+            if (execution != null)
+            {
+                EnsureNotExpired(execution);
+            }
 
             execution.UpdateActivity();
 
@@ -154,6 +197,12 @@ namespace Explorer.Tours.Core.UseCases
             return null;
         }
 
+        public List<TourExecutionDto> GetExecutionsForUser(long userId)
+        {
+            var executions = _repo.GetByUserId(userId);
+            return _mapper.Map<List<TourExecutionDto>>(executions);
+        }
+
         private void ValidateCoordinates(double lat, double lon)
         {
             if (double.IsNaN(lat) || double.IsNaN(lon))
@@ -168,7 +217,7 @@ namespace Explorer.Tours.Core.UseCases
 
         private double HaversineDistanceMeters(double lat1, double lon1, double lat2, double lon2)
         {
-            const double EarthRadiusMeters = 6371000.0; 
+            const double EarthRadiusMeters = 6371000.0;
 
             var dLat = ToRad(lat2 - lat1);
             var dLon = ToRad(lon2 - lon1);
