@@ -19,7 +19,7 @@ public class Tour : AggregateRoot
     public DateTime? PublishedDate { get; private set; }
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
-    public List<TourReview> Reviews { get; set; }
+    //public List<TourReview> Reviews { get; set; }
     public double? AverageRating { get; private set; }
     public List<TourReview> Reviews { get; private set; }
     public List<TourDuration> Durations { get; private set; }
