@@ -15,4 +15,6 @@ public class TourDto
     public List<KeyPointDto> KeyPoints { get; set; }
     public List<TourReviewDto> Reviews { get; set; }
     public double AverageRating { get; set; }
+    public List<TourDurationDto> Durations { get; set; }
+    public double TourLength { get; set; }
 }

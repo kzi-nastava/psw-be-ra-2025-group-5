@@ -7,4 +7,5 @@ public class CreateKeyPointDto
     public LocationDto Location { get; set; }
     public byte[]? Image { get; set; }
     public string? Secret { get; set; }
+    public double TourLength { get; set; }
 }

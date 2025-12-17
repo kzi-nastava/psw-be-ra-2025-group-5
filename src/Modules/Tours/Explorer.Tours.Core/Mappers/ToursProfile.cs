@@ -73,8 +73,18 @@ public class ToursProfile : Profile
             .ConstructUsing(dto => new ReviewImage(0, Convert.FromBase64String(dto.Data), dto.ContentType, dto.Order));
 
         CreateMap<TourReview, TourReviewDto>()
-            .ForMember(d => d.Progress,opt => opt.MapFrom(s => s.Progress.Percentage))
-            .ForMember(d => d.Images,opt => opt.MapFrom(s => s.Images));
+            .ForMember(d => d.Progress, opt => opt.MapFrom(s => s.Progress.Percentage))
+            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images))
+            .ReverseMap()
+            .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)));
+
+        CreateMap<TourDuration, TourDurationDto>()
+            .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => src.TransportType.ToString()));
+
+        CreateMap<TourDurationDto, TourDuration>()
+            .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TransportType>(src.TransportType)));
+
+            
 
         CreateMap<TourReviewDto, TourReview>()
             .ForMember(d => d.Progress,opt => opt.MapFrom(src => new TourProgress(src.Progress)))

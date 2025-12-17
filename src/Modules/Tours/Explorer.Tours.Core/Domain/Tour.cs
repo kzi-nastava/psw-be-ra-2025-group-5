@@ -19,8 +19,12 @@ public class Tour : AggregateRoot
     public DateTime? PublishedDate { get; private set; }
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
-    public List<TourReview> Reviews { get; set; }
+    //public List<TourReview> Reviews { get; set; }
     public double? AverageRating { get; private set; }
+    public List<TourReview> Reviews { get; private set; }
+    public List<TourDuration> Durations { get; private set; }
+    //public List<TourRequiredEquipment> RequiredEquipment { get; private set; }
+    public double TourLength { get; set; }
 
     private Tour() 
     {
@@ -28,6 +32,9 @@ public class Tour : AggregateRoot
         KeyPoints = new List<KeyPoint>();
         Reviews = new List<TourReview>();
         AverageRating = 0;
+        Durations = new List<TourDuration>();
+        //RequiredEquipment = new List<TourRequiredEquipment>();
+        TourLength = 0;
     }
 
     public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
@@ -46,8 +53,10 @@ public class Tour : AggregateRoot
         Price = price;
         Status = TourStatus.Draft;
         KeyPoints = new List<KeyPoint>();
+        Durations = new List<TourDuration>();
         Reviews = new List<TourReview>();
         AverageRating = 0;
+        TourLength = 0;
     }
 
     public void AddKeyPoint(string name, string description, Location location, byte[]? image, string? secret)
@@ -119,11 +128,14 @@ public class Tour : AggregateRoot
         if (Status != TourStatus.Draft)
             throw new InvalidOperationException("Only draft tours can be published.");
 
-        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description))
-            throw new InvalidOperationException("Tour must have name and description to be published.");
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description) || Difficulty == null || Tags.Count == 0)
+            throw new InvalidOperationException("Tour must have name, description, difficulty, and at least one tag to be published.");
 
         if (KeyPoints.Count < 2)
             throw new InvalidOperationException("Tour must have at least 2 key points to be published.");
+
+        if (Durations.Count < 1)
+            throw new InvalidOperationException("Tour must have at least one duration to be published.");
 
         Status = TourStatus.Published;
         PublishedDate = DateTime.UtcNow;
@@ -204,4 +216,36 @@ public class Tour : AggregateRoot
         else
             AverageRating = 0;
     }
+    public void AddDuration(TourDuration duration)
+    {
+        if (Durations.Contains(duration))
+            throw new InvalidOperationException("Duration already exists for this tour.");
+
+        Durations.Add(duration);
+    }
+
+    public void RemoveDuration(TourDuration duration)
+    {
+        if (!Durations.Remove(duration))
+            throw new NotFoundException($"Duration not found.");
+    }
+
+    public void UpdateTourLength(double length)
+    {
+        TourLength = length;
+    }
+
+    //public void AddRequiredEquipment(TourRequiredEquipment equipment)
+    //{
+    //    if (RequiredEquipment.Contains(equipment))
+    //        throw new InvalidOperationException("Equipment already exists for this tour.");
+
+    //    RequiredEquipment.Add(equipment);
+    //}
+
+    //public void RemoveRequiredEquipment(TourRequiredEquipment equipment)
+    //{
+    //    if (!RequiredEquipment.Remove(equipment))
+    //        throw new NotFoundException($"Equipment not found.");
+    //}
 }
