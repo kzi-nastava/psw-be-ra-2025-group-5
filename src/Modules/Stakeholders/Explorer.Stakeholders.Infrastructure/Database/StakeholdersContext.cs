@@ -14,6 +14,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<Position> Positions { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Diary> Diaries { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -30,6 +31,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureTourProblem(modelBuilder);
             ConfigurePosition(modelBuilder);
             ConfigureNotification(modelBuilder);
+            ConfigureDiary(modelBuilder);
         }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
@@ -177,6 +179,42 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.HasIndex(n => n.CreatedAt);
                 builder.HasIndex(n => n.TourProblemId);
                 builder.HasIndex(n => n.TourId);
+            });
+        }
+
+        private static void ConfigureDiary(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Diary>(builder =>
+            {
+                builder.HasKey(d => d.Id);
+
+                builder.Property(d => d.Name)
+                    .IsRequired()
+                    .HasMaxLength(300);
+
+                builder.Property(d => d.CreatedAt)
+                    .IsRequired()
+                    .HasConversion(
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                    );
+
+                builder.Property(d => d.Status)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(d => d.Country)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                builder.Property(d => d.City)
+                    .HasMaxLength(100)
+                    .IsRequired(false);
+
+                builder.Property(d => d.TouristId)
+                    .IsRequired();
+
+                builder.HasIndex(d => d.TouristId);
             });
         }
 

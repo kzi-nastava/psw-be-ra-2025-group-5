@@ -99,6 +99,21 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.ActionUrl
                 ));
 
+            // ========================= Diary <-> DiaryDto =========================
+            CreateMap<Diary, DiaryDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status));
+
+            CreateMap<DiaryDto, Diary>()
+                .ConstructUsing(dto => new Diary(
+                    dto.Name,
+                    dto.CreatedAt,
+                    (DiaryStatus)dto.Status,
+                    dto.Country,
+                    dto.City,
+                    dto.TouristId
+                ))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+
         }
     }
 }
