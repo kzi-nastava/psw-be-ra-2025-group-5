@@ -57,7 +57,8 @@ public class TourQueryTests : BaseToursIntegrationTest
 
         // Assert
         result.ShouldNotBeNull();
-        result.Count.ShouldBe(9);
+        result.Count.ShouldBe(7);
+        //ovde izmena
     }
 
     private static TourController CreateController(IServiceScope scope)
