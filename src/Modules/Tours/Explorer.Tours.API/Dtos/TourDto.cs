@@ -17,4 +17,5 @@ public class TourDto
     public double AverageRating { get; set; }
     public List<TourDurationDto> Durations { get; set; }
     public double TourLength { get; set; }
+    public List<long> RequiredEquipmentIds { get; set; }
 }

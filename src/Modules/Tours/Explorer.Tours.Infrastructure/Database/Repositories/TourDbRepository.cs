@@ -20,7 +20,7 @@ public class TourDbRepository : ITourRepository
 
     public PagedResult<Tour> GetPaged(int page, int pageSize)
     {
-        var query = _dbSet.Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images);
+        var query = _dbSet.Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images).Include(t => t.RequiredEquipment);
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
         return task.Result;
@@ -30,6 +30,7 @@ public class TourDbRepository : ITourRepository
     {
         var query = _dbSet
             .Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images)
+            .Include(t => t.RequiredEquipment)
             .Where(t => t.AuthorId == authorId);
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
@@ -38,13 +39,14 @@ public class TourDbRepository : ITourRepository
 
     public List<Tour> GetAll()
     {
-        return _dbSet.Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images).ToList();
+        return _dbSet.Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images).Include(t => t.RequiredEquipment).ToList();
     }
 
     public Tour Get(long id)
     {
         var entity = _dbSet
             .Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images)
+            .Include(t => t.RequiredEquipment)
             .FirstOrDefault(t => t.Id == id);
         if (entity == null) throw new NotFoundException("Not found: " + id);
         return entity;
@@ -62,6 +64,7 @@ public class TourDbRepository : ITourRepository
         // 1. Učitaj postojeći tour SA TRACKING-om
         var existingTour = _dbSet
             .Include(t => t.KeyPoints).Include(t => t.Durations).Include(t => t.Reviews).ThenInclude(r => r.Images)
+            .Include(t => t.RequiredEquipment)
             .AsNoTracking() // ← Ne pratimo promene za sada
             .FirstOrDefault(t => t.Id == entity.Id);
 
@@ -141,6 +144,7 @@ public class TourDbRepository : ITourRepository
     {
         var query = _dbSet
             .Include(t => t.KeyPoints)
+            .Include(t => t.RequiredEquipment)
             .Where(t => t.Status == status);
 
         var task = query.GetPagedById(page, pageSize);
