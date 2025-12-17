@@ -74,7 +74,7 @@ public class ToursProfile : Profile
 
         CreateMap<TourReview, TourReviewDto>()
             .ForMember(d => d.Progress, opt => opt.MapFrom(s => s.Progress.Percentage))
-            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images));
+            .ForMember(d => d.Images, opt => opt.MapFrom(s => s.Images))
             .ReverseMap()
             .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)));
 
