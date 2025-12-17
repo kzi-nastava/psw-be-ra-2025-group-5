@@ -16,14 +16,16 @@ public class TourService : ITourService
     private readonly ITourRepository _tourRepository;
     private readonly ITourExecutionRepository _tourExecutionRepository;
     private readonly ITourPurchaseTokenRepository _purchaseTokenRepository;
+    private readonly IEquipmentRepository _equipmentRepository;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken)
+    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken, IEquipmentRepository equipmentRepository)
     {
         _tourRepository = repository;
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenRepository = purchaseToken;
+        _equipmentRepository = equipmentRepository;
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
@@ -367,4 +369,23 @@ public class TourService : ITourService
         return hasReview ? 2 : 1;
     }
 
+    public TourDto AddRequiredEquipment(long tourId, long equipmentId)
+    {
+        var tour = _tourRepository.Get(tourId);
+
+        tour.AddRequiredEquipment(equipmentId);
+
+        var result = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(result);
+    }
+
+    public TourDto RemoveRequiredEquipment(long tourId, long equipmentId)
+    {
+        var tour = _tourRepository.Get(tourId);
+
+        tour.RemoveRequiredEquipment(equipmentId);
+
+        var result = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(result);
+    }
 }

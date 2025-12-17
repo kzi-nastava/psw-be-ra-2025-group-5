@@ -38,4 +38,6 @@ public interface ITourService
     // Duration operacije
     TourDto AddDuration(long tourId, TourDurationDto durationDto);
     TourDto RemoveDuration(long tourId, TourDurationDto durationDto);
+    TourDto AddRequiredEquipment(long tourId, long equipmentId);
+    TourDto RemoveRequiredEquipment(long tourId, long equipmentId);
 }

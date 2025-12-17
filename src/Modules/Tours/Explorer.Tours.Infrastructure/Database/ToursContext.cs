@@ -21,6 +21,7 @@ public class ToursContext : DbContext
     public DbSet<TourReview> TourReviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
     public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
+    public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -81,6 +82,16 @@ public class ToursContext : DbContext
         modelBuilder.Entity<KeyPoint>()
             .Property(kp => kp.Image)
             .HasColumnType("bytea");
+
+        modelBuilder.Entity<Tour>()
+        .HasMany(t => t.RequiredEquipment)
+        .WithOne()
+        .HasForeignKey("TourId")
+        .OnDelete(DeleteBehavior.Cascade)
+        .IsRequired();
+
+        modelBuilder.Entity<RequiredEquipment>()
+            .ToTable("TourRequiredEquipment");
     }
 
     private static void ConfigureTouristPreferences(ModelBuilder modelBuilder)

@@ -23,7 +23,7 @@ public class Tour : AggregateRoot
     public double? AverageRating { get; private set; }
     public List<TourReview> Reviews { get; private set; }
     public List<TourDuration> Durations { get; private set; }
-    //public List<TourRequiredEquipment> RequiredEquipment { get; private set; }
+    public List<RequiredEquipment> RequiredEquipment { get; private set; }
     public double TourLength { get; set; }
 
     private Tour() 
@@ -33,7 +33,7 @@ public class Tour : AggregateRoot
         Reviews = new List<TourReview>();
         AverageRating = 0;
         Durations = new List<TourDuration>();
-        //RequiredEquipment = new List<TourRequiredEquipment>();
+        RequiredEquipment = new List<RequiredEquipment>();
         TourLength = 0;
     }
 
@@ -55,6 +55,7 @@ public class Tour : AggregateRoot
         KeyPoints = new List<KeyPoint>();
         Durations = new List<TourDuration>();
         Reviews = new List<TourReview>();
+        RequiredEquipment = new List<RequiredEquipment>();
         AverageRating = 0;
         TourLength = 0;
     }
@@ -235,17 +236,25 @@ public class Tour : AggregateRoot
         TourLength = length;
     }
 
-    //public void AddRequiredEquipment(TourRequiredEquipment equipment)
-    //{
-    //    if (RequiredEquipment.Contains(equipment))
-    //        throw new InvalidOperationException("Equipment already exists for this tour.");
+    public void AddRequiredEquipment(long equipmentId)
+    {
+        if (Status == TourStatus.Archived)
+            throw new InvalidOperationException("Equipment can only be modified for tours that are not archived.");
 
-    //    RequiredEquipment.Add(equipment);
-    //}
+        if (RequiredEquipment.Any(re => re.EquipmentId == equipmentId))
+            return;
 
-    //public void RemoveRequiredEquipment(TourRequiredEquipment equipment)
-    //{
-    //    if (!RequiredEquipment.Remove(equipment))
-    //        throw new NotFoundException($"Equipment not found.");
-    //}
+        RequiredEquipment.Add(new RequiredEquipment(equipmentId));
+    }
+
+    public void RemoveRequiredEquipment(long equipmentId)
+    {
+        if (Status == TourStatus.Archived)
+            throw new InvalidOperationException("Equipment can only be modified for tours that are not archived.");
+
+        var existing = RequiredEquipment.FirstOrDefault(re => re.EquipmentId == equipmentId);
+        if (existing == null) return;
+
+        RequiredEquipment.Remove(existing);
+    }
 }

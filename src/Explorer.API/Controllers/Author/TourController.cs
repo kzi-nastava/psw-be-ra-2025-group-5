@@ -108,4 +108,18 @@ public class TourController : ControllerBase
         var result = _tourService.Reactivate(tourId);
         return Ok(result);
     }
+
+    [HttpPost("{tourId:long}/equipment/{equipmentId:long}")]
+    public ActionResult<TourDto> AddEquipment(long tourId, long equipmentId)
+    {
+        var result = _tourService.AddRequiredEquipment(tourId, equipmentId);
+        return Ok(result);
+    }
+
+    [HttpDelete("{tourId:long}/equipment/{equipmentId:long}")]
+    public ActionResult<TourDto> RemoveEquipment(long tourId, long equipmentId)
+    {
+        var result = _tourService.RemoveRequiredEquipment(tourId, equipmentId);
+        return Ok(result);
+    }
 }

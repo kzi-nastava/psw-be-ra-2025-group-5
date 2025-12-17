@@ -2,6 +2,7 @@
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.Core.Domain;
 using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
+using System.Linq;
 
 namespace Explorer.Tours.Core.Mappers;
 
@@ -19,7 +20,13 @@ public class ToursProfile : Profile
         CreateMap<TourStatus, string>().ConvertUsing(src => src.ToString());
         CreateMap<string, TourStatus>().ConvertUsing(static src => Enum.Parse<TourStatus>(src, true));
 
-        CreateMap<Tour, TourDto>().ReverseMap();
+        //CreateMap<Tour, TourDto>().ReverseMap();
+
+        CreateMap<Tour, TourDto>()
+        .ForMember(d => d.RequiredEquipmentIds,
+            opt => opt.MapFrom(s => s.RequiredEquipment.Select(re => re.EquipmentId)))
+        .ReverseMap()
+        .ForMember(d => d.RequiredEquipment, opt => opt.Ignore());
 
         CreateMap<CreateTourDto, Tour>()
             .ConstructUsing(dto => new Tour(
