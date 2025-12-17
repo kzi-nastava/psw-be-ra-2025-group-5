@@ -13,10 +13,10 @@ VALUES (1, 4, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}', '["Adventure","Na
 INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (2, 6, 2, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}', '["Adventure","Nature"]');
 
-INSERT INTO tours."Tours" VALUES (1, 7, 'Uvac Canyon Lookout Tour', 'A guided visit to the iconic Uvac meanders, including hiking to the best panoramic viewpoints and observing the griffon vultures.', 1, '{Nature,Scenic,Wildlife}', 0, 0, NULL, NULL, 0.0);
-INSERT INTO tours."Tours" VALUES (2, 7, 'Niš WWII History Trail', 'Explore key WWII historical locations in Niš, including the Red Cross Concentration Camp and Bubanj Memorial Park.', 0, '{History,Culture,Education}', 5.05, 1, NULL, NULL, 0.0);
-INSERT INTO tours."Tours" VALUES (3, 8, 'Kopaonik Ski & Snow Walk', 'A winter sports experience on Kopaonik with beginner–friendly skiing and guided snow trail walks.', 2, '{}', 0, 0, NULL, NULL, 0.0);
-INSERT INTO tours."Tours" VALUES (5, 2, 'Belgrade Historical Tour', 'Explore key historical locations in Belgrade, including Kalemegdan Fortress and the old town.', 0, '{History,Culture,Education}', 5.05, 1, NULL, NULL, 0.0);
+INSERT INTO tours."Tours" VALUES (1, 7, 'Uvac Canyon Lookout Tour', 'A guided visit to the iconic Uvac meanders, including hiking to the best panoramic viewpoints and observing the griffon vultures.', 1, '{Nature,Scenic,Wildlife}', 0, 0, NULL, NULL, 0.0, 0.0);
+INSERT INTO tours."Tours" VALUES (2, 7, 'Niš WWII History Trail', 'Explore key WWII historical locations in Niš, including the Red Cross Concentration Camp and Bubanj Memorial Park.', 0, '{History,Culture,Education}', 5.05, 1, NULL, NULL, 0.0, 0.0);
+INSERT INTO tours."Tours" VALUES (3, 8, 'Kopaonik Ski & Snow Walk', 'A winter sports experience on Kopaonik with beginner–friendly skiing and guided snow trail walks.', 2, '{}', 0, 0, NULL, NULL, 0.0, 0.0);
+INSERT INTO tours."Tours" VALUES (5, 2, 'Belgrade Historical Tour', 'Explore key historical locations in Belgrade, including Kalemegdan Fortress and the old town.', 0, '{History,Culture,Education}', 5.05, 1, NULL, NULL, 0.0, 0.0);
 
 INSERT INTO tours."Facilities"(
 	"Id", "Name", "Latitude", "Longitude", "Type")
