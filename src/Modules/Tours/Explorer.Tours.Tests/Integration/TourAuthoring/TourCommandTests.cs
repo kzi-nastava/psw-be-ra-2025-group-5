@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
+using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Tours.Tests.Integration.TourAuthoring;
 
@@ -173,106 +174,6 @@ public class TourCommandTests : BaseToursIntegrationTest
         };
     }
 
-
-
-    //[Theory]
-    //[InlineData(-6, 422, TourStatus.Archived)]
-    //[InlineData(-5, 422, TourStatus.Published)]
-    //[InlineData(-4, 200, TourStatus.Published)]
-    //public void Publishes(long tourId, int expectedResponseCode, TourStatus expectedStatus)
-    //{
-    //    // Arrange
-    //    using var scope = Factory.Services.CreateScope();
-    //    var controller = CreateController(scope);
-    //    var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-
-    //    var newKeyPoint1 = new CreateKeyPointDto
-    //    {
-    //        Name = "New Key Point",
-    //        Description = "Test description",
-    //        Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
-    //        Image = null,
-    //        Secret = "Test secret"
-    //    };
-
-    //    var newKeyPoint2 = new CreateKeyPointDto
-    //    {
-    //        Name = "New Key Point",
-    //        Description = "Test description",
-    //        Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
-    //        Image = null,
-    //        Secret = "Test secret"
-    //    };
-
-
-
-    //    controller.AddKeyPoint(tourId, newKeyPoint1);
-    //    controller.AddKeyPoint(tourId, newKeyPoint2);
-
-    //    // Act
-    //    var result = (ObjectResult)controller.Publish(tourId).Result;
-
-    //    // Assert - Response
-    //    result.ShouldNotBeNull();
-    //    result.StatusCode.ShouldBe(expectedResponseCode);
-
-    //    // Assert - Database
-    //    var storedEntity = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
-    //    storedEntity.ShouldNotBeNull();
-    //    storedEntity.Status.ShouldBe(expectedStatus);
-    //}
-
-    //[Theory]
-    //[InlineData(-6, 422, TourStatus.Archived)]
-    //[InlineData(-5, 200, TourStatus.Archived)]
-    //[InlineData(-4, 422, TourStatus.Draft)]
-    //public void Archives(long tourId, int expectedResponseCode, TourStatus expectedStatus)
-    //{
-    //    // Arrange
-    //    using var scope = Factory.Services.CreateScope();
-    //    var controller = CreateController(scope);
-    //    var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-
-    //    // Act
-    //    //var result = (ObjectResult)controller.Archive(tourId).Result;
-
-    //    // Assert - Response
-    //    //result.ShouldNotBeNull();
-    //    //result.StatusCode.ShouldBe(expectedResponseCode);
-
-
-    //    Should.Throw<InvalidOperationException>(() => controller.Archive(tourId));
-
-    //    // Assert - Database
-    //    var storedEntity = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
-    //    storedEntity.ShouldNotBeNull();
-    //    storedEntity.Status.ShouldBe(expectedStatus);
-    //}
-
-    //[Theory]
-    //[InlineData(-6, 200, TourStatus.Published)]
-    //[InlineData(-5, 422, TourStatus.Published)]
-    //[InlineData(-4, 422, TourStatus.Draft)]
-    //public void Reactivates(long tourId, int expectedResponseCode, TourStatus expectedStatus)
-    //{
-    //    // Arrange
-    //    using var scope = Factory.Services.CreateScope();
-    //    var controller = CreateController(scope);
-    //    var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-
-    //    // Act
-    //    var result = (ObjectResult)controller.Reactivate(tourId).Result;
-
-    //    // Assert - Response
-    //    result.ShouldNotBeNull();
-    //    result.StatusCode.ShouldBe(expectedResponseCode);
-
-    //    // Assert - Database
-    //    var storedEntity = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
-    //    storedEntity.ShouldNotBeNull();
-    //    storedEntity.Status.ShouldBe(expectedStatus);
-    //}
-
     [Theory]
     [InlineData(-2, TourStatus.Published)] // Draft tour
     [InlineData(-3, TourStatus.Published)] // Draft tour
@@ -365,6 +266,123 @@ public class TourCommandTests : BaseToursIntegrationTest
         storedEntity.Status.ShouldBe(expectedStatus);
     }
 
+    [Theory]
+    [InlineData(-2)] // Draft
+    [InlineData(-5)] // Published
+    public void Add_equipment_succeeds_for_non_archived_tour(long tourId)
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        var equipmentId = GetAnyEquipmentId(dbContext);
+
+        // Act
+        var result = (ObjectResult)controller.AddEquipment(tourId, equipmentId).Result;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+
+        // Assert - Database
+        var storedTour = dbContext.Tours
+            .Include(t => t.RequiredEquipment)
+            .First(t => t.Id == tourId);
+
+        storedTour.RequiredEquipment.Any(re => re.EquipmentId == equipmentId)
+            .ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Add_equipment_fails_for_archived_tour()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        var tourId = -6; // u seed podacima je ovo Archived tura
+        var equipmentId = GetAnyEquipmentId(dbContext);
+
+        // Act & Assert - očekujemo domenski exception
+        Should.Throw<InvalidOperationException>(() => controller.AddEquipment(tourId, equipmentId));
+
+        // Assert - Database (nije dodato)
+        var storedTour = dbContext.Tours
+            .Include(t => t.RequiredEquipment)
+            .First(t => t.Id == tourId);
+
+        storedTour.RequiredEquipment.Any(re => re.EquipmentId == equipmentId)
+            .ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData(-2)] // Draft
+    [InlineData(-5)] // Published
+    public void Remove_equipment_succeeds_for_non_archived_tour(long tourId)
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        // Ako je tura arhivirana zbog prethodnih testova, reaktiviraj je
+        var tour = dbContext.Tours.First(t => t.Id == tourId);
+        if (tour.Status == TourStatus.Archived)
+        {
+            controller.Reactivate(tourId);
+        }
+
+        var equipmentId = GetAnyEquipmentId(dbContext);
+
+        // Najpre dodaj opremu na turu
+        controller.AddEquipment(tourId, equipmentId);
+
+        // Act
+        var result = (ObjectResult)controller.RemoveEquipment(tourId, equipmentId).Result;
+
+        // Assert - Response
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+
+        // Assert - Database
+        var storedTour = dbContext.Tours
+            .Include(t => t.RequiredEquipment)
+            .First(t => t.Id == tourId);
+
+        storedTour.RequiredEquipment.Any(re => re.EquipmentId == equipmentId)
+            .ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Remove_equipment_fails_for_archived_tour()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        var tourId = -5; // Published u seed-u
+        var equipmentId = GetAnyEquipmentId(dbContext);
+
+        // Setup: dodaj opremu i arhiviraj turu kroz normalne use-case-ove
+        controller.AddEquipment(tourId, equipmentId);
+        controller.Archive(tourId);
+
+        // Act & Assert - pokušaj uklanjanja na arhiviranoj turi mora da padne
+        Should.Throw<InvalidOperationException>(() => controller.RemoveEquipment(tourId, equipmentId));
+
+        // Assert - Database (status je Archived, oprema i dalje prisutna)
+        var storedTour = dbContext.Tours
+            .Include(t => t.RequiredEquipment)
+            .First(t => t.Id == tourId);
+
+        storedTour.Status.ShouldBe(TourStatus.Archived);
+        storedTour.RequiredEquipment.Any(re => re.EquipmentId == equipmentId)
+            .ShouldBeTrue();
+    }
+
     // --- Pomoćne funkcije ---
 
     private void AddKeyPoints(TourController controller, long tourId)
@@ -414,4 +432,15 @@ public class TourCommandTests : BaseToursIntegrationTest
         controller.Update(tourId, updateDto);
     }
 
+    private long GetAnyEquipmentId(ToursContext dbContext)
+    {
+        var equipment = dbContext.Equipment.FirstOrDefault();
+        if (equipment == null)
+        {
+            equipment = new Equipment("Test equipment", null);
+            dbContext.Equipment.Add(equipment);
+            dbContext.SaveChanges();
+        }
+        return equipment.Id;
+    }
 }

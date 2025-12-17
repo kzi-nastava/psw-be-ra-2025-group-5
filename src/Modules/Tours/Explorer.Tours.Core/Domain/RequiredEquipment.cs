@@ -15,7 +15,7 @@ namespace Explorer.Tours.Core.Domain
 
         public RequiredEquipment(long equipmentId)
         {
-            if (equipmentId <= 0) throw new ArgumentException("Invalid equipment id.", nameof(equipmentId));
+            if (equipmentId == 0) throw new ArgumentException("Invalid equipment id.", nameof(equipmentId));
             EquipmentId = equipmentId;
         }
     }
