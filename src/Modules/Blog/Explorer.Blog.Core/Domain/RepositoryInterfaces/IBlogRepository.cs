@@ -17,6 +17,11 @@ namespace Explorer.Blog.Core.Domain.RepositoryInterfaces
         BlogImage? GetImage(long id);
         BlogImage UpdateImage(BlogImage image);
         List<BlogImage> GetImagesByPostId(long postId);
-        void DeleteImage(BlogImage image); 
+        void DeleteImage(BlogImage image);
+
+        // Komentari
+        List<Comment> GetComments(long blogId);
+        void AddComment(long blogId, Comment comment);
+        void RemoveComment(long blogId, long commentId);
     }
 }

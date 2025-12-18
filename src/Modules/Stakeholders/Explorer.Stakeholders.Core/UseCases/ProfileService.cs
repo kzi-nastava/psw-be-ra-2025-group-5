@@ -2,9 +2,12 @@
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using System;
 using System.Net.Mail;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Explorer.Stakeholders.Core.UseCases;
 
@@ -12,11 +15,13 @@ public class ProfileService : IProfileService
 {
     private readonly IPersonRepository _personRepository;
     private readonly IMapper _mapper;
+    ITouristStatisticsService _touristStatisticsService;
 
-    public ProfileService(IPersonRepository personRepository, IMapper mapper)
+    public ProfileService(IPersonRepository personRepository, IMapper mapper, ITouristStatisticsService touristStatisticsService)
     {
         _personRepository = personRepository;
         _mapper = mapper;
+        _touristStatisticsService = touristStatisticsService;
     }
 
     public ProfileDto GetByUserId(long userId)
@@ -27,7 +32,10 @@ public class ProfileService : IProfileService
             if (person == null)
                 throw new KeyNotFoundException("Profile not found for this user.");
 
-            return _mapper.Map<ProfileDto>(person);
+            var profileDto = _mapper.Map<ProfileDto>(person);
+            profileDto.Statistics = _touristStatisticsService.GetStatistics(userId);
+            return profileDto;
+
         }
         catch (Exception ex)
         {
@@ -39,10 +47,8 @@ public class ProfileService : IProfileService
 
     public ProfileDto Update(ProfileDto profile)
     {
-        // Try to find the person by Person.Id first
         var existing = _personRepository.Get(profile.Id);
 
-        // If not found, try to find by UserId (client may have provided User.Id instead)
         if (existing == null)
         {
             existing = _personRepository.GetByUserId(profile.Id);

@@ -1,28 +1,49 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using System.Data;
 
 namespace Explorer.Stakeholders.Core.UseCases.Reporting;
 
 public class TourProblemService : ITourProblemService
 {
     private readonly ITourProblemRepository _repository;
+    private readonly IUserRepository _userRepository;
+    private readonly INotificationService _notificationService;
     private readonly IMapper _mapper;
 
-    public TourProblemService(ITourProblemRepository repository, IMapper mapper)
+    public TourProblemService(
+        ITourProblemRepository repository, 
+        IUserRepository userRepository, 
+        INotificationService notificationService,
+        IMapper mapper)
     {
         _repository = repository;
+        _userRepository = userRepository;
+        _notificationService = notificationService;
         _mapper = mapper;
     }
 
     public PagedResult<TourProblemDto> GetPaged(int page, int pageSize)
     {
         var result = _repository.GetPaged(page, pageSize);
-        var items = result.Results.Select(_mapper.Map<TourProblemDto>).ToList();
-        return new PagedResult<TourProblemDto>(items, result.TotalCount);
+        return MapToDto(result);
+    }
+
+    public PagedResult<TourProblemDto> GetPagedByReporterId(long reporterId, int page, int pageSize)
+    {
+        var result = _repository.GetPagedByReporterId(reporterId, page, pageSize);
+        return MapToDto(result);
+    }
+    public PagedResult<TourProblemDto> GetPagedByTourIds(List<long> tourIds, int page, int pageSize)
+    {
+        var result = _repository.GetPagedByTourIds(tourIds, page, pageSize);
+        return MapToDto(result);
     }
 
     public TourProblemDto Create(TourProblemDto dto)
@@ -38,4 +59,130 @@ public class TourProblemService : ITourProblemService
     }
 
     public void Delete(long id) => _repository.Delete(id);
+
+    public CommentDto AddComment(long problemId, long authorId, string content)
+    {
+        TourProblem problem = _repository.Get(problemId);
+        Comment comment = new Comment(authorId, content);
+
+        _repository.AddComment(comment);
+
+        problem.Comments.Add(comment.CommentId);
+        _repository.Update(problem);
+
+        var dto = _mapper.Map<CommentDto>(comment);
+
+        var user = _userRepository.GetById(authorId);
+        dto.AuthorRole = user.Role.ToString();
+
+        return dto;
+    }
+
+    public TourProblemDto GetById(long id)
+    {
+        var problem = _repository.Get(id);
+
+        if (problem == null)
+            throw new NotFoundException($"TourProblem {id} not found");
+
+        var dto = new TourProblemDto
+        {
+            Id = problem.Id,
+            TourId = problem.TourId,
+            ReporterId = problem.ReporterId,
+            Category = (API.Dtos.ProblemCategory)problem.Category,
+            Priority = (API.Dtos.ProblemPriority)problem.Priority,
+            Description = problem.Description,
+            OccurredAt = problem.OccurredAt,
+            CreatedAt = problem.CreatedAt,
+            Comments = problem.Comments
+                .Select(cid => {
+                    var c = _repository.GetCommentById(cid);
+                    var commentDto = _mapper.Map<CommentDto>(c);
+                    var user = _userRepository.GetById(c.AuthorId);
+                    commentDto.AuthorRole = user.Role.ToString();
+                    return commentDto;
+                })
+                .ToList(),
+            IsResolved = problem.IsResolved,
+            Deadline = problem.Deadline,
+            TourStatus = "Unknown"
+        };
+
+        return dto;
+    }
+
+
+
+    public List<CommentDto> GetComments(long id)
+    {
+        var problem = _repository.Get(id);
+
+        var comments = _repository.GetCommentsByIds(problem.Comments);
+
+        return comments.Select(c =>
+        {
+            var dto = _mapper.Map<CommentDto>(c);
+
+            var user = _userRepository.GetById(c.AuthorId);
+            dto.AuthorRole = user.Role.ToString();
+
+            return dto;
+        }).ToList();
+    }
+
+    private PagedResult<TourProblemDto> MapToDto(PagedResult<TourProblem> result)
+    {
+        var items = result.Results.Select(problem =>
+        {
+
+            return new TourProblemDto
+            {
+                Id = problem.Id,
+                TourId = problem.TourId,
+                ReporterId = problem.ReporterId,
+                Category = (API.Dtos.ProblemCategory)problem.Category,
+                Priority = (API.Dtos.ProblemPriority)problem.Priority,
+                Description = problem.Description,
+                OccurredAt = problem.OccurredAt,
+                CreatedAt = problem.CreatedAt,
+                Comments = problem.Comments
+                    .Select(cid => {
+                        var comment = _repository.GetCommentById(cid);
+                        return _mapper.Map<CommentDto>(comment);
+                    })
+                    .ToList(),
+                IsResolved = problem.IsResolved,
+                Deadline = problem.Deadline,
+                TourStatus = "Unknown"
+            };
+        }).ToList();
+
+        return new PagedResult<TourProblemDto>(items, result.TotalCount);
+    }
+
+
+
+    public TourProblemDto MarkResolved(long problemId, bool isResolved)
+    {
+        _repository.MarkResolved(problemId, isResolved);
+
+        var updatedProblem = _repository.Get(problemId)
+            ?? throw new NotFoundException($"TourProblem {problemId} not found");
+
+        return _mapper.Map<TourProblemDto>(updatedProblem);
+    }
+
+
+    public void SetDeadline(long problemId, DateTimeOffset? deadline)
+    {
+        if (!deadline.HasValue)
+            throw new ArgumentException("Deadline cannot be null.");
+
+        if (deadline.Value <= DateTimeOffset.UtcNow)
+            throw new InvalidOperationException("Cannot set a deadline in the past.");
+
+        _repository.UpdateDeadline(problemId, deadline);
+    }
+
 }

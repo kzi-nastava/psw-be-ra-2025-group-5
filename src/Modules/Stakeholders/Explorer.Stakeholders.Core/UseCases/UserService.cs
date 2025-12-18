@@ -69,7 +69,33 @@ namespace Explorer.Stakeholders.Core.UseCases
                 throw new InvalidOperationException("Cannot block an Administrator account.");
             }
 
+            if (!user.IsActive)
+            {
+                throw new InvalidOperationException("User is already blocked.");
+            }
+
             user.Deactivate();
+
+            User updated = _userRepository.Update(user);
+            return _mapper.Map<UserDto>(updated);
+        }
+
+        public UserDto Unblock(long id)
+        { 
+            User user = _userRepository.Get(id);
+            if (user == null)
+                throw new Exception("User not found.");
+            if (user.Role == UserRole.Administrator)
+            {
+                throw new InvalidOperationException("Cannot unblock an Administrator account.");
+            }
+
+            if(user.IsActive)
+            {
+                throw new InvalidOperationException("User is already active.");
+            }
+
+            user.Activate();
 
             User updated = _userRepository.Update(user);
             return _mapper.Map<UserDto>(updated);

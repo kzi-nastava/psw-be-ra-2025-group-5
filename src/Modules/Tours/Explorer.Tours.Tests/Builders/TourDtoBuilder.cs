@@ -4,16 +4,15 @@ namespace Explorer.Tours.Tests.Builders;
 
 public class TourDtoBuilder
 {
-    public static TourDto CreateValid()
+    public static CreateTourDto CreateValid()
     {
-        return new TourDto
+        return new CreateTourDto
         {
             Name = "Zlatibor Mountain Adventure",
             Description = "A scenic trail across Zlatibor with panoramic viewpoints and traditional food stops.",
             Difficulty = "Medium",
             Tags = ["Nature", "Hiking", "Viewpoints"],
             Price = 0,
-            Status = "Draft",
             AuthorId = 2
         };
     }

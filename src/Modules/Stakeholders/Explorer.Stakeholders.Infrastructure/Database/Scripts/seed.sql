@@ -3,6 +3,7 @@ DELETE FROM stakeholders."People";
 DELETE FROM stakeholders."Users";
 DELETE FROM stakeholders."AppRatings";
 DELETE FROM stakeholders."Clubs";
+DELETE FROM stakeholders."Notifications";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
@@ -37,14 +38,14 @@ INSERT INTO stakeholders."AppRatings"
 (2, 5, 4, 'Solidno', NOW(), NOW());
 
 INSERT INTO stakeholders."TourProblems"(
-	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
-VALUES (1, 1, 4, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', '2023-10-25T10:05:00Z');
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
+VALUES (1, 1, 4, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', '2023-10-25T10:05:00Z', ARRAY[]::bigint[], false, null);
 INSERT INTO stakeholders."TourProblems"(
-	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
-VALUES (2, 2, 5, 2, 1, 'Problem sa planom puta', '2023-10-26T11:00:00Z', '2023-10-26T11:05:00Z');
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
+VALUES (2, 2, 5, 2, 1, 'Problem sa planom puta', '2023-10-26T11:00:00Z', '2023-10-26T11:05:00Z', ARRAY[]::bigint[], false, null);
 INSERT INTO stakeholders."TourProblems"(
-	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt")
-VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z');
+	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
+VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z', ARRAY[]::bigint[], true, null);
 
 
 SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."TourProblems"));
