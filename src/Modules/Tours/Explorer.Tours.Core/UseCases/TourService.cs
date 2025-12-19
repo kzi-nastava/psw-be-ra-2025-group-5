@@ -43,12 +43,20 @@ public class TourService : ITourService
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
+    public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
+    {
+        var result = _tourRepository.SearchByLocation(searchDto.Latitude, searchDto.Longitude, searchDto.Distance, page, pageSize);
+
+        var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
+        return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+
     public TourDto Get(long id)
     {
         var tour = _tourRepository.Get(id);
         return _mapper.Map<TourDto>(tour);
     }
-
+    
     public List<string> GetAllTags()
     {
         var result = _tourRepository.GetAll();

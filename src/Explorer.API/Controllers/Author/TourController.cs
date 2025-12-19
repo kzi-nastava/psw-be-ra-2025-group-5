@@ -39,6 +39,19 @@ public class TourController : ControllerBase
         return Ok(_tourService.GetAllTags());
     }
 
+    [HttpGet("search")]
+    [AllowAnonymous]
+    public ActionResult<PagedResult<TourDto>> Search([FromQuery] double latitude, [FromQuery] double longitude, [FromQuery] double distance, [FromQuery] int page, [FromQuery] int pageSize)
+    {
+        var searchDto = new TourSearchDto
+        {
+            Latitude = latitude,
+            Longitude = longitude,
+            Distance = distance
+        };
+        return Ok(_tourService.SearchByLocation(searchDto, page, pageSize));
+    }
+
     [HttpPost]
     public ActionResult<TourDto> Create([FromBody] CreateTourDto tour)
     {
