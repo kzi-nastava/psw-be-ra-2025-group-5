@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace Explorer.Blog.API.Dtos
 {
-    public class BlogImageDto
+    public class BlogImageUploadUpdateDto
     {
-        public long Id { get; set; }
+        public IFormFile File { get; set; }
         public int Order { get; set; }
-        public string Url { get; set; }
-        public string ContentType { get; set; }
-
     }
 }

@@ -17,7 +17,7 @@ namespace Explorer.Blog.API.Public
         BlogPostDto Update(long id, UpdateBlogPostDto dto, long authorId);
         BlogImageDto AddImage(long postId, BlogImageDto dto);
         BlogImageDto GetImage(long id);
-        BlogImageDto UpdateImage(BlogImageDto dto);
+        BlogImageDto UpdateImageFromFile(long imageId, string filePath, string contentType, int order);
         List<BlogImageDto> GetImagesByPostId(long postId);
         bool DeleteImage(long imageId);
         BlogPostDto Publish(long id, long authorId);
@@ -25,6 +25,8 @@ namespace Explorer.Blog.API.Public
         BlogPostDto UpdateDraft(long id, UpdateDraftBlogPostDto dto, long authorId);
         BlogPostDto Vote(long blogId, long userId, string voteType);
         BlogPostDto CreateAndPublish(CreateAndPublishBlogPostDto dto, long authorId);
+        BlogImageDto AddImageFromFile(long postId, string filePath, string contentType, int order);
+
 
     }
 }

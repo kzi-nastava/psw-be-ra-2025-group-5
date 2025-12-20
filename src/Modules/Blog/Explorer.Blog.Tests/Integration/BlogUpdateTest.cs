@@ -75,7 +75,6 @@ namespace Explorer.Blog.Tests.Integration
         {
             using var scope = Factory.Services.CreateScope();
             var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
             var createDto = new CreateBlogPostDto
             {
@@ -84,32 +83,31 @@ namespace Explorer.Blog.Tests.Integration
             };
             var created = service.Create(createDto, authorId: 1);
 
-            var imageDto = new BlogImageDto
-            {
-                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
-                ContentType = "image/png",
-                Order = 0
-            };
-            var added = service.AddImage(created.Id, imageDto);
+            var image = service.AddImageFromFile(
+                created.Id,
+                "images/blog/test.png",
+                "image/png",
+                0
+            );
 
             service.Publish(created.Id, 1);
 
             Should.Throw<InvalidOperationException>(() =>
             {
-                service.DeleteImage(added.Id);
+                service.DeleteImage(image.Id);
             });
 
             Should.Throw<InvalidOperationException>(() =>
             {
-                service.UpdateImage(new BlogImageDto
-                {
-                    Id = added.Id,
-                    Base64 = added.Base64,
-                    ContentType = "image/png",
-                    Order = 0
-                });
+                service.UpdateImageFromFile(
+                    image.Id,
+                    "images/blog/updated.png",
+                    "image/png",
+                    0
+                );
             });
         }
+
         [Fact]
         public void Cannot_publish_if_not_in_draft()
         {

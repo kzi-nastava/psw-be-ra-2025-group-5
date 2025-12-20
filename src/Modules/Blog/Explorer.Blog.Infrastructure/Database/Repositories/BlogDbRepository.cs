@@ -51,7 +51,11 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
 
             existing.ContentType = image.ContentType;
             existing.Order = image.Order;
-            existing.Data = image.Data;
+
+            if (!string.IsNullOrEmpty(image.ImagePath))
+            {
+                existing.UpdateImagePath(image.ImagePath);
+            }
 
             _dbContext.SaveChanges();
             return existing;
@@ -112,9 +116,6 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
                 _dbContext.SaveChanges();
             }
         }
-
-
-
 
     }
 }

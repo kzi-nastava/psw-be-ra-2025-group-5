@@ -6,6 +6,7 @@ using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Public.Administration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using static Explorer.Blog.Core.Domain.BlogPost;
 
 namespace Explorer.API.Controllers.Blog;
 
@@ -79,45 +80,70 @@ public class BlogController : ControllerBase
         return Ok(updated);
     }
 
-    [HttpPost("{postId:long}/images")]
-    public IActionResult AddImage(long postId, [FromBody] BlogImageDto dto)
+    [HttpPost("{postId}/images")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> AddImage(long postId, [FromForm] BlogImageUploadDto dto)
     {
-        var result = _blogService.AddImage(postId, dto);
+        if (dto.File == null || dto.File.Length == 0)
+            return BadRequest("No file uploaded");
+
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images",  "blog");
+
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        var uniqueFileName = Guid.NewGuid() + Path.GetExtension(dto.File.FileName);
+
+        var physicalPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        var relativePath = Path.Combine("images", "blog", uniqueFileName)
+                                .Replace("\\", "/");
+
+        using (var fileStream = new FileStream(physicalPath, FileMode.Create))
+        {
+            await dto.File.CopyToAsync(fileStream);
+        }
+
+        var result = _blogService.AddImageFromFile(
+            postId,
+            relativePath,
+            dto.File.ContentType,
+            dto.Order
+        );
+
         return Ok(result);
     }
 
-    [HttpPut("images/{imageId:long}")]
-    public IActionResult UpdateImage(long imageId, [FromBody] BlogImageDto dto)
+    [HttpPut("{postId}/images/{imageId:long}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UpdateImage(
+    long postId,
+    long imageId,
+    [FromForm] BlogImageUploadUpdateDto dto)
     {
-        dto.Id = imageId;
+        if (dto.File == null || dto.File.Length == 0)
+            return BadRequest("No file uploaded");
 
-        var result = _blogService.UpdateImage(dto);
+        var post = _blogService.GetById(postId);
+        if (post == null) return NotFound("Post not found");
+
+        var path = await SaveFile(dto.File);
+
+        var result = _blogService.UpdateImageFromFile(imageId, path, dto.File.ContentType, dto.Order);
+
         if (result == null) return NotFound();
 
         return Ok(result);
     }
 
+
     [HttpGet("images/{imageId:long}")]
-    public IActionResult GetImage(long imageId)
+    public IActionResult GetImage(long id)
     {
-        var dto = _blogService.GetImage(imageId);
+        var dto = _blogService.GetImage(id);
         if (dto == null) return NotFound();
 
-        if (string.IsNullOrWhiteSpace(dto.Base64))
-            return BadRequest("Image data missing");
-
-        byte[] data;
-
-        try
-        {
-            data = Convert.FromBase64String(dto.Base64);
-        }
-        catch
-        {
-            return BadRequest("Invalid Base64 format");
-        }
-
-        return File(data, dto.ContentType);
+        return Ok(dto);
     }
 
     [HttpGet("{postId:long}/images")]
@@ -168,13 +194,63 @@ public class BlogController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("publish")]
-    public IActionResult CreateAndPublish([FromBody] CreateAndPublishBlogPostDto dto)
+    [HttpPost("publish-with-images")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateAndPublishWithImages([FromForm] CreateAndPublishBlogPostDto dto)
     {
         var authorId = GetUserIdFromToken();
-        var result = _blogService.CreateAndPublish(dto, authorId);
+
+        // 1️⃣ create draft
+        var post = _blogService.Create(
+            new CreateBlogPostDto
+            {
+                Title = dto.Title,
+                Description = dto.Description
+            },
+            authorId
+        );
+
+        // 2️⃣ upload images
+        if (dto.Images != null && dto.Images.Any())
+        {
+            int order = 0;
+            foreach (var file in dto.Images)
+            {
+                var path = await SaveFile(file);
+
+                _blogService.AddImageFromFile(
+                    post.Id,
+                    path,
+                    file.ContentType,
+                    order++
+                );
+            }
+        }
+
+        var result = _blogService.Publish(post.Id, authorId);
         return Ok(result);
     }
+    private async Task<string> SaveFile(IFormFile file)
+    {
+        var folder = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "wwwroot",
+            "images",
+            "blog");
+
+        if (!Directory.Exists(folder))
+            Directory.CreateDirectory(folder);
+
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        var physicalPath = Path.Combine(folder, fileName);
+
+        using var stream = new FileStream(physicalPath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        return $"images/blog/{fileName}";
+    }
+
+
 
 }
 
