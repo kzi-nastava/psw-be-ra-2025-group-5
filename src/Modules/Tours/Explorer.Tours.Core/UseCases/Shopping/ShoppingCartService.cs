@@ -67,7 +67,6 @@ public class ShoppingCartService : IShoppingCartService
         foreach (var item in cart.Items)
         {
             if (_TourRepository.Get(item.TourId).Status != TourStatus.Published) continue;
-            if (_TokenService.GetByTourAndTourist(item.TourId, touristId) != null) continue;
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
         }
 
