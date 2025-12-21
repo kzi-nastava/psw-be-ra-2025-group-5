@@ -14,7 +14,7 @@ namespace Explorer.Payments.Infrastructure
 {
     public static class PaymentsStartup
     {
-        public static IServiceCollection ConfigureToursModule(this IServiceCollection services)
+        public static IServiceCollection ConfigurePaymentsModule(this IServiceCollection services)
         {
             // Registers all profiles since it works on the assembly
             services.AddAutoMapper(typeof(PaymentsProfile).Assembly);
