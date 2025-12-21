@@ -1,5 +1,6 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,15 +31,15 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
             if (existingClub == null)
                 throw new KeyNotFoundException("Club not found");
 
-
             existingClub.Name = club.Name;
             existingClub.Description = club.Description;
-            existingClub.Images = club.Images;
             existingClub.CreatorId = club.CreatorId;
 
             _dbContext.SaveChanges();
             return existingClub;
         }
+
+
 
         public void Delete(long id)
         {

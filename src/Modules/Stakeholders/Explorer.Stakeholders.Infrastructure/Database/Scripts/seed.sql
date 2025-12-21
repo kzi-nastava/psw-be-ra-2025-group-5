@@ -37,6 +37,15 @@ INSERT INTO stakeholders."AppRatings"
 (1, 4, 5, 'Odlična aplikacija', NOW(), NOW()),
 (2, 5, 4, 'Solidno', NOW(), NOW());
 
+INSERT INTO stakeholders."Clubs" 
+("Id", "Name", "Description", "ImagePaths", "CreatorId") 
+VALUES
+(1, 'Planinski klub Vršac', 'Klub za ljubitelje planinarenja i prirode. Organizujemo vikend izlete na planine širom Srbije.', 
+ '/images/club/planinari1.jpeg', 4),
+(2, 'Foto safari klub', 'Fotografisanje divljih životinja i prirode. Naše ture obuhvataju nacionalne parkove i rezervate.', 
+ '/images/club/safari1.jpg', 5);
+
+
 INSERT INTO stakeholders."TourProblems"(
 	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
 VALUES (1, 1, 4, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', '2023-10-25T10:05:00Z', ARRAY[]::bigint[], false, null);
@@ -52,3 +61,4 @@ SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELE
 SELECT setval(pg_get_serial_sequence('stakeholders."People"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."People"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Users"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Users"));
 SELECT setval(pg_get_serial_sequence('stakeholders."AppRatings"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."AppRatings"));
+SELECT setval(pg_get_serial_sequence('stakeholders."Clubs"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Clubs"));

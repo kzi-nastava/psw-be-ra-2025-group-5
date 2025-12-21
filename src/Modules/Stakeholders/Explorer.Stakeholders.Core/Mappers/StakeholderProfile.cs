@@ -41,21 +41,14 @@ namespace Explorer.Stakeholders.Core.Mappers
             // ========================= Club <-> ClubDto =========================
             CreateMap<Club, ClubDto>()
                 .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.ToBase64String(img)).ToList()
-                            : new List<string>())
+                    dest => dest.ImagePaths,
+                    opt => opt.MapFrom(src => src.ImagePaths)
                 );
 
             CreateMap<ClubDto, Club>()
-                .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.FromBase64String(img)).ToList()
-                            : new List<byte[]>())
-                );
+                .ForMember(dest => dest.ImagePaths, opt => opt.Ignore()); 
+                                                                       
+
 
             CreateMap<TourProblem, TourProblemDto>()
                 .ForMember(dest => dest.Comments, opt => opt.Ignore())

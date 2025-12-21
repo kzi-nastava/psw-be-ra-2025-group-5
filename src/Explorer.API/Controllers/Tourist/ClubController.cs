@@ -36,19 +36,34 @@ namespace Explorer.API.Controllers.Tourist
         }
 
         [HttpPost]
-        public ActionResult<ClubDto> Create([FromBody] ClubDto clubDto)
+        [Consumes("multipart/form-data")]
+        public IActionResult Create([FromForm] CreateClubDto dto)
         {
-            clubDto.CreatorId = User.PersonId();
-            var result = _clubService.Create(clubDto);
+            var clubDto = new ClubDto
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                CreatorId = User.PersonId()
+            };
+
+            var result = _clubService.Create(clubDto, dto.Images);
             return Ok(result);
         }
 
         [HttpPut("{id:long}")]
-        public ActionResult<ClubDto> Update(long id, [FromBody] ClubDto clubDto)
+        [Consumes("multipart/form-data")]
+        public IActionResult Update(long id, [FromForm] CreateClubDto dto)
         {
-            clubDto.Id = id;
-            clubDto.CreatorId = User.PersonId();
-            var result = _clubService.Update(clubDto);
+
+            var clubDto = new ClubDto
+            {
+                Id = id,
+                Name = dto.Name,
+                Description = dto.Description,
+                CreatorId = User.PersonId()
+            };
+
+            var result = _clubService.Update(clubDto, dto.Images);
             return Ok(result);
         }
 
@@ -57,6 +72,13 @@ namespace Explorer.API.Controllers.Tourist
         { 
             _clubService.Delete(User.PersonId(), id);
             return Ok();
+        }
+
+        [HttpDelete("{clubId:long}/images")]
+        public IActionResult RemoveImage(long clubId, [FromBody] string imagePath)
+        {
+            var result = _clubService.RemoveImage(User.PersonId(), clubId, imagePath);
+            return Ok(result);
         }
     }
 }

@@ -9,6 +9,7 @@ using Explorer.Blog.API.Dtos;
 using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using static Explorer.Blog.Core.Domain.BlogPost;
+using Explorer.BuildingBlocks.Core.FileStorage;
 
 namespace Explorer.Blog.Core.UseCases
 {
@@ -156,11 +157,7 @@ namespace Explorer.Blog.Core.UseCases
                     : dto.Url
             );
 
-            var path = _imageStorage.SaveBlogImage(
-                postId,
-                bytes,
-                dto.ContentType
-            );
+            var path = _imageStorage.SaveImage("blog", post.AuthorId, bytes, dto.ContentType);
 
             var image = new BlogImage(
                 postId,

@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Explorer.Stakeholders.API.Dtos;
+using Microsoft.AspNetCore.Http;
+using Explorer.BuildingBlocks.Core.FileStorage;
 
 namespace Explorer.Stakeholders.Core.UseCases
 {
@@ -15,87 +17,62 @@ namespace Explorer.Stakeholders.Core.UseCases
     {
         private readonly IClubRepository _clubRepository;
         private readonly IMapper _mapper;
+        private readonly IImageStorage _imageStorage;
 
-        public ClubService(IClubRepository clubRepository, IMapper mapper)
+        public ClubService(IClubRepository clubRepository, IMapper mapper, IImageStorage imageStorage)
         {
             _clubRepository = clubRepository;
             _mapper = mapper;
+            _imageStorage = imageStorage;
+        }
+        public ClubDto Create(ClubDto clubDto, List<IFormFile> images)
+        {
+            if (images == null || !images.Any())
+                throw new ArgumentException("Club must have at least one image.");
+
+            var savedPaths = SaveImages(clubDto.CreatorId, images);
+
+            var club = new Club(
+                clubDto.Name,
+                clubDto.Description,
+                savedPaths,
+                clubDto.CreatorId
+            );
+
+            var createdClub = _clubRepository.Create(club);
+            return _mapper.Map<ClubDto>(createdClub);
         }
 
-        public ClubDto Create(ClubDto clubDto)
+        public ClubDto Update(ClubDto clubDto, List<IFormFile>? images)
         {
-            try
-            {
-                // Konvertuj Base64 stringove u byte[]
-                var imageBytes = clubDto.Images
-                    .Select(base64 => Convert.FromBase64String(base64))
-                    .ToList();
+            var existingClub = _clubRepository.GetById(clubDto.Id); 
 
-                var club = new Club(
-                    clubDto.Name,
-                    clubDto.Description,
-                    imageBytes,
-                    clubDto.CreatorId
-                );
+            existingClub.Name = clubDto.Name;
+            existingClub.Description = clubDto.Description;
 
-                var createdClub = _clubRepository.Create(club);
-                return _mapper.Map<ClubDto>(createdClub);
-            }
-            catch (ArgumentException ex)
+            if (images != null && images.Any())
             {
-                throw new EntityValidationException(ex.Message);
+                var savedPaths = SaveImages(clubDto.CreatorId, images);
+                existingClub.ImagePaths.AddRange(savedPaths);
+
             }
-            catch (FormatException ex)
-            {
-                throw new EntityValidationException("Invalid image format: " + ex.Message);
-            }
+
+            var updatedClub = _clubRepository.Update(existingClub);
+            return _mapper.Map<ClubDto>(updatedClub);
         }
 
-        public ClubDto Update(ClubDto clubDto)
+        private List<string> SaveImages(long clubId, List<IFormFile> images)
         {
-            var existingClub = _clubRepository.GetById(clubDto.Id);
-            if (existingClub == null)
+            var paths = new List<string>();
+            foreach (var file in images)
             {
-                throw new NotFoundException($"Club with ID {clubDto.Id} not found.");
+                using var ms = new MemoryStream();
+                file.CopyTo(ms);
+                var bytes = ms.ToArray();
+                var path = _imageStorage.SaveImage("club", clubId, bytes, file.ContentType);
+                paths.Add(path);
             }
-
-            if (existingClub.CreatorId != clubDto.CreatorId)
-            {
-                throw new UnauthorizedAccessException("You can only update your own clubs.");
-            }
-
-            try
-            {
-                if (clubDto.Images == null || clubDto.Images.Count == 0)
-                {
-                    throw new ArgumentException("Club must have at least one image.");
-                }
-
-                List<byte[]> imageBytes = clubDto.Images
-                    .Select(base64 => Convert.FromBase64String(base64))
-                    .ToList();
-
-                var updatedClub = new Club(
-                    clubDto.Name,
-                    clubDto.Description,
-                    imageBytes,
-                    clubDto.CreatorId
-                );
-
-                // Postavljanje ID-ja za update
-                typeof(Entity).GetProperty("Id")?.SetValue(updatedClub, clubDto.Id);
-
-                var result = _clubRepository.Update(updatedClub);
-                return _mapper.Map<ClubDto>(result);
-            }
-            catch (ArgumentException ex)
-            {
-                throw new EntityValidationException(ex.Message);
-            }
-            catch (FormatException ex)
-            {
-                throw new EntityValidationException("Invalid image format: " + ex.Message);
-            }
+            return paths;
         }
 
         public void Delete(long userId, long id)
@@ -127,5 +104,21 @@ namespace Explorer.Stakeholders.Core.UseCases
             var clubs = _clubRepository.GetAll();
             return _mapper.Map<List<ClubDto>>(clubs);
         }
+
+        public ClubDto RemoveImage(long userId, long clubId, string imagePath)
+        {
+            var club = _clubRepository.GetById(clubId);
+            if (club == null)
+                throw new KeyNotFoundException($"Club with ID {clubId} not found.");
+
+            if (club.CreatorId != userId)
+                throw new UnauthorizedAccessException("You can only modify your own clubs.");
+
+            club.ImagePaths.Remove(imagePath);
+
+            var updatedClub = _clubRepository.Update(club);
+            return _mapper.Map<ClubDto>(updatedClub);
+        }
+
     }
 }

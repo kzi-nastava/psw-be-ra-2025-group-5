@@ -1,8 +1,7 @@
 using Explorer.API.FileStorage;
 using Explorer.API.Middleware;
 using Explorer.API.Startup;
-using Explorer.Blog.API.Public;
-using Explorer.Stakeholders.Core.Mappers;
+using Explorer.BuildingBlocks.Core.FileStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 

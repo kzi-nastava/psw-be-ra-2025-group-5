@@ -7,6 +7,7 @@ using Explorer.Tours.API.Public.Administration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using static Explorer.Blog.Core.Domain.BlogPost;
+using Microsoft.Extensions.Hosting;
 
 namespace Explorer.API.Controllers.Blog;
 
@@ -87,7 +88,10 @@ public class BlogController : ControllerBase
         if (dto.File == null || dto.File.Length == 0)
             return BadRequest("No file uploaded");
 
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images",  "blog");
+        var post = _blogService.GetById(postId);
+        if (post == null) return NotFound("Post not found");
+
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images",  "blog", post.AuthorId.ToString());
 
         if (!Directory.Exists(uploadsFolder))
             Directory.CreateDirectory(uploadsFolder);

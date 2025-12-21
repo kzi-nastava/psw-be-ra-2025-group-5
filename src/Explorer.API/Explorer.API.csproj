@@ -30,6 +30,7 @@
     <Folder Include="Controllers\Author\" />
     <Folder Include="Mappers\" />
     <Folder Include="wwwroot\images\blog\" />
+    <Folder Include="wwwroot\images\club\" />
   </ItemGroup>
 
 </Project>
