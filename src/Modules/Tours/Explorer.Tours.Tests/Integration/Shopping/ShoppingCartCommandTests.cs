@@ -99,8 +99,12 @@ public class ShoppingCartCommandTests : BaseToursIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
         var controller = CreateController(scope);
 
-        // Act & Assert
-        Should.Throw<InvalidOperationException>(() => controller.AddOrderItem(-4, -2));
+        // Act
+        var result = controller.AddOrderItem(-4, -2).Result as ConflictObjectResult;
+
+        // Assert
+        result?.StatusCode.ShouldBe(409);
+        result?.Value?.ToString().ShouldContain("Tour is already in the cart.");
     }
 
     [Fact]
