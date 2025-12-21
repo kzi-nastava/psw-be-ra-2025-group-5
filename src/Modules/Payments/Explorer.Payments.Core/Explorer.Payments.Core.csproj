@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Explorer.BuildingBlocks.Infrastructure\Explorer.BuildingBlocks.Infrastructure.csproj" />
-    <ProjectReference Include="..\Explorer.Blog.Core\Explorer.Blog.Core.csproj" />
+    <ProjectReference Include="..\Explorer.Payments.API\Explorer.Payments.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <Folder Include="Domain\RepositoryInterfaces\" />
+    <Folder Include="UseCases\" />
   </ItemGroup>
 
 </Project>
