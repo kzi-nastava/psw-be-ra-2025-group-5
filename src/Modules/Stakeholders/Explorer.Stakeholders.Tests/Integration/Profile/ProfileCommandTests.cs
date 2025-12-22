@@ -18,10 +18,9 @@ public class ProfileCommandTests : BaseStakeholdersIntegrationTest
     [Fact]
     public void Successfully_updates_profile()
     {
-        // Arrange
         using var scope = Factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IProfileService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        var controller = CreateController(scope);
 
         var updatedProfile = new ProfileDto
         {
@@ -34,7 +33,7 @@ public class ProfileCommandTests : BaseStakeholdersIntegrationTest
         };
 
         // Act
-        var result = ((ObjectResult)controller.UpdateProfile(-21, updatedProfile).Result)?.Value as ProfileDto;
+        var result = service.Update(updatedProfile, profileImage: null);
 
         // Assert - Response
         result.ShouldNotBeNull();
@@ -45,7 +44,7 @@ public class ProfileCommandTests : BaseStakeholdersIntegrationTest
 
         // Assert - Database
         dbContext.ChangeTracker.Clear();
-        var storedPerson = dbContext.People.FirstOrDefault(i => i.Id == -21);
+        var storedPerson = dbContext.People.Find((long)-21);
         storedPerson.ShouldNotBeNull();
         storedPerson.Name.ShouldBe("UpdatedPera");
         storedPerson.Surname.ShouldBe("UpdatedPerić");
@@ -56,47 +55,37 @@ public class ProfileCommandTests : BaseStakeholdersIntegrationTest
     [Fact]
     public void Successfully_updates_profile_with_image()
     {
-        // Arrange
         using var scope = Factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IProfileService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
-        var controller = CreateController(scope);
+
+        var imageBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+
+        var stream = new MemoryStream(imageBytes);
+        var formFile = new Microsoft.AspNetCore.Http.FormFile(stream, 0, imageBytes.Length, "ProfileImage", "profile.png")
+        {
+            Headers = new Microsoft.AspNetCore.Http.HeaderDictionary(),
+            ContentType = "image/png"
+        };
 
         var updatedProfile = new ProfileDto
         {
             Id = -21,
             Name = "Pera",
             Surname = "Perić",
-            Email = "turista1@gmail.com",
-            ProfileImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+            Email = "turista1@gmail.com"
         };
 
         // Act
-        var result = ((ObjectResult)controller.UpdateProfile(-21, updatedProfile).Result)?.Value as ProfileDto;
+        var result = service.Update(updatedProfile, profileImage: formFile);
 
         // Assert
         result.ShouldNotBeNull();
 
         // Assert - Database
         dbContext.ChangeTracker.Clear();
-        var storedPerson = dbContext.People.FirstOrDefault(i => i.Id == -21);
+        var storedPerson = dbContext.People.Find((long)-21);
         storedPerson.ShouldNotBeNull();
-        storedPerson.ProfileImage.ShouldNotBeNull();
-    }
-
-    private static ProfileController CreateController(IServiceScope scope)
-    {
-        return new ProfileController(scope.ServiceProvider.GetRequiredService<IProfileService>())
-        {
-            ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-                    {
-                        new Claim("id", "-21")
-                    }))
-                }
-            }
-        };
+        storedPerson.ProfileImagePath.ShouldNotBeNull(); 
     }
 }

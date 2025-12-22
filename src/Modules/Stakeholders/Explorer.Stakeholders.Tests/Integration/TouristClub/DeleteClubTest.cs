@@ -2,6 +2,7 @@
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Infrastructure.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System;
@@ -24,24 +25,23 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
             var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
             var service = scope.ServiceProvider.GetRequiredService<IClubService>();
 
-            // Arrange — create club
-            var created = service.Create(new ClubDto
-            {
-                Id = -5151,
-                Name = "Planinari",
-                Description = "Opis",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
+            var created = service.Create(
+                new ClubDto
+                {
+                    Name = "Planinari",
+                    Description = "Opis",
+                    CreatorId = 1
+                },
+                new List<IFormFile> { CreateTestImage() }
+            );
 
-            // Act
             service.Delete(1, created.Id);
 
-            // Assert
             dbContext.ChangeTracker.Clear();
             var stored = dbContext.Clubs.Find(created.Id);
             stored.ShouldBeNull();
         }
+
 
         [Fact]
         public void Fails_when_club_not_found()
@@ -58,19 +58,37 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
             using var scope = Factory.Services.CreateScope();
             var service = scope.ServiceProvider.GetRequiredService<IClubService>();
 
-            var created = service.Create(new ClubDto
-            {
-                Id = -5151,
-                Name = "Planinari",
-                Description = "Opis",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
+            var created = service.Create(
+                new ClubDto
+                {
+                    Name = "Planinari",
+                    Description = "Opis",
+                    CreatorId = 1
+                },
+                new List<IFormFile> { CreateTestImage() }
+            );
 
             Should.Throw<UnauthorizedAccessException>(() =>
-            {
-                service.Delete(2, created.Id);
-            });
+                service.Delete(2, created.Id)
+            );
         }
+
+        private static IFormFile CreateTestImage()
+        {
+            var bytes = new byte[] { 1, 2, 3 };
+            var stream = new MemoryStream(bytes);
+
+            return new FormFile(
+                stream,
+                0,
+                bytes.Length,
+                "image",
+                "test.jpg")
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "image/jpeg"
+            };
+        }
+
     }
 }

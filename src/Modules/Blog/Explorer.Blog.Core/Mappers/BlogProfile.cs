@@ -14,12 +14,8 @@ namespace Explorer.Blog.Core.Mappers
                 .ForMember(dest => dest.VoteScore, opt => opt.MapFrom(src => src.GetScore()))
                 .ReverseMap();
 
-            CreateMap<BlogImage, BlogImageDto>()
-               .ForMember(dest => dest.Base64,
-                   opt => opt.MapFrom(src => Convert.ToBase64String(src.Data)));
+            CreateMap<BlogImage, BlogImageDto>().ForMember(d => d.Url, o => o.MapFrom(s => s.ImagePath));
 
-            CreateMap<BlogImageDto, BlogImage>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             // Mapiranje komentara (feat/blog-comments)
             CreateMap<Comment, CommentBlogDto>();

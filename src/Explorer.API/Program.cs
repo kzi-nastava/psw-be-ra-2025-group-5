@@ -1,6 +1,7 @@
+using Explorer.API.FileStorage;
 using Explorer.API.Middleware;
 using Explorer.API.Startup;
-using Explorer.Stakeholders.Core.Mappers;
+using Explorer.BuildingBlocks.Core.FileStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +15,11 @@ builder.Services.RegisterModules();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddHostedService<TourExpirationWorker>();
+builder.Services.AddScoped<IImageStorage, FileSystemImageStorage>();
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
