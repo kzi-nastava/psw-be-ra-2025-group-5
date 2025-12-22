@@ -82,6 +82,41 @@ public class TourExecutionQueryTests : BaseToursIntegrationTest
         result.All(e => e.UserId == -1).ShouldBeTrue();
     }
 
+    [Fact]
+    public void GetPurchasedTours_ReturnsOnlyToursWithoutExecution()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+
+        dbContext.TourExecutions.RemoveRange(dbContext.TourExecutions);
+        dbContext.TourPurchaseTokens.RemoveRange(dbContext.TourPurchaseTokens);
+        dbContext.SaveChanges();
+
+        var tourId1 = -1;
+        var tourId2 = -2;
+        var tourId3 = -3;
+
+        dbContext.TourPurchaseTokens.AddRange(
+            new TourPurchaseToken(touristId: -1, tourId: tourId1),
+            new TourPurchaseToken(touristId: -1, tourId: tourId2),
+            new TourPurchaseToken(touristId: -1, tourId: tourId3)
+        );
+
+        var execution = TourExecution.StartNew(userId: -1, tourId: tourId2);
+        dbContext.TourExecutions.Add(execution);
+
+        dbContext.SaveChanges();
+
+        var controller = CreateController(scope);
+
+        // Act
+        var result = ((ObjectResult)controller.GetPurchasedTours().Result)?.Value as List<TourDto>;
+
+        // Assert 
+        result.ShouldNotBeNull();
+        result.Select(t => t.Id).ShouldBe(new List<long> { tourId1, tourId3 });
+    }
 
     private static TourExecutionController CreateController(IServiceScope scope)
     {
