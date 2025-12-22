@@ -1,5 +1,5 @@
-﻿using Explorer.API.Controllers.Tourist;
-using Explorer.Tours.API.Dtos;
+﻿using Explorer.API.Controllers.Tours.Tourist;
+using Explorer.Tours.API.Dtos.Tours.PurchaseTokens;
 using Explorer.Tours.API.Public.Shopping;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

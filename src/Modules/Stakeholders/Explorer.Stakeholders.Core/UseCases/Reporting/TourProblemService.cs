@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Comments;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
-using Explorer.Stakeholders.Core.Domain;
-using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.Core.Domain.Comments;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TourProblems;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
+using Explorer.Stakeholders.Core.Domain.TourProblems;
 using System.Data;
 
 namespace Explorer.Stakeholders.Core.UseCases.Reporting;
@@ -90,8 +93,8 @@ public class TourProblemService : ITourProblemService
             Id = problem.Id,
             TourId = problem.TourId,
             ReporterId = problem.ReporterId,
-            Category = (API.Dtos.ProblemCategory)problem.Category,
-            Priority = (API.Dtos.ProblemPriority)problem.Priority,
+            Category = (API.Dtos.Tours.Problems.ProblemCategory)problem.Category,
+            Priority = (API.Dtos.Tours.Problems.ProblemPriority)problem.Priority,
             Description = problem.Description,
             OccurredAt = problem.OccurredAt,
             CreatedAt = problem.CreatedAt,
@@ -141,8 +144,8 @@ public class TourProblemService : ITourProblemService
                 Id = problem.Id,
                 TourId = problem.TourId,
                 ReporterId = problem.ReporterId,
-                Category = (API.Dtos.ProblemCategory)problem.Category,
-                Priority = (API.Dtos.ProblemPriority)problem.Priority,
+                Category = (API.Dtos.Tours.Problems.ProblemCategory)problem.Category,
+                Priority = (API.Dtos.Tours.Problems.ProblemPriority)problem.Priority,
                 Description = problem.Description,
                 OccurredAt = problem.OccurredAt,
                 CreatedAt = problem.CreatedAt,

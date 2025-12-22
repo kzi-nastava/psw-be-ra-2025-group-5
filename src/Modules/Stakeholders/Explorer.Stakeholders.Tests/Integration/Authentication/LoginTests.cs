@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using Explorer.API.Controllers;
 using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.API.Controllers.Authentication;
+using Explorer.Stakeholders.API.Dtos.Authentication;
+using Explorer.Stakeholders.API.Public.Users;
 
 namespace Explorer.Stakeholders.Tests.Integration.Authentication;
 

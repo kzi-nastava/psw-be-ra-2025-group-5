@@ -1,5 +1,4 @@
-﻿
-using Explorer.Tours.API.Dtos;
+﻿using Explorer.Tours.API.Dtos.Tours.PurchaseTokens;
 
 namespace Explorer.Tours.API.Public.Shopping;
 

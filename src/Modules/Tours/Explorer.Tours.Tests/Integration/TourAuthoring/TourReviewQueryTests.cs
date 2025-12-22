@@ -1,9 +1,8 @@
-﻿using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Tours.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
-using Explorer.Tours.Core.Domain;
+using Explorer.Tours.Core.Domain.TourPurchaseTokens;
+using Explorer.Tours.Core.Domain.TourExecutions;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,8 @@ using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Explorer.Tours.API.Public.Tour;
 
 namespace Explorer.Tours.Tests.Integration.TouristPreferences
 {
@@ -96,11 +97,11 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             var emptyTour = db.Tours.Include(t => t.Reviews).FirstOrDefault(t => !t.Reviews.Any());
             if (emptyTour is null)
             {
-                emptyTour = new Explorer.Tours.Core.Domain.Tour(
+                emptyTour = new Core.Domain.Tours.Tour(
                     authorId: 1,
                     name: "Empty test tour",
                     description: "desc",
-                    difficulty: Explorer.Tours.Core.Domain.TourDifficulty.Easy,
+                    difficulty: Core.Domain.Tours.TourDifficulty.Easy,
                     tags: new List<string>(),
                     price: 0
                 );

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
 
 
 namespace Explorer.Blog.Infrastructure.Database.Repositories

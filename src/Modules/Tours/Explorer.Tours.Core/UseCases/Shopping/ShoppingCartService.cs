@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
-using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Dtos.Shoppings;
+using Explorer.Tours.API.Dtos.Tours.PurchaseTokens;
 using Explorer.Tours.API.Public.Shopping;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Shopping;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Tours.Core.Domain.ShoppingCarts;
+using Explorer.Tours.Core.Domain.Tours;
 
 namespace Explorer.Tours.Core.UseCases.Shopping;
 

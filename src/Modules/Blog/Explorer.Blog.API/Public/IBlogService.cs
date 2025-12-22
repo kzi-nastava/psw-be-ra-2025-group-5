@@ -1,4 +1,5 @@
-﻿using Explorer.Blog.API.Dtos;
+﻿using Explorer.Blog.API.Dtos.Images;
+using Explorer.Blog.API.Dtos.Posts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

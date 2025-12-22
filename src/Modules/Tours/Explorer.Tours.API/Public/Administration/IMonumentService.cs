@@ -1,5 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Dtos.Monuments;
 using System;
 using System.Collections.Generic;
 using System.Linq;

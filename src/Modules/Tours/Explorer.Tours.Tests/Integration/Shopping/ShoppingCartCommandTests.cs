@@ -1,8 +1,11 @@
-﻿using Explorer.API.Controllers.Author;
-using Explorer.API.Controllers.Tourist;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
+﻿using Explorer.API.Controllers.Shopping;
+using Explorer.API.Controllers.Tours.Author;
+using Explorer.API.Controllers.Tours.Tourist;
+using Explorer.Tours.API.Dtos.Shoppings;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Dtos.Tours.PurchaseTokens;
 using Explorer.Tours.API.Public.Shopping;
+using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

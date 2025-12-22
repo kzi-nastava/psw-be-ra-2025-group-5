@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Explorer.Blog.API.Public;
-using Explorer.Blog.API.Dtos;
-using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
-using static Explorer.Blog.Core.Domain.BlogPost;
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
+using Explorer.Blog.API.Dtos.Posts;
+using Explorer.Blog.API.Dtos.Images;
 
 namespace Explorer.Blog.Core.UseCases
 {
@@ -28,12 +25,12 @@ namespace Explorer.Blog.Core.UseCases
             var result = _blogRepository.GetAll();
 
             var filtered = result.Where(post =>
-                post.Status == BlogPost.BlogStatus.Published ||
-                post.Status == BlogPost.BlogStatus.Archived ||
-                post.Status == BlogPost.BlogStatus.Active ||
-                post.Status == BlogPost.BlogStatus.Famous ||
-                post.Status == BlogPost.BlogStatus.ReadOnly ||
-                (post.Status == BlogPost.BlogStatus.Draft && post.AuthorId == userId)
+                post.Status == BlogStatus.Published ||
+                post.Status == BlogStatus.Archived ||
+                post.Status == BlogStatus.Active ||
+                post.Status == BlogStatus.Famous ||
+                post.Status == BlogStatus.ReadOnly ||
+                (post.Status == BlogStatus.Draft && post.AuthorId == userId)
             ).ToList();
 
             return _mapper.Map<List<BlogPostDto>>(filtered);
@@ -62,7 +59,7 @@ namespace Explorer.Blog.Core.UseCases
         {
             var result = _blogRepository.GetAll();
 
-            if (Enum.TryParse<BlogPost.BlogStatus>(status, true, out var parsedStatus))
+            if (Enum.TryParse<BlogStatus>(status, true, out var parsedStatus))
             {
                 var filtered = result.Where(post => post.Status == parsedStatus).ToList();
                 return _mapper.Map<List<BlogPostDto>>(filtered);

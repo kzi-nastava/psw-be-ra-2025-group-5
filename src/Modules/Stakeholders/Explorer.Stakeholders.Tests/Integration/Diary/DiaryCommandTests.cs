@@ -1,8 +1,8 @@
-using Explorer.API.Controllers.Tourist;
+using Explorer.API.Controllers.Social;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
-using Explorer.Stakeholders.Core.Domain;
+using Explorer.Stakeholders.API.Dtos.Diaries;
+using Explorer.Stakeholders.API.Public.Diaries;
+using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

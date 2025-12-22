@@ -1,4 +1,12 @@
-﻿using Explorer.Stakeholders.Core.Domain;
+﻿using Explorer.Stakeholders.Core.Domain.AppRatings;
+using Explorer.Stakeholders.Core.Domain.Clubs;
+using Explorer.Stakeholders.Core.Domain.Comments;
+using Explorer.Stakeholders.Core.Domain.Diaries;
+using Explorer.Stakeholders.Core.Domain.Notifications;
+using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.TourProblems;
+using Explorer.Stakeholders.Core.Domain.Users;
+using Explorer.Stakeholders.Core.Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

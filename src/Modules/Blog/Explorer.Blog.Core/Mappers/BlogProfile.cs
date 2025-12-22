@@ -1,6 +1,10 @@
 using AutoMapper;
-using Explorer.Blog.API.Dtos;
-using Explorer.Blog.Core.Domain;
+using Explorer.Blog.API.Dtos.Comments;
+using Explorer.Blog.API.Dtos.Images;
+using Explorer.Blog.API.Dtos.Posts;
+using Explorer.Blog.API.Dtos.Votes;
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
 
 namespace Explorer.Blog.Core.Mappers
 {

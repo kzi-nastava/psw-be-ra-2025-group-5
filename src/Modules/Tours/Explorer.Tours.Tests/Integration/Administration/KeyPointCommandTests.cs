@@ -1,8 +1,10 @@
-using Explorer.API.Controllers.Author;
+using Explorer.API.Controllers.Tours.Author;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
-using Explorer.Tours.Core.Domain;
+using Explorer.Tours.API.Dtos.KeyPoints;
+using Explorer.Tours.API.Dtos.Locations;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
