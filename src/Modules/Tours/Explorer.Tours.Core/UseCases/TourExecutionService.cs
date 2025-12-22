@@ -234,5 +234,24 @@ namespace Explorer.Tours.Core.UseCases
             return EarthRadiusMeters * c;
         }
 
+        public List<TourDto> GetPurchasedToursWithoutExecution(long userId)
+        {
+            var tokens = _tokenService.GetByTourist(userId); 
+            if (tokens == null || !tokens.Any()) return new List<TourDto>();
+
+            var tours = new List<Tour>();
+            foreach (var token in tokens)
+            {
+                bool hasExecution = _repo.HasAnyExecution(userId, token.TourId);
+                if (!hasExecution)
+                {
+                    var tour = _tourRepo.Get(token.TourId);
+                    if (tour != null) tours.Add(tour);
+                }
+            }
+
+            return _mapper.Map<List<TourDto>>(tours);
+        }
+
     }
 }
