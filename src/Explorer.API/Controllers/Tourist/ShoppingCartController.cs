@@ -35,8 +35,11 @@ public class ShoppingCartController : ControllerBase
     [HttpPost("{touristId:long}/items/{tourId:long}")]
     public ActionResult<ShoppingCartDto> AddOrderItem(long touristId, long tourId)
     {
-        var result = _ShoppingCartService.AddOrderItem(touristId, tourId);
-        return Ok(result);
+        try
+        {
+            var result = _ShoppingCartService.AddOrderItem(touristId, tourId);
+            return Ok(result);
+        } catch (InvalidOperationException ex) { return Conflict(ex.Message); }
     }
 
     [HttpDelete("{touristId:long}/items/{tourId:long}")]
