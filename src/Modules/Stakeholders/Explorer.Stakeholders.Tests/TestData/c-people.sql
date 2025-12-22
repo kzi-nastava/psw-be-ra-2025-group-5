@@ -1,5 +1,5 @@
 ﻿INSERT INTO stakeholders."People"(
-    "Id", "UserId", "Name", "Surname", "Email", "Biography", "Motto", "ProfileImage")
+    "Id", "UserId", "Name", "Surname", "Email", "Biography", "Motto", "ProfileImagePath")
 VALUES 
 (-11, -11, 'Ana', 'Anić', 'autor1@gmail.com', NULL, NULL, NULL),
 (-12, -12, 'Lena', 'Lenić', 'autor2@gmail.com', NULL, NULL, NULL),

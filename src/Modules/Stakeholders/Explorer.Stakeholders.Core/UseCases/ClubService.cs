@@ -45,7 +45,10 @@ namespace Explorer.Stakeholders.Core.UseCases
 
         public ClubDto Update(ClubDto clubDto, List<IFormFile>? images)
         {
-            var existingClub = _clubRepository.GetById(clubDto.Id); 
+            var existingClub = _clubRepository.GetById(clubDto.Id);
+
+            if (existingClub == null)
+                throw new NotFoundException($"Club with ID {clubDto.Id} not found.");
 
             existingClub.Name = clubDto.Name;
             existingClub.Description = clubDto.Description;
@@ -56,7 +59,9 @@ namespace Explorer.Stakeholders.Core.UseCases
                 existingClub.ImagePaths.AddRange(savedPaths);
             }
 
+            existingClub.Validate();
             var updatedClub = _clubRepository.Update(existingClub);
+
             return _mapper.Map<ClubDto>(updatedClub);
         }
 
