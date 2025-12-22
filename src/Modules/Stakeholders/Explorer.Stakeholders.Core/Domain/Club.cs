@@ -27,7 +27,7 @@ namespace Explorer.Stakeholders.Core.Domain
         {
             if (string.IsNullOrWhiteSpace(Name)) throw new ArgumentException("Club name cannot be empty.");
             if (string.IsNullOrWhiteSpace(Description)) throw new ArgumentException("Club description cannot be empty.");
-            if (ImagePaths.Count == 0) throw new ArgumentException("Club must have at least one image.");
+            //if (ImagePaths.Count == 0) throw new ArgumentException("Club must have at least one image.");
             //if (CreatorId < 0) throw new ArgumentException("Invalid creator ID.");
         }
     }

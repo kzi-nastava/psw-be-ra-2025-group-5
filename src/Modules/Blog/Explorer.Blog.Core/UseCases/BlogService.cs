@@ -10,6 +10,7 @@ using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using static Explorer.Blog.Core.Domain.BlogPost;
 using Explorer.BuildingBlocks.Core.FileStorage;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Explorer.Blog.Core.UseCases
 {
@@ -170,7 +171,7 @@ namespace Explorer.Blog.Core.UseCases
             return _mapper.Map<BlogImageDto>(image);
         }
 
-        public BlogImageDto UpdateImageFromFile(long imageId, string filePath, string contentType, int order)
+        public BlogImageDto UpdateImage(long imageId, byte[] imageData, string contentType, int order)
         {
             var image = _blogRepository.GetImage(imageId);
             if (image == null) return null;
@@ -179,16 +180,15 @@ namespace Explorer.Blog.Core.UseCases
             if (post.Status != BlogStatus.Draft)
                 throw new InvalidOperationException("Only draft blogs allow image update");
 
-            // update fajla i order-a
-            image.UpdateImage(filePath, contentType);
+            var newPath = _imageStorage.SaveImage("blog", post.AuthorId, imageData, contentType);
+
+            image.UpdateImage(newPath, contentType);
             image.ChangeOrder(order);
 
             _blogRepository.UpdateImage(image);
 
             return _mapper.Map<BlogImageDto>(image);
         }
-
-
         public BlogImageDto GetImage(long id)
         {
             var image = _blogRepository.GetImage(id);
@@ -199,10 +199,9 @@ namespace Explorer.Blog.Core.UseCases
                 Id = image.Id,
                 ContentType = image.ContentType,
                 Order = image.Order,
-                Url = "/images/blog/" + Path.GetFileName(image.ImagePath)
+                Url = image.ImagePath
             };
         }
-
 
         public List<BlogImageDto> GetImagesByPostId(long postId)
         {
@@ -283,20 +282,6 @@ namespace Explorer.Blog.Core.UseCases
             return _mapper.Map<BlogPostDto>(post);
         }
 
-        public BlogImageDto AddImageFromFile(long postId, string filePath, string contentType, int order)
-        {
-            var post = _blogRepository.GetById(postId);
-            if (post == null)
-                throw new KeyNotFoundException("Post not found");
-
-            if (post.Status != BlogStatus.Draft)
-                throw new InvalidOperationException("Images can be added only to draft blogs");
-
-            var image = new BlogImage(postId, filePath, contentType, order);
-            _blogRepository.AddImage(image);
-
-            return _mapper.Map<BlogImageDto>(image);
-        }
 
     }
 

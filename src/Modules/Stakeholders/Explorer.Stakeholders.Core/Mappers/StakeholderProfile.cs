@@ -10,15 +10,11 @@ namespace Explorer.Stakeholders.Core.Mappers
     {
         public StakeholderProfile()
         {
-            // ========================= Person <-> ProfileDto =========================
             CreateMap<Person, ProfileDto>()
-                .ForMember(
-                    dest => dest.ProfileImageBase64,
-                    opt => opt.MapFrom(src => src.ProfileImage != null
-                        ? Convert.ToBase64String(src.ProfileImage)
-                        : string.Empty)
-                )
-                .ReverseMap();
+                .ForMember(dest => dest.Statistics, opt => opt.Ignore()); 
+
+            CreateMap<ProfileDto, Person>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore()); 
 
             // ========================= AppRating <-> AppRatingDto =========================
             CreateMap<AppRating, AppRatingDto>();

@@ -31,6 +31,7 @@
     <Folder Include="Mappers\" />
     <Folder Include="wwwroot\images\blog\" />
     <Folder Include="wwwroot\images\club\" />
+    <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>
 
 </Project>

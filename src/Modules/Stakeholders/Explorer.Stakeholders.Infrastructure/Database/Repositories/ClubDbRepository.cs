@@ -27,18 +27,10 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
 
         public Club Update(Club club)
         {
-            var existingClub = _dbContext.Clubs.FirstOrDefault(c => c.Id == club.Id);
-            if (existingClub == null)
-                throw new KeyNotFoundException("Club not found");
-
-            existingClub.Name = club.Name;
-            existingClub.Description = club.Description;
-            existingClub.CreatorId = club.CreatorId;
-
+            _dbContext.Clubs.Update(club);
             _dbContext.SaveChanges();
-            return existingClub;
+            return club;
         }
-
 
 
         public void Delete(long id)
@@ -53,8 +45,11 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
 
         public Club? GetById(long id)
         {
-            return _dbContext.Clubs.Find(id);
+            return _dbContext.Clubs
+                .AsTracking()
+                .FirstOrDefault(c => c.Id == id);
         }
+
 
         public List<Club> GetAll()
         {

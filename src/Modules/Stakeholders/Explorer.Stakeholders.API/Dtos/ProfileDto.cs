@@ -11,7 +11,7 @@ public class ProfileDto
     public string Biography { get; set; }
     public string Motto { get; set; }
 
-    public string? ProfileImageBase64 { get; set; }
+    public string? ProfileImagePath { get; set; }
 
     public TouristStatisticsDto Statistics { get; set; }
 }

@@ -29,7 +29,7 @@ namespace Explorer.API.Controllers.Tourist
         }
 
         [HttpGet("{id:long}")]
-        public ActionResult<ClubDto> GetById(int id)
+        public ActionResult<ClubDto> GetById(long id)
         {
             var result = _clubService.GetById(id);
             return Ok(result);

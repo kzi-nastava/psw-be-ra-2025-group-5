@@ -91,39 +91,30 @@ public class BlogController : ControllerBase
         var post = _blogService.GetById(postId);
         if (post == null) return NotFound("Post not found");
 
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images",  "blog", post.AuthorId.ToString());
+        using var ms = new MemoryStream();
+        await dto.File.CopyToAsync(ms);
+        var bytes = ms.ToArray();
 
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
+        var base64 = Convert.ToBase64String(bytes);
+        var dataUrl = $"data:{dto.File.ContentType};base64,{base64}";
 
-        var uniqueFileName = Guid.NewGuid() + Path.GetExtension(dto.File.FileName);
-
-        var physicalPath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        var relativePath = Path.Combine("images", "blog", uniqueFileName)
-                                .Replace("\\", "/");
-
-        using (var fileStream = new FileStream(physicalPath, FileMode.Create))
+        var imageDto = new BlogImageDto
         {
-            await dto.File.CopyToAsync(fileStream);
-        }
+            Url = dataUrl,
+            ContentType = dto.File.ContentType,
+            Order = dto.Order
+        };
 
-        var result = _blogService.AddImageFromFile(
-            postId,
-            relativePath,
-            dto.File.ContentType,
-            dto.Order
-        );
-
+        var result = _blogService.AddImage(postId, imageDto);
         return Ok(result);
     }
 
     [HttpPut("{postId}/images/{imageId:long}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UpdateImage(
-    long postId,
-    long imageId,
-    [FromForm] BlogImageUploadUpdateDto dto)
+        long postId,
+        long imageId,
+        [FromForm] BlogImageUploadUpdateDto dto)
     {
         if (dto.File == null || dto.File.Length == 0)
             return BadRequest("No file uploaded");
@@ -131,9 +122,15 @@ public class BlogController : ControllerBase
         var post = _blogService.GetById(postId);
         if (post == null) return NotFound("Post not found");
 
-        var path = await SaveFile(dto.File);
+        using var ms = new MemoryStream();
+        await dto.File.CopyToAsync(ms);
+        var bytes = ms.ToArray();
 
-        var result = _blogService.UpdateImageFromFile(imageId, path, dto.File.ContentType, dto.Order);
+        var result = _blogService.UpdateImage(
+            imageId,
+            bytes,
+            dto.File.ContentType,
+            dto.Order);
 
         if (result == null) return NotFound();
 
@@ -204,7 +201,6 @@ public class BlogController : ControllerBase
     {
         var authorId = GetUserIdFromToken();
 
-        // 1️⃣ create draft
         var post = _blogService.Create(
             new CreateBlogPostDto
             {
@@ -214,46 +210,32 @@ public class BlogController : ControllerBase
             authorId
         );
 
-        // 2️⃣ upload images
         if (dto.Images != null && dto.Images.Any())
         {
             int order = 0;
             foreach (var file in dto.Images)
             {
-                var path = await SaveFile(file);
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+                var bytes = ms.ToArray();
 
-                _blogService.AddImageFromFile(
-                    post.Id,
-                    path,
-                    file.ContentType,
-                    order++
-                );
+                var base64 = Convert.ToBase64String(bytes);
+                var dataUrl = $"data:{file.ContentType};base64,{base64}";
+
+                var imageDto = new BlogImageDto
+                {
+                    Url = dataUrl,
+                    ContentType = file.ContentType,
+                    Order = order++
+                };
+
+                _blogService.AddImage(post.Id, imageDto);
             }
         }
 
         var result = _blogService.Publish(post.Id, authorId);
         return Ok(result);
     }
-    private async Task<string> SaveFile(IFormFile file)
-    {
-        var folder = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "wwwroot",
-            "images",
-            "blog");
-
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
-
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-        var physicalPath = Path.Combine(folder, fileName);
-
-        using var stream = new FileStream(physicalPath, FileMode.Create);
-        await file.CopyToAsync(stream);
-
-        return $"images/blog/{fileName}";
-    }
-
 
 
 }

@@ -54,7 +54,6 @@ namespace Explorer.Stakeholders.Core.UseCases
             {
                 var savedPaths = SaveImages(clubDto.CreatorId, images);
                 existingClub.ImagePaths.AddRange(savedPaths);
-
             }
 
             var updatedClub = _clubRepository.Update(existingClub);
