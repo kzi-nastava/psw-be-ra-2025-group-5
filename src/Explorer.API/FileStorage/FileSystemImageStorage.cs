@@ -5,11 +5,13 @@ namespace Explorer.API.FileStorage
 {
     public class FileSystemImageStorage : IImageStorage
     {
-        private readonly IWebHostEnvironment _env;
+        private readonly string _basePath;
 
-        public FileSystemImageStorage(IWebHostEnvironment env)
+        public FileSystemImageStorage()
         {
-            _env = env;
+            _basePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads");
+            if (!Directory.Exists(_basePath))
+                Directory.CreateDirectory(_basePath);
         }
 
         public string SaveImage(
@@ -26,13 +28,7 @@ namespace Explorer.API.FileStorage
                 _ => throw new ArgumentException("Unsupported image type")
             };
 
-            var folder = Path.Combine(
-                _env.WebRootPath,
-                "images",
-                entityType.ToLower(),
-                entityId.ToString()
-            );
-
+            var folder = Path.Combine(_basePath, entityType.ToLower(), entityId.ToString());
             Directory.CreateDirectory(folder);
 
             var fileName = $"{Guid.NewGuid()}{ext}";
@@ -40,15 +36,12 @@ namespace Explorer.API.FileStorage
 
             File.WriteAllBytes(fullPath, data);
 
-            return $"/images/{entityType.ToLower()}/{entityId}/{fileName}";
+            return Path.Combine(entityType.ToLower(), entityId.ToString(), fileName).Replace("\\", "/");
         }
 
         public void Delete(string relativePath)
         {
-            var fullPath = Path.Combine(
-                _env.WebRootPath,
-                relativePath.TrimStart('/')
-            );
+            var fullPath = Path.Combine(_basePath, relativePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
 
             if (File.Exists(fullPath))
                 File.Delete(fullPath);
