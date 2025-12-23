@@ -49,12 +49,6 @@ public class TourService : ITourService
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
-    public TourDto Get(long id)
-    {
-        var tour = _tourRepository.Get(id);
-        return _mapper.Map<TourDto>(tour);
-    }
-
     public List<string> GetAllTags()
     {
         var result = _tourRepository.GetAll();

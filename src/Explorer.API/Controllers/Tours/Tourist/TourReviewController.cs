@@ -22,7 +22,7 @@ namespace Explorer.API.Controllers.Tours.Tourist
         [HttpGet]
         public ActionResult<PagedResult<TourReviewDto>> GetByTour(long tourId, int page = 0, int pageSize = 10)
         {
-            var tour = _tourService.Get(tourId);
+            var tour = _tourService.GetById(tourId);
 
             var reviews = tour.Reviews
                 .Skip(page * pageSize)
