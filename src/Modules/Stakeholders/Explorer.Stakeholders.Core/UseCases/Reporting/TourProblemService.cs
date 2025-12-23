@@ -9,7 +9,9 @@ using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TourProblems;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using System.Data;
+
 
 namespace Explorer.Stakeholders.Core.UseCases.Reporting;
 
@@ -19,17 +21,19 @@ public class TourProblemService : ITourProblemService
     private readonly IUserRepository _userRepository;
     private readonly INotificationService _notificationService;
     private readonly IMapper _mapper;
+    private readonly ITourRepository _tourRepository;
 
     public TourProblemService(
         ITourProblemRepository repository, 
         IUserRepository userRepository, 
         INotificationService notificationService,
-        IMapper mapper)
+        IMapper mapper, ITourRepository tourRepository)
     {
         _repository = repository;
         _userRepository = userRepository;
         _notificationService = notificationService;
         _mapper = mapper;
+        _tourRepository = tourRepository;
     }
 
     public PagedResult<TourProblemDto> GetPaged(int page, int pageSize)
@@ -88,11 +92,16 @@ public class TourProblemService : ITourProblemService
         if (problem == null)
             throw new NotFoundException($"TourProblem {id} not found");
 
+        var tour = _tourRepository.Get(problem.TourId);
+        var reporter = _userRepository.GetById(problem.ReporterId);
+
         var dto = new TourProblemDto
         {
             Id = problem.Id,
             TourId = problem.TourId,
             ReporterId = problem.ReporterId,
+            TourName = tour?.Name ?? string.Empty,
+            ReporterName = reporter?.Username ?? string.Empty,
             Category = (API.Dtos.Tours.Problems.ProblemCategory)problem.Category,
             Priority = (API.Dtos.Tours.Problems.ProblemPriority)problem.Priority,
             Description = problem.Description,
@@ -138,12 +147,16 @@ public class TourProblemService : ITourProblemService
     {
         var items = result.Results.Select(problem =>
         {
+            var tour = _tourRepository.Get(problem.TourId);
+            var reporter = _userRepository.GetById(problem.ReporterId);
 
             return new TourProblemDto
             {
                 Id = problem.Id,
                 TourId = problem.TourId,
                 ReporterId = problem.ReporterId,
+                TourName = tour?.Name ?? string.Empty,
+                ReporterName = reporter?.Username ?? string.Empty,
                 Category = (API.Dtos.Tours.Problems.ProblemCategory)problem.Category,
                 Priority = (API.Dtos.Tours.Problems.ProblemPriority)problem.Priority,
                 Description = problem.Description,

@@ -86,8 +86,11 @@ namespace Explorer.Stakeholders.Core.Mappers
                     CreatedAt = src.CreatedAt,
                     IsResolved = src.IsResolved,
                     Deadline = src.Deadline,
-                    Comments = new List<CommentDto>()
+                    Comments = new List<CommentDto>(),
+                    TourName = "",
+                    ReporterName = ""
                 });
+
 
             CreateMap<TourProblemDto, TourProblem>();
 

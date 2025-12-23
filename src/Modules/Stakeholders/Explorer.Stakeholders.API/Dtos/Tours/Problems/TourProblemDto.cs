@@ -9,9 +9,11 @@ public class TourProblemDto
 
     [NotDefault]
     public long TourId { get; set; }
+    public string TourName { get; set; } = string.Empty;
 
     [NotDefault]
     public long ReporterId { get; set; }
+    public string ReporterName { get; set; } = string.Empty;
 
     public ProblemCategory Category { get; set; }
 
