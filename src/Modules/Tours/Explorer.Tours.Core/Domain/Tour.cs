@@ -9,21 +9,22 @@ public enum TourDifficulty { Easy, Medium, Hard };
 
 public class Tour : AggregateRoot
 {
-    public int AuthorId { get; private set; }
-    public string Name { get; private set; }
-    public string? Description { get; private set; }
-    public TourDifficulty Difficulty { get; private set; }
-    public List<string> Tags { get; private set; }
-    public double Price { get; private set; }
-    public TourStatus Status { get; private set; }
-    public DateTime? PublishedDate { get; private set; }
-    public DateTime? ArchivedDate { get; private set; }
-    public List<KeyPoint> KeyPoints { get; private set; }
-    //public List<TourReview> Reviews { get; set; }
-    public double? AverageRating { get; private set; }
-    public List<TourReview> Reviews { get; private set; }
-    public List<TourDuration> Durations { get; private set; }
-    public List<RequiredEquipment> RequiredEquipment { get; private set; }
+    public int AuthorId { get; set; }
+    public string Name { get; set; }
+    public string? Description { get; set; }
+    public TourDifficulty Difficulty { get; set; }
+    public List<string> Tags { get; set; }
+    public double Price { get; set; }
+    public TourStatus Status { get; set; }
+    public DateTime? PublishedDate { get; set; }
+    public DateTime? ArchivedDate { get; set; }
+    public string? ThumbnailPath { get; set; }
+    public string? ThumbnailContentType { get; set; }
+    public List<KeyPoint> KeyPoints { get; set; }
+    public double? AverageRating { get; set; }
+    public List<TourReview> Reviews { get; set; }
+    public List<TourDuration> Durations { get; set; }
+    public List<RequiredEquipment> RequiredEquipment { get; set; }
     public double TourLength { get; set; }
 
     private Tour() 
@@ -58,6 +59,14 @@ public class Tour : AggregateRoot
         RequiredEquipment = new List<RequiredEquipment>();
         AverageRating = 0;
         TourLength = 0;
+        ThumbnailPath = null;
+        ThumbnailContentType = null;
+    }
+
+    public void SetThumbnail(string? path, string? contentType)
+    {
+        ThumbnailPath = path;
+        ThumbnailContentType = contentType;
     }
 
     public void AddKeyPoint(string name, string description, Location location, byte[]? image, string? secret)

@@ -13,7 +13,9 @@ public class TourDtoBuilder
             Difficulty = "Medium",
             Tags = ["Nature", "Hiking", "Viewpoints"],
             Price = 0,
-            AuthorId = 2
+            AuthorId = 2,
+            ThumbnailImage = null,
+            ThumbnailContentType = null
         };
     }
 }

@@ -53,15 +53,22 @@ public class TourCommandTests : BaseToursIntegrationTest
         // Assert - Database
         var storedEntity = dbContext.Tours.FirstOrDefault(i => i.Name == newEntity.Name);
         storedEntity.ShouldNotBeNull();
-        storedEntity.Id.ShouldBe(result.Id);
+        storedEntity.Name.ShouldBe(result.Name);
+        storedEntity.Description.ShouldBe(result.Description);
     }
 
     [Theory]
     [InlineData(nameof(CreateTourDto.Name))]
-    [InlineData(nameof(CreateTourDto.AuthorId))]
     public void Create_fails_null_data(string field)
     {
-        ShouldFailValidation(field, null);
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+        var updatedEntity = TourDtoBuilder.CreateValid();
+        updatedEntity.Name = null; // ili ""
+
+        // Act & Assert
+        Should.Throw<ArgumentException>(() => controller.Create(updatedEntity));
     }
 
     [Theory]

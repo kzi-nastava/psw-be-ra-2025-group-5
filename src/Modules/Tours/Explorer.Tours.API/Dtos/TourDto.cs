@@ -12,6 +12,8 @@ public class TourDto
     public string Status { get; set; }
     public DateTime? PublishedDate { get; set; }
     public DateTime? ArchivedDate { get; set; }
+    public string? ThumbnailUrl { get; set; } = string.Empty;
+    public string? ThumbnailContentType { get; set; }
     public List<KeyPointDto> KeyPoints { get; set; }
     public List<TourReviewDto> Reviews { get; set; }
     public double AverageRating { get; set; }

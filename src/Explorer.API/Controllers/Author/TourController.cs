@@ -42,13 +42,15 @@ public class TourController : ControllerBase
     [HttpPost]
     public ActionResult<TourDto> Create([FromBody] CreateTourDto tour)
     {
-        return Ok(_tourService.Create(tour));
+        var authorId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        return Ok(_tourService.Create(tour, authorId));
     }
 
     [HttpPut("{id:long}")]
     public ActionResult<TourDto> Update(long id, [FromBody] UpdateTourDto tour)
     {
-        return Ok(_tourService.Update(id, tour));
+        var authorId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        return Ok(_tourService.Update(id, tour, authorId));
     }
 
     [HttpDelete("{id:long}")]
@@ -120,6 +122,35 @@ public class TourController : ControllerBase
     public ActionResult<TourDto> RemoveEquipment(long tourId, long equipmentId)
     {
         var result = _tourService.RemoveRequiredEquipment(tourId, equipmentId);
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/thumbnail")]
+    [Consumes("multipart/form-data")]
+    public ActionResult<TourThumbnailDto> AddThumbnail(
+    long id,
+    [FromForm] TourThumbnailUploadDto dto)
+    {
+        if (dto.File == null || dto.File.Length == 0)
+            return BadRequest("No file uploaded");
+
+        var authorId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        var tour = _tourService.Get(id);
+        
+        if (tour.AuthorId != authorId)
+            return Forbid("You can only add thumbnails to your own tours");
+
+        using var ms = new MemoryStream();
+        dto.File.CopyTo(ms);
+
+        var result = _tourService.AddThumbnail(id, ms.ToArray(), dto.File.ContentType);
+        return Ok(result);
+    }
+
+    [HttpGet("{id}/thumbnail")]
+    public ActionResult<TourThumbnailDto> GetThumbnail(long id)
+    {
+        var result = _tourService.GetThumbnail(id);
         return Ok(result);
     }
 }

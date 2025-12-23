@@ -9,8 +9,8 @@ public interface ITourService
     PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize);
     TourDto Get(long id);
     List<string> GetAllTags();
-    TourDto Create(CreateTourDto tour);
-    TourDto Update(long id, UpdateTourDto tour);
+    TourDto Create(CreateTourDto tour, long authorId);
+    TourDto Update(long id, UpdateTourDto tour, long authorId);
     void Delete(long id);
 
     // KeyPoint operacije
@@ -42,4 +42,8 @@ public interface ITourService
     TourDto RemoveRequiredEquipment(long tourId, long equipmentId);
     void CloseTour(long tourId);
     TourDto GetById(long id);
+    
+    // Thumbnail operacije
+    TourThumbnailDto AddThumbnail(long tourId, byte[] image, string contentType);
+    TourThumbnailDto GetThumbnail(long tourId);
 }

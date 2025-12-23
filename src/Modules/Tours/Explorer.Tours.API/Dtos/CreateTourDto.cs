@@ -8,4 +8,6 @@ public class CreateTourDto
     public string Difficulty { get; set; }
     public List<string> Tags { get; set; }
     public double Price { get; set; }
+    public byte[]? ThumbnailImage { get; set; }
+    public string? ThumbnailContentType { get; set; }
 }

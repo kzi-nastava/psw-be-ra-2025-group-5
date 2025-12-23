@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.Core.Domain;
-using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 using System.Linq;
 
 namespace Explorer.Tours.Core.Mappers;
@@ -14,29 +13,47 @@ public class ToursProfile : Profile
 
         CreateMap<TouristPreferencesDto, TouristPreferences>().ReverseMap();
 
-        CreateMap<TourDifficulty, string>().ConvertUsing(src => src.ToString());
-        CreateMap<string, TourDifficulty>().ConvertUsing(src => Enum.Parse<TourDifficulty>(src, true));
+        CreateMap<Domain.TourDifficulty, string>().ConvertUsing(src => src.ToString());
+        CreateMap<string, Domain.TourDifficulty>().ConvertUsing(src => Enum.Parse<Domain.TourDifficulty>(src, true));
 
         CreateMap<TourStatus, string>().ConvertUsing(src => src.ToString());
         CreateMap<string, TourStatus>().ConvertUsing(static src => Enum.Parse<TourStatus>(src, true));
 
-        //CreateMap<Tour, TourDto>().ReverseMap();
-
         CreateMap<Tour, TourDto>()
-        .ForMember(d => d.RequiredEquipmentIds,
-            opt => opt.MapFrom(s => s.RequiredEquipment.Select(re => re.EquipmentId)))
-        .ReverseMap()
-        .ForMember(d => d.RequiredEquipment, opt => opt.Ignore());
+            .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
+            .ForMember(d => d.Difficulty, opt => opt.MapFrom(s => s.Difficulty.ToString()))
+            .ForMember(d => d.ThumbnailUrl, opt => opt.MapFrom(s => s.ThumbnailPath))
+            .ForMember(d => d.ThumbnailContentType, opt => opt.MapFrom(s => s.ThumbnailContentType))
+            .ForMember(d => d.RequiredEquipmentIds,
+                opt => opt.MapFrom(s => s.RequiredEquipment.Select(re => re.EquipmentId).ToList()));
 
         CreateMap<CreateTourDto, Tour>()
-            .ConstructUsing(dto => new Tour(
-                dto.AuthorId,
-                dto.Name,
-                dto.Description,
-                Enum.Parse<TourDifficulty>(dto.Difficulty, true),
-                dto.Tags,
-                dto.Price
-            ));
+            .ForMember(d => d.Id, opt => opt.Ignore())
+            .ForMember(d => d.Status, opt => opt.Ignore())
+            .ForMember(d => d.PublishedDate, opt => opt.Ignore())
+            .ForMember(d => d.ArchivedDate, opt => opt.Ignore())
+            .ForMember(d => d.KeyPoints, opt => opt.Ignore())
+            .ForMember(d => d.Reviews, opt => opt.Ignore())
+            .ForMember(d => d.AverageRating, opt => opt.Ignore())
+            .ForMember(d => d.Durations, opt => opt.Ignore())
+            .ForMember(d => d.RequiredEquipment, opt => opt.Ignore())
+            .ForMember(d => d.TourLength, opt => opt.Ignore())
+            .ForMember(d => d.ThumbnailPath, opt => opt.Ignore())
+            .ForMember(d => d.ThumbnailContentType, opt => opt.Ignore());
+
+        CreateMap<UpdateTourDto, Tour>()
+            .ForMember(d => d.Id, opt => opt.Ignore())
+            .ForMember(d => d.AuthorId, opt => opt.Ignore())
+            .ForMember(d => d.Status, opt => opt.Ignore())
+            .ForMember(d => d.PublishedDate, opt => opt.Ignore())
+            .ForMember(d => d.ArchivedDate, opt => opt.Ignore())
+            .ForMember(d => d.KeyPoints, opt => opt.Ignore())
+            .ForMember(d => d.Reviews, opt => opt.Ignore())
+            .ForMember(d => d.AverageRating, opt => opt.Ignore())
+            .ForMember(d => d.RequiredEquipment, opt => opt.Ignore())
+            .ForMember(d => d.TourLength, opt => opt.Ignore())
+            .ForMember(d => d.ThumbnailPath, opt => opt.Ignore())
+            .ForMember(d => d.ThumbnailContentType, opt => opt.Ignore());
 
         CreateMap<MonumentLocationDto, MonumentLocation>().ReverseMap();
         CreateMap<MonumentDto, Monument>().ReverseMap();
@@ -59,8 +76,7 @@ public class ToursProfile : Profile
 
         CreateMap<KeyPointCompletion, KeyPointCompletionDto>().ReverseMap();
 
-        CreateMap<TourExecution, TourExecutionDto>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+        CreateMap<TourExecution, TourExecutionDto>();
 
         CreateMap<TourExecution, StartExecutionResultDto>()
             .ForMember(dest => dest.ExecutionId, opt => opt.MapFrom(src => src.Id))
@@ -91,12 +107,9 @@ public class ToursProfile : Profile
         CreateMap<TourDurationDto, TourDuration>()
             .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TransportType>(src.TransportType)));
 
-            
-
         CreateMap<TourReviewDto, TourReview>()
-            .ForMember(d => d.Progress,opt => opt.MapFrom(src => new TourProgress(src.Progress)))
-            .ForMember(d => d.Images,opt => opt.Ignore());
-            
+            .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)))
+            .ForMember(d => d.Images, opt => opt.Ignore());
 
         CreateMap<TourPurchaseTokenDto, TourPurchaseToken>().ReverseMap();
         CreateMap<CreateTourPurchaseTokenDto, TourPurchaseToken>();

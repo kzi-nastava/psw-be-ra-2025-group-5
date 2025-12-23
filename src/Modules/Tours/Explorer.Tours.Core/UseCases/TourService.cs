@@ -1,28 +1,28 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
-using System;
-using System.Linq;
-using System.Reflection.Metadata;
-
+using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 
 namespace Explorer.Tours.Core.UseCases;
 
 public class TourService : ITourService
 {
     private readonly ITourRepository _tourRepository;
+    private readonly IImageStorage _imageStorage;
     private readonly ITourExecutionRepository _tourExecutionRepository;
     private readonly ITourPurchaseTokenRepository _purchaseTokenRepository;
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken, IEquipmentRepository equipmentRepository)
+    public TourService(ITourRepository repository, IImageStorage imageStorage, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken, IEquipmentRepository equipmentRepository)
     {
         _tourRepository = repository;
+        _imageStorage = imageStorage;
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenRepository = purchaseToken;
@@ -56,18 +56,28 @@ public class TourService : ITourService
         return items;
     }
 
-    public TourDto Create(CreateTourDto dto)
+    public TourDto Create(CreateTourDto dto, long authorId)
     {
-        var tour = _mapper.Map<Tour>(dto);
-        var result = _tourRepository.Create(tour);
-        return _mapper.Map<TourDto>(result);
+        var tour = new Tour(
+            (int)authorId,
+            dto.Name,
+            dto.Description,
+            Enum.Parse<TourDifficulty>(dto.Difficulty),
+            dto.Tags,
+            dto.Price
+        );
+
+        var created = _tourRepository.Create(tour);
+        return _mapper.Map<TourDto>(created);
     }
 
-    public TourDto Update(long id, UpdateTourDto dto)
+    public TourDto Update(long id, UpdateTourDto dto, long authorId)
     {
         var tour = _tourRepository.Get(id);
-        var difficulty = Enum.Parse<Domain.TourDifficulty>(dto.Difficulty, true);
-        
+        if (tour == null)
+            throw new NotFoundException("Tour not found.");
+
+        var difficulty = Enum.Parse<TourDifficulty>(dto.Difficulty, true);
         tour.Update(dto.Name, dto.Description, difficulty, dto.Tags, dto.Price);
 
         // Sync Durations
@@ -92,13 +102,53 @@ public class TourService : ITourService
                 tour.RemoveDuration(existingDuration);
             }
         }
-        
-        var result = _tourRepository.Update(tour);
-        return _mapper.Map<TourDto>(result);
+
+        var updated = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(updated);
+    }
+
+    public TourThumbnailDto AddThumbnail(long tourId, byte[] image, string contentType)
+    {
+        var tour = _tourRepository.Get(tourId);
+        if (tour == null)
+            throw new NotFoundException("Tour not found.");
+
+        if (image == null || image.Length == 0)
+            throw new ArgumentException("Image cannot be empty.", nameof(image));
+
+        var thumbnailPath = _imageStorage.SaveImage("tours", tourId, image, contentType);
+        tour.SetThumbnail(thumbnailPath, contentType);
+        _tourRepository.Update(tour);
+
+        return new TourThumbnailDto
+        {
+            TourId = tourId,
+            Url = thumbnailPath,
+            ContentType = contentType
+        };
+    }
+
+    public TourThumbnailDto GetThumbnail(long tourId)
+    {
+        var tour = _tourRepository.Get(tourId);
+        if (tour == null)
+            throw new NotFoundException("Tour not found.");
+
+        return new TourThumbnailDto
+        {
+            TourId = tourId,
+            Url = tour.ThumbnailPath,
+            ContentType = tour.ThumbnailContentType
+        };
     }
 
     public void Delete(long id)
     {
+        var tour = _tourRepository.Get(id);
+        if (tour != null && !string.IsNullOrEmpty(tour.ThumbnailPath))
+        {
+            _imageStorage.Delete(tour.ThumbnailPath);
+        }
         _tourRepository.Delete(id);
     }
 
@@ -159,7 +209,7 @@ public class TourService : ITourService
             tour.UpdateTourLength(tourLength);
         }
 
-            var result = _tourRepository.Update(tour);
+        var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
 
@@ -247,7 +297,7 @@ public class TourService : ITourService
             throw new KeyNotFoundException("Key point not found.");
 
         var dto = _mapper.Map<KeyPointDto>(keyPoint);
-        dto.Secret = null; 
+        dto.Secret = null;
 
         return dto;
     }
@@ -272,16 +322,14 @@ public class TourService : ITourService
         List<ReviewImage>? images = null;
         if (dto.Images != null && dto.Images.Any())
         {
-        images = dto.Images
-            .OrderBy(i => i.Order)
-            .Select((img, index) =>
-                new ReviewImage(0, Convert.FromBase64String(img.Data), img.ContentType, index))
-            .ToList();
+            images = dto.Images
+                .OrderBy(i => i.Order)
+                .Select((img, index) =>
+                    new ReviewImage(0, Convert.FromBase64String(img.Data), img.ContentType, index))
+                .ToList();
         }
 
-        // Koristi repozitorijumovu AddReview i prosledi slike
         tour.AddReview(dto.Grade, dto.Comment, DateTime.UtcNow, progress, userId, username, images);
-
 
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
@@ -303,7 +351,7 @@ public class TourService : ITourService
             images = dto.Images
                 .OrderBy(i => i.Order)
                 .Select((img, index) =>
-                    new ReviewImage( reviewId, Convert.FromBase64String(img.Data), img.ContentType, index))
+                    new ReviewImage(reviewId, Convert.FromBase64String(img.Data), img.ContentType, index))
                 .ToList();
         }
 
@@ -324,7 +372,6 @@ public class TourService : ITourService
     }
 
     // Duration operacije
-
     public TourDto AddDuration(long tourId, TourDurationDto durationDto)
     {
         var tour = _tourRepository.Get(tourId);
@@ -342,12 +389,13 @@ public class TourService : ITourService
         var result = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(result);
     }
+
     public int GetReviewButtonState(long tourId, long userId)
     {
         // 0 = ne ispunjava uslove
         // 1 = može da ostavi recenziju (Leave)
         // 2 = može da izmeni recenziju (Edit)
-
+  
         var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
         if (purchaseToken == null)
             return 0;
@@ -357,13 +405,12 @@ public class TourService : ITourService
             return 0;
 
         var tour = _tourRepository.Get(tourId);
-        
+
         int total = tour.KeyPoints.Count;
         int completed = execution.CompletedKeyPoints.Count;
         double progress = total == 0 ? 100 : (100.0 * completed / total);
         if (progress < 35)
             return 0;
-        
 
         bool hasReview = tour.Reviews.Any(r => r.TouristID == userId);
 
@@ -390,7 +437,7 @@ public class TourService : ITourService
         return _mapper.Map<TourDto>(result);
     }
 
-    public void CloseTour(long tourId) 
+    public void CloseTour(long tourId)
     {
         _tourRepository.Close(tourId);
     }
@@ -400,5 +447,4 @@ public class TourService : ITourService
         var tour = _tourRepository.Get(id);
         return _mapper.Map<TourDto>(tour);
     }
-
 }
