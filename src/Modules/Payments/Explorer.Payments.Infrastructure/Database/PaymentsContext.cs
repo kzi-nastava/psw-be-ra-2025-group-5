@@ -1,19 +1,37 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Explorer.Payments.Core.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text.Json;
 
-namespace Explorer.Payments.Infrastructure.Database
+namespace Explorer.Payments.Infrastructure.Database;
+
+public class PaymentsContext: DbContext
 {
-    public class PaymentsContext: DbContext
-    {
-        public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) { }
+    public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+    public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.HasDefaultSchema("payments");
-        }
+    public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) {}
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.HasDefaultSchema("payments");
+
+        ConfigureShoppingCart(modelBuilder);
+    }
+
+    private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ShoppingCart>()
+        .Property(s => s.Items)
+        .HasColumnType("jsonb")
+        .HasConversion(
+            items => JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false }),
+            json => JsonSerializer.Deserialize<List<OrderItem>>(json, new JsonSerializerOptions()) ?? new List<OrderItem>(),
+            new ValueComparer<List<OrderItem>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()
+            )
+        );
     }
 }
