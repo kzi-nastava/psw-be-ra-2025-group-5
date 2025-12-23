@@ -32,4 +32,9 @@ public class TourPurchaseTokenDbRepository : ITourPurchaseTokenRepository
         DbContext.SaveChanges();
         return entity;
     }
+    public List<TourPurchaseToken> GetByTourist(long touristId)
+    {
+        return _dbSet.Where(t => t.TouristId == touristId).ToList();
+    }
+
 }

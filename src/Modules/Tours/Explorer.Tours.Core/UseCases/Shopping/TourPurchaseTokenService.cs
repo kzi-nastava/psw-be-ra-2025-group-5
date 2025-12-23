@@ -37,4 +37,10 @@ public class TourPurchaseTokenService : ITourPurchaseTokenService
         var result = _TourPurchaseTokenRepository.Create(_mapper.Map<TourPurchaseToken>(entity));
         return _mapper.Map<TourPurchaseTokenDto>(result);
     }
+
+    public List<TourPurchaseTokenDto> GetByTourist(long touristId)
+    {
+        var tokens = _TourPurchaseTokenRepository.GetByTourist(touristId);
+        return _mapper.Map<List<TourPurchaseTokenDto>>(tokens);
+    }
 }
