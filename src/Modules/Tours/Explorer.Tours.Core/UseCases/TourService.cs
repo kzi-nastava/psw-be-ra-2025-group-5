@@ -1,31 +1,28 @@
 ﻿using AutoMapper;
-using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
-using System;
-using System.Linq;
-using System.Reflection.Metadata;
-
 
 namespace Explorer.Tours.Core.UseCases;
 
-public class TourService : ITourService
+public class TourService : ITourService, ITourSharedService
 {
     private readonly ITourRepository _tourRepository;
     private readonly ITourExecutionRepository _tourExecutionRepository;
-    private readonly ITourPurchaseTokenRepository _purchaseTokenRepository;
+    private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenRepository purchaseToken, IEquipmentRepository equipmentRepository)
+    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenSharedService purchaseToken, IEquipmentRepository equipmentRepository)
     {
         _tourRepository = repository;
         _mapper = mapper;
         _tourExecutionRepository = execution;
-        _purchaseTokenRepository = purchaseToken;
+        _purchaseTokenService = purchaseToken;
         _equipmentRepository = equipmentRepository;
     }
 
@@ -254,7 +251,7 @@ public class TourService : ITourService
 
     public TourDto AddReview(long tourId, long userId, string username, TourReviewDto dto)
     {
-        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        var purchaseToken = _purchaseTokenService.GetByTourAndTourist(tourId, userId);
         if (purchaseToken == null)
             throw new InvalidOperationException("User has not purchased this tour.");
 
@@ -348,7 +345,7 @@ public class TourService : ITourService
         // 1 = može da ostavi recenziju (Leave)
         // 2 = može da izmeni recenziju (Edit)
 
-        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        var purchaseToken = _purchaseTokenService.GetByTourAndTourist(tourId, userId);
         if (purchaseToken == null)
             return 0;
 
