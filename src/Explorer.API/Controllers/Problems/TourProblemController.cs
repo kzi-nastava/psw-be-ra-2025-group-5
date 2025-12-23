@@ -243,6 +243,9 @@ namespace Explorer.API.Controllers.ProblemReporting
             var problem = _tourProblemService.GetById(id);
             var tour = _tourService.GetById(problem.TourId);
 
+            problem.TourName = tour?.Name ?? "Unknown";
+            problem.TourStatus = tour?.Status ?? "Unknown";
+
             if (userId != problem.ReporterId && userId != tour.AuthorId && !isAdmin)
                 return Forbid();
 
