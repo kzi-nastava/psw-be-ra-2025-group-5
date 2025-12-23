@@ -21,7 +21,6 @@ public class Tour : AggregateRoot
     public DateTime? PublishedDate { get; private set; }
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
-    //public List<TourReview> Reviews { get; set; }
     public double? AverageRating { get; private set; }
     public List<TourReview> Reviews { get; private set; }
     public List<TourDuration> Durations { get; private set; }
@@ -182,13 +181,6 @@ public class Tour : AggregateRoot
     public TourReview AddReview(int grade, string? comment, DateTime? reviewTime, double progress, long touristId, string username, List<ReviewImage>? images = null)
     {
         var review = new TourReview(grade, comment, reviewTime, progress, touristId, Id, images, username);
-        Reviews.Add(review);
-        GetAverageGrade();
-        return review;
-    }
-
-    public TourReview AddReview(TourReview review)
-    {
         Reviews.Add(review);
         GetAverageGrade();
         return review;
