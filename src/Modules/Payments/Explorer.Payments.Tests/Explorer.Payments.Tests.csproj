@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Explorer.BuildingBlocks.Tests\Explorer.BuildingBlocks.Tests.csproj" />
     <ProjectReference Include="..\..\..\Explorer.API\Explorer.API.csproj" />
+    <ProjectReference Include="..\Explorer.Payments.API\Explorer.Payments.API.csproj" />
   </ItemGroup>
 
 </Project>

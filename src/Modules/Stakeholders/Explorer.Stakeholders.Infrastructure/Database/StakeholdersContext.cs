@@ -1,6 +1,8 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
 
 namespace Explorer.Stakeholders.Infrastructure.Database
 {
@@ -32,7 +34,45 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigurePosition(modelBuilder);
             ConfigureNotification(modelBuilder);
             ConfigureDiary(modelBuilder);
+            ConfigureClub(modelBuilder);
         }
+
+        private static void ConfigureClub(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Club>(builder =>
+            {
+                builder.HasKey(c => c.Id);
+
+                builder.Property(c => c.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                builder.Property(c => c.Description)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                builder.Property(c => c.CreatorId)
+                    .IsRequired();
+
+                builder.Property(c => c.ImagePaths)
+                    .HasConversion(
+                        v => string.Join(";", v),  
+                        v => v.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList()  
+                    )
+                    .Metadata.SetValueComparer(
+                        new ValueComparer<List<string>>(
+                            (c1, c2) => c1.SequenceEqual(c2),  
+                            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),  
+                            c => c.ToList()  
+                        )
+                    );
+
+                builder.Property(c => c.ImagePaths)
+                        .HasColumnType("text")
+                        .IsRequired();
+                });
+        }
+
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
         {

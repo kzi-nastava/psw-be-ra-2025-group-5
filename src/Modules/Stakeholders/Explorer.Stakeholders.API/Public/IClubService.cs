@@ -1,4 +1,5 @@
 ﻿using Explorer.Stakeholders.API.Dtos;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,11 @@ namespace Explorer.Stakeholders.API.Public
 {
     public interface IClubService
     {
-        ClubDto Create(ClubDto clubDto);
-        ClubDto Update(ClubDto clubDto);
+        ClubDto Create(ClubDto clubDto, List<IFormFile> images);
         void Delete(long userId, long id);
         ClubDto GetById(long id);
         List<ClubDto> GetAll();
+        ClubDto Update(ClubDto clubDto, List<IFormFile>? images);
+        ClubDto RemoveImage(long userId, long clubId, string imagePath);
     }
 }

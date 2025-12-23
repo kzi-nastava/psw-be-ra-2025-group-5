@@ -184,17 +184,21 @@ public class ShoppingCartCommandTests : BasePaymentsIntegrationTest
         // Act
         cartController.AddOrderItem(-5, -4);
         var result = ((ObjectResult)cartController.Checkout(-5).Result)?.Value as ShoppingCartDto;
-        var token = tokenController.GetByTourAndTourist(-4, -5).Result;
+        var tokenResult = tokenController.GetByTourAndTourist(-4, -5).Result;
+        var okResult = tokenResult as ObjectResult;
+        var token = okResult?.Value;
 
-        // Assert - Response
+        // Assert - Cart response
         result.ShouldNotBeNull();
         result.Id.ShouldNotBe(0);
         result.TouristId.ShouldBe(-5);
         result.Items.Count.ShouldBe(0);
         result.Total.ShouldBe(0);
 
-        token.ShouldNotBeNull();
-        token.ShouldBeOfType<NotFoundResult>();
+        // Assert - Token
+        okResult.ShouldNotBeNull();
+        okResult.StatusCode.ShouldBe(200);
+        token.ShouldBeNull(); 
     }
     
     [Fact]

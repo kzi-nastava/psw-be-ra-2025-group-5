@@ -21,6 +21,6 @@ public class TourPurchaseTokenController : Controller
     public ActionResult<TourPurchaseToken> GetByTourAndTourist([FromQuery] long tourId, [FromRoute] long touristId)
     {
         var result = _TokenService.GetByTourAndTourist(tourId, touristId);
-        return result is not null ? Ok(result) : NotFound();
+        return Ok(result); 
     }
 }
