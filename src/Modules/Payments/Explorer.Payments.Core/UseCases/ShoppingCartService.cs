@@ -45,7 +45,7 @@ public class ShoppingCartService : IShoppingCartService
 
     public ShoppingCartDto AddOrderItem(long touristId, long tourId)
     {
-        var cart = _ShoppingCartRepository.GetByTourist(touristId);
+        var cart = _ShoppingCartRepository.GetByTourist(touristId) ?? _ShoppingCartRepository.Create(new ShoppingCart(touristId));
         var tour = _TourService.Get(tourId);
         cart.AddItem(tour.Id, tour.Name, tour.Price);
 
