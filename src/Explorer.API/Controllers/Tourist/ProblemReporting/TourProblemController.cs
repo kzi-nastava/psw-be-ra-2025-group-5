@@ -4,6 +4,7 @@ using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.UseCases.Reporting;
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,16 +17,19 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
     {
         private readonly ITourProblemService _tourProblemService;
         private readonly ITourService _tourService;
+        private readonly ITourExecutionService _tourExecution;
         private readonly INotificationService _notificationService;
 
         public TourProblemController(
             ITourProblemService tourProblemService, 
             ITourService tourService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ITourExecutionService tourExecution)
         {
             _tourProblemService = tourProblemService;
             _tourService = tourService;
             _notificationService = notificationService;
+            _tourExecution = tourExecution;
         }
 
         [HttpGet]
@@ -241,6 +245,7 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
 
             var problem = _tourProblemService.GetById(id);
             var tour = _tourService.GetById(problem.TourId);
+            problem.TourName = tour.Name;
 
             if (userId != problem.ReporterId && userId != tour.AuthorId && !isAdmin)
                 return Forbid();
@@ -272,6 +277,20 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
             }
 
             return Ok(_tourProblemService.GetById(id));
+        }
+
+        [HttpGet("{id}/completed-tours")]
+        [Authorize(Policy = "touristPolicy")]
+        public ActionResult<List<CompletedToursDto>> GetCompletedTours(long id)
+        {
+            var result = _tourExecution.GetExecutionsForUser(id);
+            var completedTours = result.Select(execution =>
+                new CompletedToursDto
+                {
+                    Name = _tourService.GetById(execution.TourId)?.Name ?? "Unknown",
+                    TourId = execution.TourId
+                }).ToList();
+            return Ok(completedTours);
         }
     }
 }
