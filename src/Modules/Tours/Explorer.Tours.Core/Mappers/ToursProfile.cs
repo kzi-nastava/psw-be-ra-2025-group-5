@@ -2,6 +2,7 @@
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.Core.Domain;
 using System.Linq;
+using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 
 namespace Explorer.Tours.Core.Mappers;
 
@@ -61,13 +62,6 @@ public class ToursProfile : Profile
         CreateMap<TouristEquipmentDto, TouristEquipment>().ReverseMap();
         CreateMap<FacilityDto, Facility>().ReverseMap();
 
-        CreateMap<OrderItem, OrderItemDto>().ReverseMap();
-
-        CreateMap<ShoppingCartDto, ShoppingCart>().ReverseMap();
-
-        CreateMap<CreateShoppingCartDto, ShoppingCart>()
-            .ConstructUsing(src => new ShoppingCart(src.TouristId));
-
         CreateMap<Location, LocationDto>().ReverseMap();
 
         CreateMap<KeyPoint, KeyPointDto>().ReverseMap();
@@ -111,7 +105,6 @@ public class ToursProfile : Profile
             .ForMember(d => d.Progress, opt => opt.MapFrom(src => new TourProgress(src.Progress)))
             .ForMember(d => d.Images, opt => opt.Ignore());
 
-        CreateMap<TourPurchaseTokenDto, TourPurchaseToken>().ReverseMap();
-        CreateMap<CreateTourPurchaseTokenDto, TourPurchaseToken>();
+        CreateMap<TourStatisticsItem, TourStatisticsItemDto>().ReverseMap();
     }
 }

@@ -1,6 +1,4 @@
-﻿using Explorer.Stakeholders.API.Internal.Statistics;
-
-namespace Explorer.Stakeholders.API.Dtos;
+﻿namespace Explorer.Stakeholders.API.Dtos;
 
 public class ProfileDto
 {

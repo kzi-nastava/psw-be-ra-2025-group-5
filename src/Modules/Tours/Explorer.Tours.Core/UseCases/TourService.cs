@@ -2,7 +2,9 @@
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
@@ -10,12 +12,12 @@ using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 
 namespace Explorer.Tours.Core.UseCases;
 
-public class TourService : ITourService
+public class TourService : ITourService, ITourSharedService
 {
     private readonly ITourRepository _tourRepository;
     private readonly IImageStorage _imageStorage;
     private readonly ITourExecutionRepository _tourExecutionRepository;
-    private readonly ITourPurchaseTokenRepository _purchaseTokenRepository;
+    private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IMapper _mapper;
 
@@ -25,7 +27,7 @@ public class TourService : ITourService
         _imageStorage = imageStorage;
         _mapper = mapper;
         _tourExecutionRepository = execution;
-        _purchaseTokenRepository = purchaseToken;
+        _purchaseTokenService = purchaseToken;
         _equipmentRepository = equipmentRepository;
     }
 
@@ -304,7 +306,7 @@ public class TourService : ITourService
 
     public TourDto AddReview(long tourId, long userId, string username, TourReviewDto dto)
     {
-        var purchaseToken = _purchaseTokenRepository.GetByTourAndTourist(tourId, userId);
+        var purchaseToken = _purchaseTokenService.GetByTourAndTourist(tourId, userId);
         if (purchaseToken == null)
             throw new InvalidOperationException("User has not purchased this tour.");
 

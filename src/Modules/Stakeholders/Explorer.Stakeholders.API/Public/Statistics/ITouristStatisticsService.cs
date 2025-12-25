@@ -1,10 +1,8 @@
-﻿
-using Explorer.Stakeholders.API.Internal.Statistics;
+﻿using Explorer.Stakeholders.API.Dtos;
 
-namespace Explorer.Stakeholders.API.Public.Statistics
+namespace Explorer.Stakeholders.API.Public.Statistics;
+
+public interface ITouristStatisticsService
 {
-    public interface ITouristStatisticsService
-    {
-        TouristStatisticsDto GetStatistics(long userId);
-    }
+    TouristStatisticsDto GetStatistics(long userId);
 }

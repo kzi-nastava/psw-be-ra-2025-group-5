@@ -1,7 +1,6 @@
 ﻿using Explorer.API.Controllers.Author;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
 using Explorer.Tours.Infrastructure.Database;
 using Explorer.Tours.Tests.Builders;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 using Microsoft.EntityFrameworkCore;
+using Explorer.Tours.API.Public;
 
 namespace Explorer.Tours.Tests.Integration.TourAuthoring;
 

@@ -1,4 +1,6 @@
 ﻿using Explorer.API.Controllers.Tourist;
+using Explorer.Payments.Core.Domain;
+using Explorer.Payments.Infrastructure.Database;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain; 
@@ -87,26 +89,24 @@ public class TourExecutionQueryTests : BaseToursIntegrationTest
     {
         // Arrange
         using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-
-        dbContext.TourExecutions.RemoveRange(dbContext.TourExecutions);
-        dbContext.TourPurchaseTokens.RemoveRange(dbContext.TourPurchaseTokens);
-        dbContext.SaveChanges();
+        var tourDbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var paymentsDbContext = scope.ServiceProvider.GetRequiredService<PaymentsContext>();
 
         var tourId1 = -1;
         var tourId2 = -2;
         var tourId3 = -3;
 
-        dbContext.TourPurchaseTokens.AddRange(
+        paymentsDbContext.TourPurchaseTokens.AddRange(
             new TourPurchaseToken(touristId: -1, tourId: tourId1),
             new TourPurchaseToken(touristId: -1, tourId: tourId2),
             new TourPurchaseToken(touristId: -1, tourId: tourId3)
         );
+        paymentsDbContext.SaveChanges();
 
         var execution = TourExecution.StartNew(userId: -1, tourId: tourId2);
-        dbContext.TourExecutions.Add(execution);
+        tourDbContext.TourExecutions.Add(execution);
 
-        dbContext.SaveChanges();
+        tourDbContext.SaveChanges();
 
         var controller = CreateController(scope);
 
@@ -126,4 +126,3 @@ public class TourExecutionQueryTests : BaseToursIntegrationTest
         };
     }
 }
-
