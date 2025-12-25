@@ -2,11 +2,12 @@
 using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Internal;
+using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 
 namespace Explorer.Tours.Core.UseCases;
 
-public class TourStatisticsService : ITourStatisticsService
+public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsService
 {
     private readonly ITourStatisticsDbRepository _StatisticsRepository;
     private readonly ITourPurchaseTokenSharedService _TokenService;

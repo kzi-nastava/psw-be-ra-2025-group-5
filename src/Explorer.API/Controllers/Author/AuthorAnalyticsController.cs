@@ -12,17 +12,17 @@ namespace Explorer.API.Controllers.Author
     [ApiController]
     public class AuthorAnalyticsController : ControllerBase
     {
-        private readonly ITourStatisticsService _tourStatisticsService;
+        private readonly ITourAnalyticsService _tourAnalyticsService;
 
-        public AuthorAnalyticsController(ITourStatisticsService tourStatisticsService)
+        public AuthorAnalyticsController(ITourAnalyticsService tourAnalyticsService)
         {
-            _tourStatisticsService = tourStatisticsService;
+            _tourAnalyticsService = tourAnalyticsService;
         }
 
         [HttpGet("by-price")]
         public ActionResult<IReadOnlyCollection<ToursByPriceDto>> GetToursCountByPrice([FromQuery] long userId)
         {
-            var result = _tourStatisticsService.GetToursCountByPrice(userId);
+            var result = _tourAnalyticsService.GetToursCountByPrice(userId);
             return Ok(result);
         }
 
