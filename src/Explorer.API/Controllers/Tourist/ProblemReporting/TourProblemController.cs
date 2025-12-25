@@ -46,8 +46,18 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
                 result = _tourProblemService.GetPaged(page, pageSize);
                 result.Results.ForEach(tp =>
                 {
-                    var tour = _tourService.GetById(tp.TourId);
-                    tp.TourName = tour.Name;
+                    try
+                    {
+                        var tour = _tourService.GetById(tp.TourId);
+                        if (tour != null)
+                        {
+                            tp.TourName = tour.Name;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to get tour name for TourId {tp.TourId}: {ex.Message}");
+                    }
                 });
             }
             else if (User.IsInRole("tourist"))
@@ -55,8 +65,18 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
                 result = _tourProblemService.GetPagedByReporterId(userId, page, pageSize);
                 result.Results.ForEach(tp =>
                 {
-                    var tour = _tourService.GetById(tp.TourId);
-                    tp.TourName = tour.Name;
+                    try
+                    {
+                        var tour = _tourService.GetById(tp.TourId);
+                        if (tour != null)
+                        {
+                            tp.TourName = tour.Name;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to get tour name for TourId {tp.TourId}: {ex.Message}");
+                    }
                 });
             }
             else if (User.IsInRole("author"))
@@ -67,8 +87,18 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
                 result = _tourProblemService.GetPagedByTourIds(tourIds, page, pageSize);
                 result.Results.ForEach(tp =>
                 {
-                    var tour = _tourService.GetById(tp.TourId);
-                    tp.TourName = tour.Name;
+                    try
+                    {
+                        var tour = _tourService.GetById(tp.TourId);
+                        if (tour != null)
+                        {
+                            tp.TourName = tour.Name;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to get tour name for TourId {tp.TourId}: {ex.Message}");
+                    }
                 });
             }
             else
