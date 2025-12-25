@@ -19,16 +19,12 @@ namespace Explorer.API.Controllers.Author
             _tourStatisticsService = tourStatisticsService;
         }
 
-        //[HttpGet("purchased/count/{userId:long}")]
-        //public ActionResult<int> GetPurchasedToursCount(long userId)
-        //{
-        //    return Ok(_tourStatisticsService.GetPurchasedToursCount(userId));
-        //}
+        [HttpGet("by-price")]
+        public ActionResult<IReadOnlyCollection<ToursByPriceDto>> GetToursCountByPrice([FromQuery] long userId)
+        {
+            var result = _tourStatisticsService.GetToursCountByPrice(userId);
+            return Ok(result);
+        }
 
-        //[HttpGet("completed/{userId:long}")]
-        //public ActionResult<IReadOnlyCollection<TourStatisticsItemDto>> GetCompletedTours(long userId)
-        //{
-        //    return Ok(_tourStatisticsService.GetCompletedTours(userId));
-        //}
     }
 }

@@ -30,4 +30,18 @@ public class TourStatisticsService : ITourStatisticsService
         var tours = result.Select(_mapper.Map<TourStatisticsItemDto>).ToList();
         return tours;
     }
+
+    public IReadOnlyCollection<ToursByPriceDto> GetToursCountByPrice(long userId)
+    {
+        var data = _StatisticsRepository.GetToursCountByPrice(userId);
+
+        return data
+            .Select(t => new ToursByPriceDto
+            {
+                Count = t.Count,
+                PriceRange = t.PriceRange
+            })
+            .ToList()
+            .AsReadOnly();
+    }
 }
