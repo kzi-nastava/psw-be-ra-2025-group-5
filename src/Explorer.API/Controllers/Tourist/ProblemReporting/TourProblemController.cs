@@ -44,6 +44,11 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
             if (isAdmin)
             {
                 result = _tourProblemService.GetPaged(page, pageSize);
+                result.Results.ForEach(tp =>
+                {
+                    var tour = _tourService.GetById(tp.TourId);
+                    tp.TourName = tour.Name;
+                });
             }
             else if (User.IsInRole("tourist"))
             {
@@ -60,6 +65,11 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
                 var tourIds = tours.Select(t => (long)t.Id).ToList();
 
                 result = _tourProblemService.GetPagedByTourIds(tourIds, page, pageSize);
+                result.Results.ForEach(tp =>
+                {
+                    var tour = _tourService.GetById(tp.TourId);
+                    tp.TourName = tour.Name;
+                });
             }
             else
             {
