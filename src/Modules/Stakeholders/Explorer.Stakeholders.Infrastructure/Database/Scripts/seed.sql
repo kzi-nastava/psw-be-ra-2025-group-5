@@ -45,6 +45,12 @@ VALUES
 (2, 'Foto safari klub', 'Fotografisanje divljih životinja i prirode. Naše ture obuhvataju nacionalne parkove i rezervate.', 
  '/images/club/safari1.jpg', 5, 0);
 
+INSERT INTO stakeholders."ClubMembers" 
+	("ClubId", "TouristId", "JoinedAt") 
+VALUES 
+	(1, 5, NOW());
+
+
 INSERT INTO stakeholders."TourProblems"(
 	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
 VALUES (1, 1, 4, 0, 2, 'Problem sa bezbednošću na turi', '2023-10-25T10:00:00Z', '2023-10-25T10:05:00Z', ARRAY[]::bigint[], false, null);

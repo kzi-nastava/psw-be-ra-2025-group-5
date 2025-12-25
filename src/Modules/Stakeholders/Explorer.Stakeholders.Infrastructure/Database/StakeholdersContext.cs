@@ -271,6 +271,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.HasIndex(n => n.CreatedAt);
                 builder.HasIndex(n => n.TourProblemId);
                 builder.HasIndex(n => n.TourId);
+                builder.HasIndex(n => n.ClubId);
             });
         }
 

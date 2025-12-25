@@ -18,6 +18,7 @@ namespace Explorer.Stakeholders.API.Public
         ClubDto RemoveImage(long userId, long clubId, string imagePath);
         void CloseClub(long clubId, long ownerId);
         void RemoveMember(long clubId, long ownerId, long memberId);
+        List<UserDto> GetClubMembers(long clubId, long ownerId);
 
     }
 }

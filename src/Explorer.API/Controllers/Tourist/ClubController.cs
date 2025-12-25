@@ -120,5 +120,13 @@ namespace Explorer.API.Controllers.Tourist
             return Ok(new { message = "Member removed successfully." });
         }
 
+        [HttpGet("{clubId}/members")]
+        public IActionResult GetMembers(long clubId)
+        {
+            var ownerId = User.PersonId();
+            var members = _clubService.GetClubMembers(clubId, ownerId);
+            return Ok(members);
+        }
+
     }
 }

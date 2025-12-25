@@ -23,6 +23,7 @@ public class Notification : Entity
     public long? TourProblemId { get; private set; }
     public long? TourId { get; private set; }
     public string? ActionUrl { get; private set; }
+    public long? ClubId { get; private set; }
 
     private Notification() { }
 
@@ -33,7 +34,8 @@ public class Notification : Entity
         string message,
         long? tourProblemId = null,
         long? tourId = null,
-        string? actionUrl = null)
+        string? actionUrl = null,
+        long? clubId = null)
     {
         if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
         if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Title is required.", nameof(title));
@@ -48,6 +50,7 @@ public class Notification : Entity
         TourProblemId = tourProblemId;
         TourId = tourId;
         ActionUrl = actionUrl;
+        ClubId = clubId;
     }
 
     public void MarkAsRead()
