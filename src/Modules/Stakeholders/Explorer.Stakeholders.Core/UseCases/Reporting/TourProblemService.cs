@@ -6,7 +6,6 @@ using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using System.Data;
 
 namespace Explorer.Stakeholders.Core.UseCases.Reporting;
@@ -15,20 +14,17 @@ public class TourProblemService : ITourProblemService
 {
     private readonly ITourProblemRepository _repository;
     private readonly IUserRepository _userRepository;
-    private readonly ITourRepository _tourRepository;
     private readonly INotificationService _notificationService;
     private readonly IMapper _mapper;
 
     public TourProblemService(
         ITourProblemRepository repository, 
         IUserRepository userRepository,
-        ITourRepository tourRepository,
         INotificationService notificationService,
         IMapper mapper)
     {
         _repository = repository;
         _userRepository = userRepository;
-        _tourRepository = tourRepository;
         _notificationService = notificationService;
         _mapper = mapper;
     }
@@ -158,8 +154,7 @@ public class TourProblemService : ITourProblemService
                     .ToList(),
                 IsResolved = problem.IsResolved,
                 Deadline = problem.Deadline,
-                TourStatus = "Unknown",
-                TourName = _tourRepository.Get(problem.TourId)?.Name
+                TourStatus = "Unknown"
             };
         }).ToList();
 

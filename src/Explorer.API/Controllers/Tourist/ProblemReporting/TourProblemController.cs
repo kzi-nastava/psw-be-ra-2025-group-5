@@ -48,6 +48,11 @@ namespace Explorer.API.Controllers.Tourist.ProblemReporting
             else if (User.IsInRole("tourist"))
             {
                 result = _tourProblemService.GetPagedByReporterId(userId, page, pageSize);
+                result.Results.ForEach(tp =>
+                {
+                    var tour = _tourService.GetById(tp.TourId);
+                    tp.TourName = tour.Name;
+                });
             }
             else if (User.IsInRole("author"))
             {
