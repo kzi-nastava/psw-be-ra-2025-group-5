@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Explorer.Blog.API.Dtos
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public List<BlogImageDto> Images { get; set; } = new();
+        public List<IFormFile> Images { get; set; }
+
     }
 }

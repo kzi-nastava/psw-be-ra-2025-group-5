@@ -65,4 +65,13 @@ public class TourExecutionController : ControllerBase
         return Ok(executions);
     }
 
+    [HttpGet("purchased")]
+    public ActionResult<List<TourDto>> GetPurchasedTours()
+    {
+        long userId = long.Parse(User.FindFirst("id")!.Value);
+        var tours = _service.GetPurchasedToursWithoutExecution(userId);
+        return Ok(tours);
+    }
+
+
 }

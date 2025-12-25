@@ -10,15 +10,11 @@ namespace Explorer.Stakeholders.Core.Mappers
     {
         public StakeholderProfile()
         {
-            // ========================= Person <-> ProfileDto =========================
             CreateMap<Person, ProfileDto>()
-                .ForMember(
-                    dest => dest.ProfileImageBase64,
-                    opt => opt.MapFrom(src => src.ProfileImage != null
-                        ? Convert.ToBase64String(src.ProfileImage)
-                        : string.Empty)
-                )
-                .ReverseMap();
+                .ForMember(dest => dest.Statistics, opt => opt.Ignore()); 
+
+            CreateMap<ProfileDto, Person>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore()); 
 
             // ========================= AppRating <-> AppRatingDto =========================
             CreateMap<AppRating, AppRatingDto>();
@@ -41,21 +37,14 @@ namespace Explorer.Stakeholders.Core.Mappers
             // ========================= Club <-> ClubDto =========================
             CreateMap<Club, ClubDto>()
                 .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.ToBase64String(img)).ToList()
-                            : new List<string>())
+                    dest => dest.ImagePaths,
+                    opt => opt.MapFrom(src => src.ImagePaths)
                 );
 
             CreateMap<ClubDto, Club>()
-                .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.FromBase64String(img)).ToList()
-                            : new List<byte[]>())
-                );
+                .ForMember(dest => dest.ImagePaths, opt => opt.Ignore()); 
+                                                                       
+
 
             CreateMap<TourProblem, TourProblemDto>()
                 .ForMember(dest => dest.Comments, opt => opt.Ignore())
