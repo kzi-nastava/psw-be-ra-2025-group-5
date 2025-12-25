@@ -85,7 +85,8 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.Message,
                     dto.TourProblemId,
                     dto.TourId,
-                    dto.ActionUrl
+                    dto.ActionUrl,
+                    dto.ClubId
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
@@ -102,6 +103,9 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.TouristId
                 ))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<ClubInvite, ClubInviteDto>()
+                .ForMember(dest => dest.TouristUsername, opt => opt.Ignore());
 
         }
     }

@@ -13,5 +13,6 @@ namespace Explorer.Stakeholders.API.Dtos
         public string Description { get; set; }
         public List<string> ImagePaths { get; set; } = new List<string>();
         public long CreatorId { get; set; }
+        public string Status { get; set; }
     }
 }

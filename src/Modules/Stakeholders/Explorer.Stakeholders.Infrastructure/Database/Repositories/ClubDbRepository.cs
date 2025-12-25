@@ -46,6 +46,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
         public Club? GetById(long id)
         {
             return _dbContext.Clubs
+                .Include(c => c.Members)
                 .AsTracking()
                 .FirstOrDefault(c => c.Id == id);
         }

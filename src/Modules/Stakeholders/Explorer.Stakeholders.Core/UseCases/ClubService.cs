@@ -18,12 +18,14 @@ namespace Explorer.Stakeholders.Core.UseCases
         private readonly IClubRepository _clubRepository;
         private readonly IMapper _mapper;
         private readonly IImageStorage _imageStorage;
+        private readonly IUserService _userService;
 
-        public ClubService(IClubRepository clubRepository, IMapper mapper, IImageStorage imageStorage)
+        public ClubService(IClubRepository clubRepository, IMapper mapper, IImageStorage imageStorage, IUserService userService)
         {
             _clubRepository = clubRepository;
             _mapper = mapper;
             _imageStorage = imageStorage;
+            _userService = userService;
         }
         public ClubDto Create(ClubDto clubDto, List<IFormFile> images)
         {
@@ -36,7 +38,8 @@ namespace Explorer.Stakeholders.Core.UseCases
                 clubDto.Name,
                 clubDto.Description,
                 savedPaths,
-                clubDto.CreatorId
+                clubDto.CreatorId,
+                Club.ClubStatus.Active
             );
 
             var createdClub = _clubRepository.Create(club);
@@ -124,5 +127,53 @@ namespace Explorer.Stakeholders.Core.UseCases
             return _mapper.Map<ClubDto>(updatedClub);
         }
 
+        public void CloseClub(long clubId, long ownerId)
+        {
+            var club = _clubRepository.GetById(clubId);
+            if (club == null)
+                throw new KeyNotFoundException("Club not found");
+
+            if (club.CreatorId != ownerId)
+                throw new UnauthorizedAccessException("Only the club owner can close the club");
+
+            if (!club.IsActive())
+                throw new InvalidOperationException("Club is already closed");
+
+            club.CloseClub();
+            _clubRepository.Update(club);
+        }
+        public void RemoveMember(long clubId, long ownerId, long memberId)
+        {
+            var club = _clubRepository.GetById(clubId);
+            if (club == null)
+                throw new KeyNotFoundException("Club not found");
+
+            if (club.CreatorId != ownerId)
+                throw new UnauthorizedAccessException("Only the club owner can remove members");
+
+            if (!club.IsMember(memberId))
+                throw new InvalidOperationException("Member is not part of this club");
+
+            if (memberId == ownerId)
+                throw new InvalidOperationException("Owner cannot remove themselves");
+
+            club.RemoveMember(memberId);
+            _clubRepository.Update(club);
+        }
+        public List<UserDto> GetClubMembers(long clubId, long ownerId)
+        {
+            var club = _clubRepository.GetById(clubId);
+            if (club == null)
+                throw new KeyNotFoundException("Club not found");
+
+            if (club.CreatorId != ownerId)
+                throw new UnauthorizedAccessException("Only the club owner can view members");
+
+            return club.Members.Select(m => new UserDto
+            {
+                Id = m.TouristId,
+                Username = _userService.GetById(m.TouristId).Username
+            }).ToList();
+        }
     }
 }

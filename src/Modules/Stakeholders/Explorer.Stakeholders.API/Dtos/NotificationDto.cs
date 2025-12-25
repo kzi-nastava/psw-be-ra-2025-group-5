@@ -12,5 +12,6 @@ public class NotificationDto
     public long? TourProblemId { get; set; }
     public long? TourId { get; set; }
     public string? ActionUrl { get; set; }
+    public long? ClubId { get; set; }
 }
 
