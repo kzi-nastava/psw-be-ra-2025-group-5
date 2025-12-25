@@ -8,7 +8,8 @@ public enum NotificationType
     CommentAdded,
     DeadlineSet,
     TourClosed,
-    ProblemStatusChanged
+    ProblemStatusChanged,
+    ClubInvite
 }
 
 public class Notification : Entity

@@ -101,5 +101,24 @@ namespace Explorer.API.Controllers.Tourist
             return PhysicalFile(filePath, mime);
         }
 
+        [HttpPost("{clubId}/close")]
+        public IActionResult CloseClub(long clubId)
+        {
+            var ownerId = User.PersonId();
+
+            _clubService.CloseClub(clubId, ownerId);
+            return Ok(new { message = "Club closed successfully." });
+        }
+
+        [HttpPost("{clubId}/removeMember/{memberId}")]
+        [Authorize]
+        public IActionResult RemoveMember(long clubId, long memberId)
+        {
+            var ownerId = User.PersonId();
+
+            _clubService.RemoveMember(clubId, ownerId, memberId);
+            return Ok(new { message = "Member removed successfully." });
+        }
+
     }
 }

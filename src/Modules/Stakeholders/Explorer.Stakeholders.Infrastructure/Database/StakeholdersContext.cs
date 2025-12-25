@@ -17,6 +17,8 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Diary> Diaries { get; set; }
+        public DbSet<ClubInvite> ClubInvites { get; set; }
+        public DbSet<ClubMember> ClubMembers { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -35,6 +37,8 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureNotification(modelBuilder);
             ConfigureDiary(modelBuilder);
             ConfigureClub(modelBuilder);
+            ConfigureClubInvite(modelBuilder);
+            ConfigureClubMember(modelBuilder);
         }
 
         private static void ConfigureClub(ModelBuilder modelBuilder)
@@ -70,9 +74,57 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.Property(c => c.ImagePaths)
                         .HasColumnType("text")
                         .IsRequired();
-                });
-        }
 
+                builder.Property(c => c.Status)
+                        .HasConversion<int>() 
+                        .IsRequired()
+                        .HasDefaultValue(Club.ClubStatus.Active);
+                builder.Property(c => c.Status)
+                        .HasConversion<int>()   
+                        .IsRequired();
+
+            });
+
+        }
+        private static void ConfigureClubInvite(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClubInvite>(builder =>
+            {
+                builder.HasKey(ci => ci.Id);
+                builder.Property(ci => ci.ClubId).IsRequired();
+                builder.Property(ci => ci.TouristId).IsRequired();
+                builder.Property(ci => ci.CreatedAt).IsRequired();
+                builder.Property(ci => ci.NotificationId).IsRequired();
+            });
+        }
+        private static void ConfigureClubMember(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClubMember>(builder =>
+            {
+                builder.HasKey(cm => new { cm.ClubId, cm.TouristId });
+
+                builder.Property(cm => cm.ClubId)
+                       .IsRequired();
+
+                builder.Property(cm => cm.TouristId)
+                       .IsRequired();
+
+                builder.Property(cm => cm.JoinedAt)
+                       .IsRequired();
+
+                builder.HasOne<Club>()
+                       .WithMany(c => c.Members)
+                       .HasForeignKey(cm => cm.ClubId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne<Person>()
+                       .WithMany()
+                       .HasForeignKey(cm => cm.TouristId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.ToTable("ClubMembers");
+            });
+        }
 
         private static void ConfigureStakeholder(ModelBuilder modelBuilder)
         {

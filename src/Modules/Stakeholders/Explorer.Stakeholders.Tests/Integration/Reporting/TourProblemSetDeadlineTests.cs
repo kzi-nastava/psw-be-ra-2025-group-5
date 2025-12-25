@@ -30,7 +30,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
             long problemId = -22;
-            var newDeadline = new DateTimeOffset(2025, 12, 24, 10, 30, 0, TimeSpan.Zero);
+            var newDeadline = new DateTimeOffset(2026, 12, 24, 10, 30, 0, TimeSpan.Zero);
 
             // Act
             var dto = new SetDeadlineDto { Deadline = newDeadline };

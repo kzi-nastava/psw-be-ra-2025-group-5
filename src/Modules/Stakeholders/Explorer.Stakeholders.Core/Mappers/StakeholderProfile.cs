@@ -103,6 +103,9 @@ namespace Explorer.Stakeholders.Core.Mappers
                 ))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
+            CreateMap<ClubInvite, ClubInviteDto>()
+                .ForMember(dest => dest.TouristUsername, opt => opt.Ignore());
+
         }
     }
 }

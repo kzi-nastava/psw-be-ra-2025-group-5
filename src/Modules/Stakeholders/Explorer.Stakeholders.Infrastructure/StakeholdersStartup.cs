@@ -5,6 +5,7 @@ using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.Core.Mappers;
 using Explorer.Stakeholders.Core.UseCases;
+using Explorer.Stakeholders.Core.UseCases.ClubMembership;
 using Explorer.Stakeholders.Core.UseCases.Reporting;
 using Explorer.Stakeholders.Core.UseCases.Statistics;
 using Explorer.Stakeholders.Infrastructure.Authentication;
@@ -39,6 +40,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<ITouristStatisticsService, TouristStatisticsService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDiaryService, DiaryService>();
+            services.AddScoped<IClubInviteService, ClubInviteService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
@@ -51,6 +53,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IPositionRepository, PositionDbRepository>();
             services.AddScoped<INotificationRepository, NotificationDbRepository>();
             services.AddScoped<IDiaryRepository, DiaryRepository>();
+            services.AddScoped<IClubInviteRepository, ClubInviteDbRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
             dataSourceBuilder.EnableDynamicJson();

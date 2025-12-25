@@ -16,5 +16,8 @@ namespace Explorer.Stakeholders.API.Public
         List<ClubDto> GetAll();
         ClubDto Update(ClubDto clubDto, List<IFormFile>? images);
         ClubDto RemoveImage(long userId, long clubId, string imagePath);
+        void CloseClub(long clubId, long ownerId);
+        void RemoveMember(long clubId, long ownerId, long memberId);
+
     }
 }
