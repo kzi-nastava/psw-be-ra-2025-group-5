@@ -69,7 +69,7 @@ public class TourExecutionController : ControllerBase
     }
 
     [HttpGet("purchased")]
-    public ActionResult<List<TourDto>> GetPurchasedTours()
+    public ActionResult<List<TourBasicDto>> GetPurchasedTours()
     {
         long userId = long.Parse(User.FindFirst("id")!.Value);
         var tours = _service.GetPurchasedToursWithoutExecution(userId);

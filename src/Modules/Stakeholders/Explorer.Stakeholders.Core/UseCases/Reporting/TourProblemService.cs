@@ -88,7 +88,7 @@ public class TourProblemService : ITourProblemService
         if (problem == null)
             throw new NotFoundException($"TourProblem {id} not found");
 
-        var tourDto = new TourDto { Id = problem.TourId, Name = "Unknown", Status = "Unknown" };
+        var tourDto = new TourBasicDto { Id = problem.TourId, Name = "Unknown", Status = "Unknown" };
 
         var reporter = _userRepository.GetById(problem.ReporterId);
 
@@ -144,7 +144,7 @@ public class TourProblemService : ITourProblemService
     {
         var items = result.Results.Select(problem =>
         {
-            var tourDto = new TourDto { Id = problem.TourId, Name = "Unknown", Status = "Unknown" };
+            var tourDto = new TourBasicDto { Id = problem.TourId, Name = "Unknown", Status = "Unknown" };
             var reporter = _userRepository.GetById(problem.ReporterId);
 
             return new TourProblemDto

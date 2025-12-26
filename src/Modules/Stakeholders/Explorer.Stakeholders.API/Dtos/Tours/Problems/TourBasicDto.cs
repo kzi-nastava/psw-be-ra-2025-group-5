@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Explorer.Stakeholders.API.Dtos.Tours.Problems
 {
-    public class TourDto
+    public class TourBasicDto
     {
         public long Id { get; set; }
         public string Name { get; set; }
