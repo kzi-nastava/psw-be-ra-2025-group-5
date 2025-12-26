@@ -41,4 +41,10 @@ public class ChallengeService : IChallengeService
     {
         _challengeRepository.Delete(id);
     }
+
+    public List<ChallengeDto> GetAllActive()
+    {
+        var result = _challengeRepository.GetAll().Where(c => c.Status == ChallengeStatus.Active);
+        return result.Select(_mapper.Map<ChallengeDto>).ToList();
+    }
 }
