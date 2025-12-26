@@ -19,6 +19,8 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<Diary> Diaries { get; set; }
         public DbSet<ClubInvite> ClubInvites { get; set; }
         public DbSet<ClubMember> ClubMembers { get; set; }
+        public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
+
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -39,6 +41,37 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClub(modelBuilder);
             ConfigureClubInvite(modelBuilder);
             ConfigureClubMember(modelBuilder);
+            ConfigureClubJoinRequest(modelBuilder);
+        }
+
+        private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClubJoinRequest>(builder =>
+            {
+                builder.HasKey(cjr => cjr.Id);
+
+                builder.Property(cjr => cjr.ClubId)
+                       .IsRequired();
+
+                builder.Property(cjr => cjr.TouristId)
+                       .IsRequired();
+
+                builder.Property(cjr => cjr.CreatedAt)
+                       .IsRequired();
+
+                builder.HasOne<Club>()
+                       .WithMany()
+                       .HasForeignKey(cjr => cjr.ClubId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne<Person>()
+                       .WithMany()
+                       .HasForeignKey(cjr => cjr.TouristId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasIndex(cjr => cjr.ClubId);
+                builder.HasIndex(cjr => cjr.TouristId);
+            });
         }
 
         private static void ConfigureClub(ModelBuilder modelBuilder)

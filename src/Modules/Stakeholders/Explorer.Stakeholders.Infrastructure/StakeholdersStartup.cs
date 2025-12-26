@@ -41,6 +41,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDiaryService, DiaryService>();
             services.AddScoped<IClubInviteService, ClubInviteService>();
+            services.AddScoped<IClubJoinRequestService, ClubJoinRequestService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
@@ -54,6 +55,8 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<INotificationRepository, NotificationDbRepository>();
             services.AddScoped<IDiaryRepository, DiaryRepository>();
             services.AddScoped<IClubInviteRepository, ClubInviteDbRepository>();
+            services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
+
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
             dataSourceBuilder.EnableDynamicJson();

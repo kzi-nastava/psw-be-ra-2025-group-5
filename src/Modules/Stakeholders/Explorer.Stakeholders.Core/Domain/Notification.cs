@@ -9,7 +9,8 @@ public enum NotificationType
     DeadlineSet,
     TourClosed,
     ProblemStatusChanged,
-    ClubInvite
+    ClubInvite,
+    ClubJoin
 }
 
 public class Notification : Entity

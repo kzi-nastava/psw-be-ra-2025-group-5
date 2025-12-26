@@ -147,5 +147,69 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
                 ContentType = "image/jpeg"
             };
         }
+
+
+        [Fact]
+        public void Tourist_can_request_to_join_and_cancel_request()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var clubService = scope.ServiceProvider.GetRequiredService<IClubService>();
+            var joinRequestService = scope.ServiceProvider.GetRequiredService<IClubJoinRequestService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+
+
+            var club = clubService.Create(new ClubDto
+            {
+                Name = "Tourist Klub",
+                Description = "Test za turiste",
+                CreatorId = -21
+            }, new List<IFormFile> { CreateTestImage() });
+
+            joinRequestService.RequestToJoin(club.Id, -22);
+
+            dbContext.ChangeTracker.Clear();
+            var pendingRequest = dbContext.ClubJoinRequests
+                .FirstOrDefault(r => r.ClubId == club.Id && r.TouristId == -22);
+            pendingRequest.ShouldNotBeNull();
+
+            joinRequestService.CancelRequest(club.Id, -22);
+
+            dbContext.ChangeTracker.Clear();
+            dbContext.ClubJoinRequests
+                .Any(r => r.ClubId == club.Id && r.TouristId == -22)
+                .ShouldBeFalse();
+        }
+
+        [Fact]
+        public void Tourist_membership_status_reflects_correctly()
+        {
+            using var scope = Factory.Services.CreateScope();
+            var clubService = scope.ServiceProvider.GetRequiredService<IClubService>();
+            var joinRequestService = scope.ServiceProvider.GetRequiredService<IClubJoinRequestService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
+
+            var club = clubService.Create(new ClubDto
+            {
+                Name = "Status Klub",
+                Description = "Test statusa",
+                CreatorId = -21
+            }, new List<IFormFile> { CreateTestImage() });
+
+            joinRequestService.GetMembershipStatus(club.Id, -22).ShouldBe("None");
+
+            joinRequestService.RequestToJoin(club.Id, -22);
+            joinRequestService.GetMembershipStatus(club.Id, -22).ShouldBe("Pending");
+
+            var joinRequest = dbContext.ClubJoinRequests
+                .First(r => r.ClubId == club.Id && r.TouristId == -22);
+            joinRequestService.AcceptRequest(club.Id, -22, -21);
+
+            joinRequestService.GetMembershipStatus(club.Id, -22).ShouldBe("Member");
+        }
+
+
+
+
+
     }
 }
