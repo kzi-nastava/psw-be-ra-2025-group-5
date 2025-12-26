@@ -13,6 +13,7 @@ using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Internal;
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Microsoft.AspNetCore.Http;
+using System.Security.Cryptography;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -147,7 +148,11 @@ public class TourService : ITourService, ITourSharedService
         var tour = _tourRepository.Get(tourId);
         var location = _mapper.Map<Location>(keyPointDto.Location);
 
-        string? imagePath = null;
+        var keyPoint = tour.KeyPoints.FirstOrDefault(kp => kp.Id == keyPointId);
+        if (keyPoint == null)
+            throw new Exception("KeyPoint not found");
+
+        string? imagePath = keyPoint.ImagePath;
         if (keyPointDto.ImagePath != null)
         {
             imagePath = SaveKeyPointImage(keyPointDto.ImagePath, tour.AuthorId);
@@ -342,7 +347,6 @@ public class TourService : ITourService, ITourSharedService
         var tour = _tourRepository.Get(tourId);
 
         tour.RemoveReview(reviewId);
-
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
     }
