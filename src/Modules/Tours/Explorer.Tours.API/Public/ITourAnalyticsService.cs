@@ -10,5 +10,6 @@ namespace Explorer.Tours.API.Public
     public interface ITourAnalyticsService
     {
         IReadOnlyCollection<ToursByPriceDto> GetToursCountByPrice(long userId);
+        TourReviewStatisticsDto GetReviewStatistics(long authorId, string period);
     }
 }

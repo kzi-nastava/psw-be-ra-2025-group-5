@@ -26,5 +26,12 @@ namespace Explorer.API.Controllers.Author
             return Ok(result);
         }
 
+        [HttpGet("reviews")]
+        public ActionResult<TourReviewStatisticsDto> GetReviewStatistics([FromQuery] long userId, [FromQuery] string period = "all")
+        {
+            var result = _tourAnalyticsService.GetReviewStatistics(userId, period);
+            return Ok(result);
+        }
+
     }
 }
