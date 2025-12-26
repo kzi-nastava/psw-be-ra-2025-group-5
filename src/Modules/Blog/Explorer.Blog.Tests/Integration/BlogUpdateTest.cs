@@ -1,6 +1,7 @@
-﻿using Explorer.Blog.API.Dtos;
+﻿using Explorer.Blog.API.Dtos.Posts;
+using Explorer.Blog.API.Dtos.Images;
 using Explorer.Blog.API.Public;
-using Explorer.Blog.Core.Domain;
+using Explorer.Blog.Core.Domain.BlogPosts;
 using Explorer.Blog.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -65,10 +66,10 @@ namespace Explorer.Blog.Tests.Integration
             var archived = service.Archive(created.Id, authorId: 1);
 
             archived.ShouldNotBeNull();
-            archived.Status.ShouldBe(BlogPost.BlogStatus.Archived.ToString());
+            archived.Status.ShouldBe(BlogStatus.Archived.ToString());
 
             var stored = dbContext.BlogPosts.Find(created.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Archived);
+            stored.Status.ShouldBe(BlogStatus.Archived);
         }
 
         [Fact]

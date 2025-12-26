@@ -1,4 +1,8 @@
-﻿using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Tours.Execution;
+using Explorer.Tours.API.Dtos.Tours.Executions;
+using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.API.Controllers.Tourist;
 using Explorer.Payments.Core.Domain;
 using Explorer.Payments.Infrastructure.Database;
 using Explorer.Tours.API.Dtos;
@@ -8,6 +12,7 @@ using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using Explorer.Tours.API.Dtos.Tours;
 
 namespace Explorer.Tours.Tests.Integration.TourExe;
 

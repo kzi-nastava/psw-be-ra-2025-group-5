@@ -1,13 +1,13 @@
 ﻿using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.Core.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Explorer.Stakeholders.Core.Domain.Club;
 using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Clubs;
+using Explorer.Stakeholders.API.Public.Notifications;
+using Explorer.Stakeholders.Core.UseCases.Administration.Users;
+using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.Core.Domain.Users;
 
 namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
 {

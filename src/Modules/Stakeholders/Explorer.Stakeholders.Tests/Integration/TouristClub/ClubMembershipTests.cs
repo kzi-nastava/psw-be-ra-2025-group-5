@@ -1,5 +1,7 @@
 ﻿using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Public.Clubs;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

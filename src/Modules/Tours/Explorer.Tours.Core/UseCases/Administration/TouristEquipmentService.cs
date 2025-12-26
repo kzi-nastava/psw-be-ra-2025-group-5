@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Tours.API.Public.Administration;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.Core.Domain.Equipments.Entities;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Equipments;
 
 namespace Explorer.Tours.Core.UseCases.Administration
 {

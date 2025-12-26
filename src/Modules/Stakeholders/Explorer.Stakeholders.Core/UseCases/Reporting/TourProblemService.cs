@@ -1,12 +1,18 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Comments;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
-using Explorer.Stakeholders.Core.Domain;
-using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.Core.Domain.Comments;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TourProblems;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
+using Explorer.Stakeholders.Core.Domain.TourProblems;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Tours.Core.Domain.Tours;
 using System.Data;
+
 
 namespace Explorer.Stakeholders.Core.UseCases.Reporting;
 
@@ -14,18 +20,15 @@ public class TourProblemService : ITourProblemService
 {
     private readonly ITourProblemRepository _repository;
     private readonly IUserRepository _userRepository;
-    private readonly INotificationService _notificationService;
     private readonly IMapper _mapper;
 
     public TourProblemService(
         ITourProblemRepository repository, 
         IUserRepository userRepository,
-        INotificationService notificationService,
         IMapper mapper)
     {
         _repository = repository;
         _userRepository = userRepository;
-        _notificationService = notificationService;
         _mapper = mapper;
     }
 
@@ -85,13 +88,19 @@ public class TourProblemService : ITourProblemService
         if (problem == null)
             throw new NotFoundException($"TourProblem {id} not found");
 
+        var tourDto = new TourBasicDto { Id = problem.TourId, Name = "Unknown", Status = "Unknown" };
+
+        var reporter = _userRepository.GetById(problem.ReporterId);
+
         var dto = new TourProblemDto
         {
             Id = problem.Id,
             TourId = problem.TourId,
             ReporterId = problem.ReporterId,
-            Category = (API.Dtos.ProblemCategory)problem.Category,
-            Priority = (API.Dtos.ProblemPriority)problem.Priority,
+            TourName = tourDto?.Name ?? string.Empty,
+            ReporterName = reporter?.Username ?? string.Empty,
+            Category = (API.Dtos.Tours.Problems.ProblemCategory)problem.Category,
+            Priority = (API.Dtos.Tours.Problems.ProblemPriority)problem.Priority,
             Description = problem.Description,
             OccurredAt = problem.OccurredAt,
             CreatedAt = problem.CreatedAt,
@@ -135,14 +144,18 @@ public class TourProblemService : ITourProblemService
     {
         var items = result.Results.Select(problem =>
         {
+            var tourDto = new TourBasicDto { Id = problem.TourId, Name = "Unknown", Status = "Unknown" };
+            var reporter = _userRepository.GetById(problem.ReporterId);
 
             return new TourProblemDto
             {
                 Id = problem.Id,
                 TourId = problem.TourId,
                 ReporterId = problem.ReporterId,
-                Category = (API.Dtos.ProblemCategory)problem.Category,
-                Priority = (API.Dtos.ProblemPriority)problem.Priority,
+                TourName = tourDto?.Name ?? string.Empty,
+                ReporterName = reporter?.Username ?? string.Empty,
+                Category = (API.Dtos.Tours.Problems.ProblemCategory)problem.Category,
+                Priority = (API.Dtos.Tours.Problems.ProblemPriority)problem.Priority,
                 Description = problem.Description,
                 OccurredAt = problem.OccurredAt,
                 CreatedAt = problem.CreatedAt,

@@ -1,7 +1,7 @@
-﻿using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Location;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Locations;
+using Explorer.Stakeholders.API.Public.Positions;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Tests;
 using Microsoft.AspNetCore.Mvc;

@@ -1,6 +1,6 @@
-﻿using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Tours.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Tours.API.Public.Administration;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;

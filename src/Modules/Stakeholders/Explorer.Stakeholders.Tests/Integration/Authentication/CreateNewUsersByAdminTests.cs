@@ -1,9 +1,9 @@
 ﻿using Explorer.API.Controllers;
-using Explorer.API.Controllers.Administrator.Administration;
-using Explorer.Stakeholders.API.Dtos;
+using Explorer.API.Controllers.Administrator;
+using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public;
-using Explorer.Stakeholders.Core.Domain;
-using Explorer.Stakeholders.Core.UseCases;
+using Explorer.Stakeholders.Core.Domain.Users;
+using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

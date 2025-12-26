@@ -1,7 +1,7 @@
-using Explorer.API.Controllers.Tourist;
+using Explorer.API.Controllers.Tours.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Dtos.Preferences;
+using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

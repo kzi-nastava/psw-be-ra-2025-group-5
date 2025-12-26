@@ -1,14 +1,11 @@
-﻿using Explorer.Blog.API.Dtos;
+﻿using Explorer.Blog.API.Dtos.Images;
+using Explorer.Blog.API.Dtos.Posts;
 using Explorer.Blog.API.Public;
-using Explorer.Blog.Core.Domain;
+using Explorer.Blog.Core.Domain.BlogPosts;
 using Explorer.Blog.Core.UseCases;
 using Explorer.Blog.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 namespace Explorer.Blog.Tests.Integration
 {
     [Collection("Sequential")]
@@ -132,11 +129,11 @@ namespace Explorer.Blog.Tests.Integration
             var created = service.Create(createDto, authorId: 1);
 
             created.ShouldNotBeNull();
-            created.Status.ShouldBe(BlogPost.BlogStatus.Draft.ToString());
+            created.Status.ShouldBe(BlogStatus.Draft.ToString());
 
             var stored = dbContext.BlogPosts.Find(created.Id);
             stored.ShouldNotBeNull();
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Draft);
+            stored.Status.ShouldBe(BlogStatus.Draft);
         }
 
         [Fact]
@@ -156,10 +153,10 @@ namespace Explorer.Blog.Tests.Integration
             var published = service.Publish(created.Id, authorId: 1);
 
             published.ShouldNotBeNull();
-            published.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+            published.Status.ShouldBe(BlogStatus.Published.ToString());
 
             var stored = dbContext.BlogPosts.Find(created.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Published);
+            stored.Status.ShouldBe(BlogStatus.Published);
         }
 
         [Fact]
@@ -187,7 +184,7 @@ namespace Explorer.Blog.Tests.Integration
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
             stored.ShouldNotBeNull();
-            stored.Status.ShouldBe(BlogPost.BlogStatus.ReadOnly);
+            stored.Status.ShouldBe(BlogStatus.ReadOnly);
         }
 
         [Fact]
@@ -214,7 +211,7 @@ namespace Explorer.Blog.Tests.Integration
 
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Active);
+            stored.Status.ShouldBe(BlogStatus.Active);
         }
 
         [Fact]
@@ -243,7 +240,7 @@ namespace Explorer.Blog.Tests.Integration
 
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Active);
+            stored.Status.ShouldBe(BlogStatus.Active);
         }
 
         [Fact]
@@ -271,7 +268,7 @@ namespace Explorer.Blog.Tests.Integration
 
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Famous);
+            stored.Status.ShouldBe(BlogStatus.Famous);
         }
 
         [Fact]
@@ -288,7 +285,7 @@ namespace Explorer.Blog.Tests.Integration
 
             var result = service.CreateAndPublish(dto, authorId: 1);
 
-            result.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+            result.Status.ShouldBe(BlogStatus.Published.ToString());
         }
 
 
