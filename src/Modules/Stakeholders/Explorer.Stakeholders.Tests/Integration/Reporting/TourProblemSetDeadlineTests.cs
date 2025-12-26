@@ -50,6 +50,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var controller = CreateController(scope, "-22", "tourist");
 
             long problemId = -22;
+            
             var newDeadline = new DateTimeOffset(2029, 12, 25, 12, 0, 0, TimeSpan.Zero);
 
             var dto = new SetDeadlineDto { Deadline = newDeadline };
@@ -79,8 +80,9 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
             var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+            var tourExecutionService = scope.ServiceProvider.GetRequiredService<ITourExecutionService>();
 
-            return new TourProblemController(tourProblemService, tourService, notificationService)
+            return new TourProblemController(tourProblemService, tourService, notificationService, tourExecutionService)
             {
                 ControllerContext = new ControllerContext
                 {

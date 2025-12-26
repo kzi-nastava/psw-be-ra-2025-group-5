@@ -26,7 +26,6 @@ public static class BlogStartup
         services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<IBlogRepository, BlogDbRepository>();
 
-        
         services.AddScoped<BlogCommentService>();
         services.AddScoped<BlogDomainService>();
     }

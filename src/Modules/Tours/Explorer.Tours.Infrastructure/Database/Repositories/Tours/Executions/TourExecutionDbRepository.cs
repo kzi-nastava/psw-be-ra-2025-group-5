@@ -70,5 +70,8 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories.Tours.Executions
                 .FirstOrDefault(x => x.UserId == userId
                                      && x.TourId == tourId);
         }
+
+        public bool HasAnyExecution(long userId, long tourId) => _context.TourExecutions.Any(e => e.UserId == userId && e.TourId == tourId); 
+
     }
 }

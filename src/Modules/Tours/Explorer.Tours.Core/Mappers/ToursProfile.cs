@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using TourDifficulty = Explorer.Tours.Core.Domain.Tours.TourDifficulty;
-using System.Linq;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Explorer.Tours.Core.Domain.TourExecutions;
 using Explorer.Tours.Core.Domain.TourExecutions.ValueObejcts;
-using Explorer.Tours.Core.Domain.ShoppingCarts;
-using Explorer.Tours.Core.Domain.ShoppingCarts.ValueObjects;
-using Explorer.Tours.Core.Domain.TourPurchaseTokens;
 using Explorer.Tours.Core.Domain.Equipments;
 using Explorer.Tours.Core.Domain.Equipments.Entities;
 using Explorer.Tours.Core.Domain.Monuments;
@@ -20,12 +16,12 @@ using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Tours.API.Dtos.Facilities;
 using Explorer.Tours.API.Dtos.Tours.Executions;
 using Explorer.Tours.API.Dtos.Tours;
-using Explorer.Tours.API.Dtos.Tours.PurchaseTokens;
-using Explorer.Tours.API.Dtos.Shoppings;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Preferences;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
 using Explorer.Tours.API.Dtos.Locations;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.Core.Domain;
 
 namespace Explorer.Tours.Core.Mappers;
 
@@ -42,8 +38,6 @@ public class ToursProfile : Profile
 
         CreateMap<TourStatus, string>().ConvertUsing(src => src.ToString());
         CreateMap<string, TourStatus>().ConvertUsing(static src => Enum.Parse<TourStatus>(src, true));
-
-        //CreateMap<Tour, TourDto>().ReverseMap();
 
         CreateMap<Tour, TourDto>()
         .ForMember(d => d.RequiredEquipmentIds,
@@ -66,13 +60,6 @@ public class ToursProfile : Profile
 
         CreateMap<TouristEquipmentDto, TouristEquipment>().ReverseMap();
         CreateMap<FacilityDto, Facility>().ReverseMap();
-
-        CreateMap<OrderItem, OrderItemDto>().ReverseMap();
-
-        CreateMap<ShoppingCartDto, ShoppingCart>().ReverseMap();
-
-        CreateMap<CreateShoppingCartDto, ShoppingCart>()
-            .ConstructUsing(src => new ShoppingCart(src.TouristId));
 
         CreateMap<Location, LocationDto>().ReverseMap();
 
@@ -114,14 +101,10 @@ public class ToursProfile : Profile
         CreateMap<TourDurationDto, TourDuration>()
             .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TourDuration.TransportTypeEnum>(src.TransportType)));
 
-            
-
         CreateMap<TourReviewDto, TourReview>()
             .ForMember(d => d.Progress,opt => opt.MapFrom(src => new TourProgress(src.Progress)))
             .ForMember(d => d.Images,opt => opt.Ignore());
-            
 
-        CreateMap<TourPurchaseTokenDto, TourPurchaseToken>().ReverseMap();
-        CreateMap<CreateTourPurchaseTokenDto, TourPurchaseToken>();
+        CreateMap<TourStatisticsItem, TourStatisticsItemDto>().ReverseMap();
     }
 }

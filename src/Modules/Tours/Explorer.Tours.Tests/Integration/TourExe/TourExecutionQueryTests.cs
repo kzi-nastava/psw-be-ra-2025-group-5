@@ -2,10 +2,17 @@
 using Explorer.Tours.API.Dtos.Tours.Executions;
 using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.API.Controllers.Tourist;
+using Explorer.Payments.Core.Domain;
+using Explorer.Payments.Infrastructure.Database;
+using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Public;
+using Explorer.Tours.Core.Domain; 
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using Explorer.Tours.API.Dtos.Tours;
 
 namespace Explorer.Tours.Tests.Integration.TourExe;
 
@@ -82,6 +89,39 @@ public class TourExecutionQueryTests : BaseToursIntegrationTest
         result.All(e => e.UserId == -1).ShouldBeTrue();
     }
 
+    [Fact]
+    public void GetPurchasedTours_ReturnsOnlyToursWithoutExecution()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var tourDbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+        var paymentsDbContext = scope.ServiceProvider.GetRequiredService<PaymentsContext>();
+
+        var tourId1 = -1;
+        var tourId2 = -2;
+        var tourId3 = -3;
+
+        paymentsDbContext.TourPurchaseTokens.AddRange(
+            new TourPurchaseToken(touristId: -1, tourId: tourId1),
+            new TourPurchaseToken(touristId: -1, tourId: tourId2),
+            new TourPurchaseToken(touristId: -1, tourId: tourId3)
+        );
+        paymentsDbContext.SaveChanges();
+
+        var execution = TourExecution.StartNew(userId: -1, tourId: tourId2);
+        tourDbContext.TourExecutions.Add(execution);
+
+        tourDbContext.SaveChanges();
+
+        var controller = CreateController(scope);
+
+        // Act
+        var result = ((ObjectResult)controller.GetPurchasedTours().Result)?.Value as List<TourDto>;
+
+        // Assert 
+        result.ShouldNotBeNull();
+        result.Select(t => t.Id).ShouldBe(new List<long> { tourId1, tourId3 });
+    }
 
     private static TourExecutionController CreateController(IServiceScope scope)
     {
@@ -91,4 +131,3 @@ public class TourExecutionQueryTests : BaseToursIntegrationTest
         };
     }
 }
-

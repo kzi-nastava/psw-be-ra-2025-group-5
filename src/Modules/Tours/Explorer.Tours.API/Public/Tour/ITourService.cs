@@ -42,5 +42,5 @@ public interface ITourService
     TourDto AddRequiredEquipment(long tourId, long equipmentId);
     TourDto RemoveRequiredEquipment(long tourId, long equipmentId);
     void CloseTour(long tourId);
-    TourDto GetById(long id);
+    TourDto Get(long id);
 }

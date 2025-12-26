@@ -1,10 +1,3 @@
-﻿INSERT INTO stakeholders."Clubs" (
-    "Id", "Name", "Description", "Images", "CreatorId"
-)
-VALUES (
-    -1,
-    'Planinari',
-    'Planinarski klub',
-    ARRAY[decode('iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAASFBMVEXw8PDUVp/SSZry9/Tq1eDUUp3ZeK7x8/Lp0N3agLLSRZjr2uPYcKvZea/TT5zq1uDdkbvlutHz/vjv6+3ROpTVXqLpztzWZaX0Py9GAAACFklEQVR4nO3cTVZaYRBFUQIC+vgLasj8Z5pWGml5G1UvRbLPAK7fZmkPa7ORJEmSJOl/7fjERcCPl+ftlBCPL5/bZ2057yLh9tuztj8QEk6PkHB+hITzIyScHyHh/AgJ50dIOD9CwvkREs6PkHB+hITzI/wtXPZB4Y9cd+qaCU/nw9ddfkSvOl9WnTp8T4Sb4y7o/S356Le3dad2ETBrlz3rNfh+S+BUZYSEPVOVERL2TFVGSNgzVRkhYc9UZYSEPVOVERL2TFVGSNgzVRkhYc9UZYSEPVOVERL2TFVGSNgzlZZcZ/gLwt26VyNOhyW4cfD5SISXZGq539a9GrGcb69f9/hIfuDtEUzdo4+h8GrE/lL3SxP9VdyiVxV+JyrbqqvyVYSEPRESdm3VRUjYtVUXIWHXVl2EhF1bdRESdm3VRUjYtVUXIWHXVl2EhF1bdRESdm3VRUjYtVVXrTC5GnG9vEcXAMo6Ra+qvBrx823dDutfjbgmpzjqWmZejShs6Le+CAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCacLo/+PX1848mrENXr8PliaejXinhD32dTIqxHhqYfCqbW/EzVzauizCAnnP4uQcP6zCAnnP4uQcP6zCAnnP4uQcP6zCAnnP4uQcP6zCAnnP4uQcP6zCAn/3Cq7zzBzKrwaEd1nmDkVXo3I7jPMnJIkSZIk6V/sF+VupuU9YoYGAAAAAElFTkSuQmCC', 'base64')],
-    -21
-);
+﻿INSERT INTO stakeholders."Clubs" 
+("Id", "Name", "Description", "ImagePaths", "CreatorId") 
+VALUES (-41, 'Test klub', 'Opis za test klub', '/images/club/planinari1.jpeg', -21);

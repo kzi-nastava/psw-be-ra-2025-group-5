@@ -1,4 +1,5 @@
-﻿using Explorer.Tours.API.Dtos.KeyPoints;
+﻿using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Locations;
 using Explorer.Tours.API.Dtos.Tours.Executions;
 using Explorer.Tours.API.Public.Tour;
@@ -66,5 +67,14 @@ public class TourExecutionController : ControllerBase
         var executions = _service.GetExecutionsForUser(userId);
         return Ok(executions);
     }
+
+    [HttpGet("purchased")]
+    public ActionResult<List<TourDto>> GetPurchasedTours()
+    {
+        long userId = long.Parse(User.FindFirst("id")!.Value);
+        var tours = _service.GetPurchasedToursWithoutExecution(userId);
+        return Ok(tours);
+    }
+
 
 }

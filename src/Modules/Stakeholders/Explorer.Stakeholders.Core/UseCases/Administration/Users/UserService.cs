@@ -82,7 +82,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
         }
 
         public UserDto Unblock(long id)
-        { 
+        {
             User user = _userRepository.Get(id);
             if (user == null)
                 throw new Exception("User not found.");
@@ -91,7 +91,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
                 throw new InvalidOperationException("Cannot unblock an Administrator account.");
             }
 
-            if(user.IsActive)
+            if (user.IsActive)
             {
                 throw new InvalidOperationException("User is already active.");
             }
@@ -100,6 +100,14 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
 
             User updated = _userRepository.Update(user);
             return _mapper.Map<UserDto>(updated);
+        }
+
+        public UserDto GetById(long id)
+        {
+            User user = _userRepository.Get(id);
+            if (user == null)
+                throw new Exception("User not found.");
+            return _mapper.Map<UserDto>(user);
         }
     }
 }

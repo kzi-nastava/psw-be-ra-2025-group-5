@@ -12,7 +12,7 @@ public class Person : Entity
 
     public string? Biography { get; set; }
     public string? Motto { get; set; }
-    public byte[]? ProfileImage { get; set; }
+    public string? ProfileImagePath { get; set; }
     public Person(long userId, string? name, string? surname, string email)
     {
         UserId = userId;

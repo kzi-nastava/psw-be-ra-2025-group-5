@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Explorer.Tours.API.Dtos.KeyPoints;
+﻿using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Locations;
+using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Executions;
 
 namespace Explorer.Tours.API.Public.Tour
@@ -18,5 +14,6 @@ namespace Explorer.Tours.API.Public.Tour
         TourExecutionDto GetExecution(long executionId);
         List<TourExecutionDto> GetExecutionsForUser(long userId);
         void ExpireOldTours();
+        List<TourDto> GetPurchasedToursWithoutExecution(long userId);
     }
 }

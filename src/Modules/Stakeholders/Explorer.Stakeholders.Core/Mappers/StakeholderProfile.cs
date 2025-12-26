@@ -1,4 +1,5 @@
 using AutoMapper;
+using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.AppRatings;
 using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.Comments;
@@ -7,6 +8,7 @@ using Explorer.Stakeholders.API.Dtos.Locations;
 using Explorer.Stakeholders.API.Dtos.Notifications;
 using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
@@ -25,15 +27,11 @@ namespace Explorer.Stakeholders.Core.Mappers
     {
         public StakeholderProfile()
         {
-            // ========================= Person <-> ProfileDto =========================
             CreateMap<Person, ProfileDto>()
-                .ForMember(
-                    dest => dest.ProfileImageBase64,
-                    opt => opt.MapFrom(src => src.ProfileImage != null
-                        ? Convert.ToBase64String(src.ProfileImage)
-                        : string.Empty)
-                )
-                .ReverseMap();
+                .ForMember(dest => dest.Statistics, opt => opt.Ignore()); 
+
+            CreateMap<ProfileDto, Person>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore()); 
 
             // ========================= AppRating <-> AppRatingDto =========================
             CreateMap<AppRating, AppRatingDto>();
@@ -56,21 +54,14 @@ namespace Explorer.Stakeholders.Core.Mappers
             // ========================= Club <-> ClubDto =========================
             CreateMap<Club, ClubDto>()
                 .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.ToBase64String(img)).ToList()
-                            : new List<string>())
+                    dest => dest.ImagePaths,
+                    opt => opt.MapFrom(src => src.ImagePaths)
                 );
 
             CreateMap<ClubDto, Club>()
-                .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.FromBase64String(img)).ToList()
-                            : new List<byte[]>())
-                );
+                .ForMember(dest => dest.ImagePaths, opt => opt.Ignore()); 
+                                                                       
+
 
             CreateMap<TourProblem, TourProblemDto>()
                 .ForMember(dest => dest.Comments, opt => opt.Ignore())
@@ -114,7 +105,8 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.Message,
                     dto.TourProblemId,
                     dto.TourId,
-                    dto.ActionUrl
+                    dto.ActionUrl,
+                    dto.ClubId
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
@@ -131,6 +123,9 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.TouristId
                 ))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<ClubInvite, ClubInviteDto>()
+                .ForMember(dest => dest.TouristUsername, opt => opt.Ignore());
 
         }
     }

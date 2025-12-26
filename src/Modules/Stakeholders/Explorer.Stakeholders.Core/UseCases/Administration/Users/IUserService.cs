@@ -13,5 +13,6 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
         List<UserDto> GetAll();
         UserDto Block(long id);
         UserDto Unblock(long id);
+        UserDto GetById(long id);
     }
 }

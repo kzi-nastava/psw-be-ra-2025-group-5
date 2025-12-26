@@ -1,10 +1,4 @@
 ﻿using AutoMapper;
-using Explorer.Tours.API.Public.Shopping;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.TourExecutions;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
@@ -12,6 +6,9 @@ using Explorer.Tours.API.Dtos.Tours.Executions;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Locations;
 using Explorer.Tours.API.Public.Tour;
+using Explorer.Payments.API.Internal;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.Core.Domain.Tours;
 
 namespace Explorer.Tours.Core.UseCases.Tours
 {
@@ -21,9 +18,9 @@ namespace Explorer.Tours.Core.UseCases.Tours
         private readonly ITourRepository _tourRepo;
         private readonly IMapper _mapper;
         private const double DefaultThresholdMeters = 20.0;
-        private readonly ITourPurchaseTokenService _tokenService;
+        private readonly ITourPurchaseTokenSharedService _tokenService;
 
-        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper, ITourPurchaseTokenService tokenService)
+        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper, ITourPurchaseTokenSharedService tokenService)
         {
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
             _tourRepo = tourRepo ?? throw new ArgumentNullException(nameof(tourRepo));
@@ -235,6 +232,25 @@ namespace Explorer.Tours.Core.UseCases.Tours
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
             return EarthRadiusMeters * c;
+        }
+
+        public List<TourDto> GetPurchasedToursWithoutExecution(long userId)
+        {
+            var tokens = _tokenService.GetByTourist(userId); 
+            if (tokens == null || !tokens.Any()) return new List<TourDto>();
+
+            var tours = new List<Tour>();
+            foreach (var token in tokens)
+            {
+                bool hasExecution = _repo.HasAnyExecution(userId, token.TourId);
+                if (!hasExecution)
+                {
+                    var tour = _tourRepo.Get(token.TourId);
+                    if (tour != null) tours.Add(tour);
+                }
+            }
+
+            return _mapper.Map<List<TourDto>>(tours);
         }
 
     }

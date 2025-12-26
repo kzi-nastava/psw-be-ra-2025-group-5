@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Core.Domain;
+using Microsoft.AspNetCore.Http;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using System;
 using System.Net.Mail;
@@ -15,12 +17,14 @@ public class ProfileService : IProfileService
 {
     private readonly IPersonRepository _personRepository;
     private readonly IMapper _mapper;
+    private readonly IImageStorage _imageStorage;
     ITouristStatisticsService _touristStatisticsService;
 
-    public ProfileService(IPersonRepository personRepository, IMapper mapper, ITouristStatisticsService touristStatisticsService)
+    public ProfileService(IPersonRepository personRepository, IMapper mapper, ITouristStatisticsService touristStatisticsService, IImageStorage imageStorage)
     {
         _personRepository = personRepository;
         _mapper = mapper;
+        _imageStorage = imageStorage;
         _touristStatisticsService = touristStatisticsService;
     }
 
@@ -44,8 +48,7 @@ public class ProfileService : IProfileService
         }
     }
 
-
-    public ProfileDto Update(ProfileDto profile)
+    public ProfileDto Update(ProfileDto profile, IFormFile? profileImage)
     {
         var existing = _personRepository.Get(profile.Id);
 
@@ -70,12 +73,36 @@ public class ProfileService : IProfileService
         existing.Biography = profile.Biography;
         existing.Motto = profile.Motto;
 
-        if (!string.IsNullOrEmpty(profile.ProfileImageBase64))
+        if (profileImage != null && profileImage.Length > 0)
         {
-            existing.ProfileImage = Convert.FromBase64String(profile.ProfileImageBase64);
+
+            try
+            {
+                var imagePath = SaveImages(profile.Id, new List<IFormFile> { profileImage }).First();
+                existing.ProfileImagePath = imagePath;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Failed to save profile image: {ex.Message}", ex);
+            }
         }
 
         var updated = _personRepository.Update(existing);
         return _mapper.Map<ProfileDto>(updated);
     }
+    
+    private List<string> SaveImages(long personId, List<IFormFile> images)
+    {
+        var paths = new List<string>();
+        foreach (var file in images)
+        {
+            using var ms = new MemoryStream();
+            file.CopyTo(ms);
+            var bytes = ms.ToArray();
+            var path = _imageStorage.SaveImage("profiles", personId, bytes, file.ContentType);
+            paths.Add(path);
+        }
+        return paths;
+    }
+    
 }

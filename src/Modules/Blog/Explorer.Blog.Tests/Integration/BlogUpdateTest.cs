@@ -71,46 +71,34 @@ namespace Explorer.Blog.Tests.Integration
             var stored = dbContext.BlogPosts.Find(created.Id);
             stored.Status.ShouldBe(BlogStatus.Archived);
         }
+
         [Fact]
         public void Fails_to_modify_images_when_published()
         {
             using var scope = Factory.Services.CreateScope();
             var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
-            var createDto = new CreateBlogPostDto
+            var created = service.Create(new CreateBlogPostDto
             {
                 Title = "Blog sa slikama",
                 Description = "Opis"
-            };
-            var created = service.Create(createDto, authorId: 1);
+            }, authorId: 1);
 
             var imageDto = new BlogImageDto
             {
-                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
+                Url = "data:image/png;base64,AA==",
                 ContentType = "image/png",
                 Order = 0
             };
-            var added = service.AddImage(created.Id, imageDto);
+            var image = service.AddImage(created.Id, imageDto);
 
             service.Publish(created.Id, 1);
 
+            Should.Throw<InvalidOperationException>(() => service.DeleteImage(image.Id));
             Should.Throw<InvalidOperationException>(() =>
-            {
-                service.DeleteImage(added.Id);
-            });
-
-            Should.Throw<InvalidOperationException>(() =>
-            {
-                service.UpdateImage(new BlogImageDto
-                {
-                    Id = added.Id,
-                    Base64 = added.Base64,
-                    ContentType = "image/png",
-                    Order = 0
-                });
-            });
+                service.UpdateImage(image.Id, Convert.FromBase64String("AA=="), "image/png", 0));
         }
+
         [Fact]
         public void Cannot_publish_if_not_in_draft()
         {

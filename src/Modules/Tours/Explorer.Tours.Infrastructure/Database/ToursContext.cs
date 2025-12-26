@@ -2,17 +2,13 @@ using Explorer.Tours.Core.Domain.Equipments;
 using Explorer.Tours.Core.Domain.Equipments.Entities;
 using Explorer.Tours.Core.Domain.Facilities;
 using Explorer.Tours.Core.Domain.Monuments;
-using Explorer.Tours.Core.Domain.ShoppingCarts;
-using Explorer.Tours.Core.Domain.ShoppingCarts.ValueObjects;
 using Explorer.Tours.Core.Domain.TourExecutions;
 using Explorer.Tours.Core.Domain.Preferences;
-using Explorer.Tours.Core.Domain.TourPurchaseTokens;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
 using TransportationType = Explorer.Tours.Core.Domain.Preferences.TransportationType;
 using Explorer.Tours.API.Dtos.Locations;
@@ -27,11 +23,9 @@ public class ToursContext : DbContext
     public DbSet<TouristEquipment> TouristEquipment { get; set; }
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
-    public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     public DbSet<TourExecution> TourExecutions { get; set; }
     public DbSet<TourReview> TourReviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
-    public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
     public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
@@ -44,7 +38,6 @@ public class ToursContext : DbContext
         
         ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
-        ConfigureShoppingCart(modelBuilder);
         ConfigureTourExecution(modelBuilder);
         ConfigureReview(modelBuilder);
     }
@@ -150,9 +143,6 @@ public class ToursContext : DbContext
             });
     }
 
-
-
-
     private static void ConfigureReview(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ReviewImage>(b =>
@@ -207,26 +197,5 @@ public class ToursContext : DbContext
                 .HasDefaultValue("")
                 .IsRequired(false);
         });
-    }
-
-    // Helper klasa za deserijalizaciju Location-a
-    private class LocationDtopublic{
-        double Latitude { get; set; }
-        public double Longitude { get; set; }
-    }
-    private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ShoppingCart>()
-        .Property(s => s.Items)
-        .HasColumnType("jsonb")
-        .HasConversion(
-            items => JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false }),
-            json => JsonSerializer.Deserialize<List<OrderItem>>(json, new JsonSerializerOptions()) ?? new List<OrderItem>(),
-            new ValueComparer<List<OrderItem>>(
-                (c1, c2) => c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList()
-            )
-        );
     }
 }

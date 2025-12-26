@@ -1,9 +1,4 @@
-﻿using Explorer.Blog.API.Dtos.Images;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Blog.API.Dtos.Posts
 {
@@ -11,6 +6,7 @@ namespace Explorer.Blog.API.Dtos.Posts
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public List<BlogImageDto> Images { get; set; } = new();
+        public List<IFormFile> Images { get; set; }
+
     }
 }

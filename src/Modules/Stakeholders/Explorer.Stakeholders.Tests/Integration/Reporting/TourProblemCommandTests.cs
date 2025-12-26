@@ -167,7 +167,8 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
      return new TourProblemController(
             scope.ServiceProvider.GetRequiredService<ITourProblemService>(), 
             scope.ServiceProvider.GetRequiredService<ITourService>(),
-            scope.ServiceProvider.GetRequiredService<INotificationService>())
+            scope.ServiceProvider.GetRequiredService<INotificationService>(),
+            scope.ServiceProvider.GetRequiredService<ITourExecutionService>())
         {
         ControllerContext = BuildContext("-21")
         };

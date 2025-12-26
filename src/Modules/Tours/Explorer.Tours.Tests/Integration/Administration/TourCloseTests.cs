@@ -6,10 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Linq;
 using System.Security.Claims;
-using Xunit;
 
 namespace Explorer.Tours.Tests.Integration.Administration
 {
@@ -34,7 +31,7 @@ namespace Explorer.Tours.Tests.Integration.Administration
             badRequest.ShouldNotBeNull();
             badRequest.Value.ShouldBe("Cannot close tour: no unresolved problems with expired deadline.");
 
-            var tour = tourService.GetById(tourId);
+            var tour = tourService.Get(tourId);
             tour.Status.ShouldNotBe("Closed");
         }
 

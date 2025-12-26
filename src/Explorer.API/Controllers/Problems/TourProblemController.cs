@@ -5,6 +5,7 @@ using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.UseCases.Reporting;
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +18,19 @@ namespace Explorer.API.Controllers.ProblemReporting
     {
         private readonly ITourProblemService _tourProblemService;
         private readonly ITourService _tourService;
+        private readonly ITourExecutionService _tourExecution;
         private readonly INotificationService _notificationService;
 
         public TourProblemController(
             ITourProblemService tourProblemService, 
             ITourService tourService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ITourExecutionService tourExecution)
         {
             _tourProblemService = tourProblemService;
             _tourService = tourService;
             _notificationService = notificationService;
+            _tourExecution = tourExecution;
         }
 
         [HttpGet]
@@ -41,10 +45,40 @@ namespace Explorer.API.Controllers.ProblemReporting
             if (isAdmin)
             {
                 result = _tourProblemService.GetPaged(page, pageSize);
+                result.Results.ForEach(tp =>
+                {
+                    try
+                    {
+                        var tour = _tourService.Get(tp.TourId);
+                        if (tour != null)
+                        {
+                            tp.TourName = tour.Name;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to get tour name for TourId {tp.TourId}: {ex.Message}");
+                    }
+                });
             }
             else if (User.IsInRole("tourist"))
             {
                 result = _tourProblemService.GetPagedByReporterId(userId, page, pageSize);
+                result.Results.ForEach(tp =>
+                {
+                    try
+                    {
+                        var tour = _tourService.Get(tp.TourId);
+                        if (tour != null)
+                        {
+                            tp.TourName = tour.Name;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to get tour name for TourId {tp.TourId}: {ex.Message}");
+                    }
+                });
             }
             else if (User.IsInRole("author"))
             {
@@ -52,6 +86,21 @@ namespace Explorer.API.Controllers.ProblemReporting
                 var tourIds = tours.Select(t => t.Id).ToList();
 
                 result = _tourProblemService.GetPagedByTourIds(tourIds, page, pageSize);
+                result.Results.ForEach(tp =>
+                {
+                    try
+                    {
+                        var tour = _tourService.Get(tp.TourId);
+                        if (tour != null)
+                        {
+                            tp.TourName = tour.Name;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to get tour name for TourId {tp.TourId}: {ex.Message}");
+                    }
+                });
             }
             else
             {
@@ -70,7 +119,7 @@ namespace Explorer.API.Controllers.ProblemReporting
 
             try
             {
-                var tour = _tourService.GetById(result.TourId);
+                var tour = _tourService.Get(result.TourId);
                 _notificationService.CreateProblemReportedNotification(
                     authorId: tour.AuthorId,
                     tourId: result.TourId,
@@ -110,7 +159,7 @@ namespace Explorer.API.Controllers.ProblemReporting
             bool isAdmin = User.IsInRole("administrator");
 
             var problem = _tourProblemService.GetById(id);
-            var tour = _tourService.GetById(problem.TourId);
+            var tour = _tourService.Get(problem.TourId);
 
             if (userId != problem.ReporterId && userId != tour.AuthorId && !isAdmin)
                 return Forbid();
@@ -158,7 +207,7 @@ namespace Explorer.API.Controllers.ProblemReporting
             bool isAdmin = User.IsInRole("administrator");
 
             var problem = _tourProblemService.GetById(id);
-            var tour = _tourService.GetById(problem.TourId);
+            var tour = _tourService.Get(problem.TourId);
 
             if (userId != problem.ReporterId && userId != tour.AuthorId && !isAdmin)
                 return Forbid();
@@ -185,7 +234,7 @@ namespace Explorer.API.Controllers.ProblemReporting
             try
             {
                 var problem = _tourProblemService.GetById(id);
-                var tour = _tourService.GetById(problem.TourId);
+                var tour = _tourService.Get(problem.TourId);
 
                 if (isAdmin)
                 {
@@ -241,7 +290,8 @@ namespace Explorer.API.Controllers.ProblemReporting
             bool isAdmin = User.IsInRole("administrator");
 
             var problem = _tourProblemService.GetById(id);
-            var tour = _tourService.GetById(problem.TourId);
+            var tour = _tourService.Get(problem.TourId);
+            problem.TourName = tour.Name;
 
             problem.TourName = tour?.Name ?? "Unknown";
             problem.TourStatus = tour?.Status ?? "Unknown";
@@ -261,7 +311,7 @@ namespace Explorer.API.Controllers.ProblemReporting
             try
             {
                 var problem = _tourProblemService.GetById(id);
-                var tour = _tourService.GetById(problem.TourId);
+                var tour = _tourService.Get(problem.TourId);
 
                 _notificationService.CreateDeadlineSetNotification(
                     authorId: tour.AuthorId,
@@ -276,6 +326,20 @@ namespace Explorer.API.Controllers.ProblemReporting
             }
 
             return Ok(_tourProblemService.GetById(id));
+        }
+
+        [HttpGet("{id}/completed-tours")]
+        [Authorize(Policy = "touristPolicy")]
+        public ActionResult<List<CompletedToursDto>> GetCompletedTours(long id)
+        {
+            var result = _tourExecution.GetExecutionsForUser(id);
+            var completedTours = result.Select(execution =>
+                new CompletedToursDto
+                {
+                    Name = _tourService.Get(execution.TourId)?.Name ?? "Unknown",
+                    TourId = execution.TourId
+                }).ToList();
+            return Ok(completedTours);
         }
     }
 }

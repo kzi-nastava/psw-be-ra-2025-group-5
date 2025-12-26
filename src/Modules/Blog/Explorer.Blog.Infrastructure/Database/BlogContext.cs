@@ -33,12 +33,12 @@ public class BlogContext : DbContext
 
         modelBuilder.Entity<BlogImage>(i =>
         {
-            i.Property(x => x.Data).IsRequired().HasColumnType("bytea");
+            i.Property(x => x.ImagePath).IsRequired().HasMaxLength(500);
             i.Property(x => x.ContentType).IsRequired().HasMaxLength(100);
             i.Property(x => x.Order).IsRequired();
         });
 
-        modelBuilder.Entity<Comment>(c =>
+        modelBuilder.Entity<Comment>(c =>   
         {
             c.ToTable("Comments"); 
             c.HasKey(x => x.CommentId);

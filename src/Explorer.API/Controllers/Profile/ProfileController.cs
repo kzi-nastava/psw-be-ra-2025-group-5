@@ -1,5 +1,7 @@
-﻿using Explorer.Stakeholders.API.Dtos.Users;
+﻿using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Users;
+using Explorer.Stakeholders.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,28 +42,62 @@ public class ProfileController : ControllerBase
         }
     }
 
-    // PUT api/profile/{userId}
     [HttpPut("{userId}")]
-    public ActionResult<ProfileDto> UpdateProfile(long userId, [FromBody] ProfileDto profile)
+    [Consumes("multipart/form-data")]
+    public ActionResult<ProfileDto> UpdateProfile(long userId, [FromForm] UpdateProfileDto dto)
     {
+        var loggedInUserId = User.PersonId();
+        if (loggedInUserId != userId)
+            return Forbid();
+
         try
         {
-            profile.Id = userId; 
-            var updated = _profileService.Update(profile);
-            return Ok(updated);
+            var profileDto = new ProfileDto
+            {
+                Id = userId,
+                Name = dto.Name,
+                Surname = dto.Surname,
+                Email = dto.Email,
+                Biography = dto.Biography,
+                Motto = dto.Motto
+            };
+
+            var result = _profileService.Update(profileDto, dto.ProfileImage);
+            return Ok(result);
         }
         catch (KeyNotFoundException ex)
         {
-            return NotFound(ex.Message);
-        }   
+            return NotFound(new { message = ex.Message });
+        }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
+
+    [AllowAnonymous]
+    [HttpGet("{clubId:long}/images/{*fileName}")]
+    public IActionResult GetImage(long clubId, string fileName)
+    {
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads", "profiles", clubId.ToString(), fileName);
+
+        if (!System.IO.File.Exists(filePath))
+            return NotFound();
+
+        var ext = Path.GetExtension(fileName).ToLower();
+        var mime = ext switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream"
+        };
+        return PhysicalFile(filePath, mime);
+    }
+
 }
 

@@ -30,7 +30,7 @@ public class TourController : ControllerBase
     [HttpGet("{id:long}")]
     public ActionResult<TourDto> Get(long id)
     {
-        return Ok(_tourService.GetById(id));
+        return Ok(_tourService.Get(id));
     }
 
     [HttpGet("tags")]

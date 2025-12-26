@@ -28,7 +28,7 @@ namespace Explorer.API.Controllers.Administrator
         [HttpPost("{id}/close")]
         public ActionResult CloseTour(long id)
         {
-            var tour = _tourService.GetById(id);
+            var tour = _tourService.Get(id);
             if (tour == null) return NotFound();
 
             if (tour.Status == "Closed")
@@ -63,7 +63,7 @@ namespace Explorer.API.Controllers.Administrator
         [HttpGet("{id}/tour-status")]
         public ActionResult GetTourStatus(long id)
         {
-            var tour = _tourService.GetById(id);
+            var tour = _tourService.Get(id);
             if (tour == null) return NotFound();
 
             return Ok(new { status = tour.Status });

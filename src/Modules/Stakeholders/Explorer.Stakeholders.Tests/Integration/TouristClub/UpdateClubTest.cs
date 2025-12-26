@@ -2,6 +2,7 @@
 using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Public.Clubs;
 using Explorer.Stakeholders.Infrastructure.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System;
@@ -24,39 +25,34 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
             var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
             var service = scope.ServiceProvider.GetRequiredService<IClubService>();
 
-            // Arrange – create a club
-            var created = service.Create(new ClubDto
-            {
-                Id = -5151,
-                Name = "Planinari",
-                Description = "Opis",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
+            var created = service.Create(
+                new ClubDto
+                {
+                    Name = "Planinari",
+                    Description = "Opis",
+                    CreatorId = 1
+                },
+                new List<IFormFile> { CreateTestImage() }
+            );
 
-            var dto = new ClubDto
-            {
-                Id = created.Id,
-                Name = "Planinari Updated",
-                Description = "Novi opis",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 2 }) },
-                CreatorId = 1
-            };
+            var updated = service.Update(
+                new ClubDto
+                {
+                    Id = created.Id,
+                    Name = "Planinari Updated",
+                    Description = "Novi opis",
+                    CreatorId = 1
+                },
+                new List<IFormFile> { CreateTestImage() }
+            );
 
-            // Act
-            var updated = service.Update(dto);
-
-            // Assert
-            updated.ShouldNotBeNull();
             updated.Name.ShouldBe("Planinari Updated");
             updated.Description.ShouldBe("Novi opis");
+            updated.ImagePaths.Count.ShouldBe(2); 
 
             dbContext.ChangeTracker.Clear();
             var stored = dbContext.Clubs.Find(created.Id);
-            stored.ShouldNotBeNull();
-            stored.Name.ShouldBe("Planinari Updated");
-            stored.Description.ShouldBe("Novi opis");
-            stored.Images.Count.ShouldBe(1);
+            stored.ImagePaths.Count.ShouldBe(2);
         }
 
         [Fact]
@@ -67,13 +63,15 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
 
             var dto = new ClubDto
             {
+                Id = 9999,
                 Name = "Test",
                 Description = "Desc",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
                 CreatorId = 1
             };
 
-            Should.Throw<NotFoundException>(() => service.Update(dto));
+            Should.Throw<NotFoundException>(() =>
+                service.Update(dto, null)
+            );
         }
 
         [Fact]
@@ -82,100 +80,75 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
             using var scope = Factory.Services.CreateScope();
             var service = scope.ServiceProvider.GetRequiredService<IClubService>();
 
-            var created = service.Create(new ClubDto
-            {
-                Name = "Valid",
-                Description = "Desc",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
+            var created = service.Create(
+                new ClubDto
+                {
+                    Name = "Valid",
+                    Description = "Desc",
+                    CreatorId = 1
+                },
+                new List<IFormFile> { CreateTestImage() }
+            );
 
             var dto = new ClubDto
             {
                 Id = created.Id,
                 Name = "",
-                Description = "Updated Desc",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 2 }) },
+                Description = "Updated",
                 CreatorId = 1
             };
 
-            Should.Throw<EntityValidationException>(() => service.Update(dto));
+            Should.Throw<ArgumentException>(() =>
+                service.Update(dto, null)
+            );
         }
+
         [Fact]
         public void Fails_when_description_empty()
         {
             using var scope = Factory.Services.CreateScope();
             var service = scope.ServiceProvider.GetRequiredService<IClubService>();
 
-            var created = service.Create(new ClubDto
-            {
-                Name = "Name",
-                Description = "Valid",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
-
-            var dto = new ClubDto
-            {
-                Id = created.Id,
-                Name = "NameNew",
-                Description = "",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 2 }) },
-                CreatorId = 1
-            };
-
-            Should.Throw<EntityValidationException>(() => service.Update(dto));
-        }
-        [Fact]
-        public void Fails_when_no_images()
-        {
-            using var scope = Factory.Services.CreateScope();
-            var service = scope.ServiceProvider.GetRequiredService<IClubService>();
-
-            var created = service.Create(new ClubDto
-            {
-                Name = "Test",
-                Description = "Desc",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
+            var created = service.Create(
+                new ClubDto
+                {
+                    Name = "Name",
+                    Description = "Valid",
+                    CreatorId = 1
+                },
+                new List<IFormFile> { CreateTestImage() }
+            );
 
             var dto = new ClubDto
             {
                 Id = created.Id,
                 Name = "Updated",
-                Description = "Updated Desc",
-                Images = new List<string>(), 
+                Description = "",
                 CreatorId = 1
             };
 
-            Should.Throw<EntityValidationException>(() => service.Update(dto));
+            Should.Throw<ArgumentException>(() =>
+                service.Update(dto, null)
+            );
         }
 
-        [Fact]
-        public void Fails_when_image_invalid_base64()
+        private static IFormFile CreateTestImage()
         {
-            using var scope = Factory.Services.CreateScope();
-            var service = scope.ServiceProvider.GetRequiredService<IClubService>();
+            var bytes = new byte[] { 1, 2, 3 };
+            var stream = new MemoryStream(bytes);
 
-            var created = service.Create(new ClubDto
+            return new FormFile(
+                stream,
+                0,
+                bytes.Length,
+                "image",
+                "test.jpg")
             {
-                Name = "Test",
-                Description = "Opis",
-                Images = new List<string> { Convert.ToBase64String(new byte[] { 1 }) },
-                CreatorId = 1
-            });
-
-            var dto = new ClubDto
-            {
-                Id = created.Id,
-                Name = "Test",
-                Description = "Opis",
-                Images = new List<string> { "invalid-base64" },
-                CreatorId = 1
+                Headers = new HeaderDictionary(),
+                ContentType = "image/jpeg"
             };
-
-            Should.Throw<EntityValidationException>(() => service.Update(dto));
         }
+
     }
+
 }
