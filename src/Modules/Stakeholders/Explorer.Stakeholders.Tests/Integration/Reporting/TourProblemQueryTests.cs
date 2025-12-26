@@ -38,8 +38,9 @@ public class TourProblemQueryTests : BaseStakeholdersIntegrationTest
         var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
         var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+        var tourExecutionService = scope.ServiceProvider.GetRequiredService<ITourExecutionService>();
 
-        return new TourProblemController(tourProblemService, tourService, notificationService)
+        return new TourProblemController(tourProblemService, tourService, notificationService, tourExecutionService)
         {
             ControllerContext = new ControllerContext
             {

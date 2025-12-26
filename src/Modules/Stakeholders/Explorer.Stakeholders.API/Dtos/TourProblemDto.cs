@@ -12,6 +12,7 @@ public class TourProblemDto
 
     [NotDefault]
     public long ReporterId { get; set; }
+    public string? TourName { get; set; }
 
     public ProblemCategory Category { get; set; }
 

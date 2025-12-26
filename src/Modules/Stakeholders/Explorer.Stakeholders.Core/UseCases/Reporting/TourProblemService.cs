@@ -19,7 +19,7 @@ public class TourProblemService : ITourProblemService
 
     public TourProblemService(
         ITourProblemRepository repository, 
-        IUserRepository userRepository, 
+        IUserRepository userRepository,
         INotificationService notificationService,
         IMapper mapper)
     {
