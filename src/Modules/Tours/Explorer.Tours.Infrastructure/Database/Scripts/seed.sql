@@ -29,6 +29,13 @@ INSERT INTO tours."Facilities"(
 	"Id", "Name", "Latitude", "Longitude", "Type")
 VALUES (4, 'Hostel Drina', 44.1375, 19.4419, 0);
 
+INSERT INTO tours."KeyPoints"
+("Id", "Name", "Description", "Location", "ImagePath", "Secret", "Position", "TourId")
+VALUES 
+(1, 'Uvac Viewpoint', 'Best viewpoint over Uvac meanders.', '{"Latitude":43.123,"Longitude":19.456}', '/images/keypoints/uvac.jpg', false, 1, 1),
+(2, 'Bubanj Memorial', 'WWII memorial site in Niš.', '{"Latitude":43.312,"Longitude":21.899}', '/images/keypoints/bubanj.jpg', false, 2, 2),
+(3, 'Belgrade Fortress', 'Historic Kalemegdan Fortress.', '{"Latitude":44.820,"Longitude":20.456}', '/images/keypoints/kalemegdan.jpg', false, 1, 5);
+
 INSERT INTO tours."Monument" ("Id", "Name", "Description", "Year", "Status", "Location_Latitude", "Location_Longitude")
 VALUES
 (1, 'Test Monument One', 'Description 1', 1945, 0, 44.815, 20.460);
@@ -68,3 +75,4 @@ SELECT setval(pg_get_serial_sequence('tours."Monument"', 'Id'), (SELECT COALESCE
 SELECT setval(pg_get_serial_sequence('tours."Equipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Equipment"));
 SELECT setval(pg_get_serial_sequence('tours."TouristEquipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristEquipment"));
 SELECT setval(pg_get_serial_sequence('tours."TourReviews"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourReviews"));
+SELECT setval(pg_get_serial_sequence('tours."KeyPoints"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."KeyPoints"));
