@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using Explorer.API.Controllers;
 using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Core.Domain;
-using Explorer.API.Controllers.Administration;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Explorer.API.Controllers.Administrator;
+using Explorer.API.Controllers.Tours;
+using Explorer.Stakeholders.API.Dtos.AppRatings;
+using Explorer.Stakeholders.API.Public.AppRatings;
 
 namespace Explorer.Stakeholders.Tests.Integration.AppRatings;
 

@@ -1,7 +1,7 @@
-using Explorer.API.Controllers.Tourist;
+using Explorer.API.Controllers.Social;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Diaries;
+using Explorer.Stakeholders.API.Public.Diaries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

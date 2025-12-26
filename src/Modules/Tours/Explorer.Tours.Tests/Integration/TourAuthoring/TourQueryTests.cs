@@ -1,7 +1,7 @@
-﻿using Explorer.API.Controllers.Author;
+﻿using Explorer.API.Controllers.Tours.Author;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

@@ -1,5 +1,6 @@
 ﻿using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

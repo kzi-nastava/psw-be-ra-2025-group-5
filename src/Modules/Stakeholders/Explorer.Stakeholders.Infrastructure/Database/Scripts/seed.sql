@@ -4,6 +4,8 @@ DELETE FROM stakeholders."Users";
 DELETE FROM stakeholders."AppRatings";
 DELETE FROM stakeholders."Clubs";
 DELETE FROM stakeholders."Notifications";
+DELETE FROM stakeholders."ClubInvites";
+DELETE FROM stakeholders."ClubMembers";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
@@ -30,20 +32,23 @@ VALUES
 (7, 7, 'Zika', 'Zikić', 'zika@gmail.com', NULL, 'Carpe Diem', NULL),
 (8, 8, 'Mika', 'Mikić', 'mika@gmail.com', NULL, 'Carpe Diem', NULL);
 
-
-
 INSERT INTO stakeholders."AppRatings" 
 ("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
 (1, 4, 5, 'Odlična aplikacija', NOW(), NOW()),
 (2, 5, 4, 'Solidno', NOW(), NOW());
 
 INSERT INTO stakeholders."Clubs" 
-("Id", "Name", "Description", "ImagePaths", "CreatorId") 
+("Id", "Name", "Description", "ImagePaths", "CreatorId", "Status")
 VALUES
 (1, 'Planinski klub Vršac', 'Klub za ljubitelje planinarenja i prirode. Organizujemo vikend izlete na planine širom Srbije.', 
- '/images/club/planinari1.jpeg', 4),
+ '/images/club/planinari1.jpeg', 4, 0),
 (2, 'Foto safari klub', 'Fotografisanje divljih životinja i prirode. Naše ture obuhvataju nacionalne parkove i rezervate.', 
- '/images/club/safari1.jpg', 5);
+ '/images/club/safari1.jpg', 5, 0);
+
+INSERT INTO stakeholders."ClubMembers" 
+	("ClubId", "TouristId", "JoinedAt") 
+VALUES 
+	(1, 5, NOW());
 
 
 INSERT INTO stakeholders."TourProblems"(

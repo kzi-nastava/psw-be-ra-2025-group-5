@@ -1,4 +1,5 @@
-﻿using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Shopping;
+using Explorer.API.Controllers.Tourist;
 using Explorer.Payments.API.Dtos;
 using Explorer.Payments.API.Public;
 using Microsoft.AspNetCore.Mvc;

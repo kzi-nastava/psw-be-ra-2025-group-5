@@ -1,6 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
 using Explorer.Payments.Core.Domain.Shared;
 
+
 namespace Explorer.Payments.Core.Domain;
 
 public class TourPurchaseToken : AggregateRoot

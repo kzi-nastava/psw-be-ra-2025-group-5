@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Tours.Core.Domain.Monuments;
+
+namespace Explorer.Tours.Core.Domain.RepositoryInterfaces.Monuments
+{
+    public interface IMonumentRepository
+    {
+        PagedResult<Monument> GetPaged(int page, int pageSize);
+        Monument Create(Monument map);
+        Monument Update(Monument map);
+        void Delete(long id);
+        IEnumerable<Monument> GetAllForTourists();
+    }
+}

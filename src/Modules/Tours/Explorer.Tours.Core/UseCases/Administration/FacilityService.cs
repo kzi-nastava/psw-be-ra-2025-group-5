@@ -1,5 +1,4 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.Administration;
 using System;
 using System.Collections.Generic;
@@ -7,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using Explorer.Tours.Core.Domain;
-using Explorer.Tours.Core.Domain.RepositoryInterfaces;
+using Explorer.Tours.Core.Domain.Facilities;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Facilities;
+using Explorer.Tours.API.Dtos.Facilities;
 
 
 namespace Explorer.Tours.Core.UseCases.Administration

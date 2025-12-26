@@ -1,7 +1,27 @@
 ﻿using AutoMapper;
+using TourDifficulty = Explorer.Tours.Core.Domain.Tours.TourDifficulty;
+using Explorer.Tours.Core.Domain.Tours;
+using Explorer.Tours.Core.Domain.Tours.Entities;
+using Explorer.Tours.Core.Domain.Tours.ValueObjects;
+using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.Tours.Core.Domain.TourExecutions.ValueObejcts;
+using Explorer.Tours.Core.Domain.Equipments;
+using Explorer.Tours.Core.Domain.Equipments.Entities;
+using Explorer.Tours.Core.Domain.Monuments;
+using Explorer.Tours.Core.Domain.Monuments.ValueObjects;
+using Explorer.Tours.Core.Domain.Facilities;
+using Explorer.Tours.Core.Domain.Preferences;
+using Explorer.Tours.API.Dtos.Monuments;
+using Explorer.Tours.API.Dtos.Equipments;
+using Explorer.Tours.API.Dtos.Facilities;
+using Explorer.Tours.API.Dtos.Tours.Executions;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Dtos.KeyPoints;
+using Explorer.Tours.API.Dtos.Preferences;
+using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Explorer.Tours.API.Dtos.Locations;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.Core.Domain;
-using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
 
 namespace Explorer.Tours.Core.Mappers;
 
@@ -79,7 +99,7 @@ public class ToursProfile : Profile
             .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => src.TransportType.ToString()));
 
         CreateMap<TourDurationDto, TourDuration>()
-            .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TransportType>(src.TransportType)));
+            .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src => Enum.Parse<TourDuration.TransportTypeEnum>(src.TransportType)));
 
         CreateMap<TourReviewDto, TourReview>()
             .ForMember(d => d.Progress,opt => opt.MapFrom(src => new TourProgress(src.Progress)))

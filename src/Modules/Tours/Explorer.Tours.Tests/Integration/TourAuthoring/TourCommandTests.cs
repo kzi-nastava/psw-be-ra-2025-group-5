@@ -1,15 +1,18 @@
-﻿using Explorer.API.Controllers.Author;
-using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.Core.Domain;
+﻿using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.Tours.API.Dtos.KeyPoints;
+using Explorer.Tours.API.Dtos.Locations;
+using Explorer.Tours.Core.Domain.Equipments;
 using Explorer.Tours.Infrastructure.Database;
 using Explorer.Tours.Tests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
+using TourDifficulty = Explorer.Tours.Core.Domain.Tours.TourDifficulty;
 using Microsoft.EntityFrameworkCore;
-using Explorer.Tours.API.Public;
+using Explorer.API.Controllers.Tours.Author;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.Core.Domain.Tours;
 
 namespace Explorer.Tours.Tests.Integration.TourAuthoring;
 

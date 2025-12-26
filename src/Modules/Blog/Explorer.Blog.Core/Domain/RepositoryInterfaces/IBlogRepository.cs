@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

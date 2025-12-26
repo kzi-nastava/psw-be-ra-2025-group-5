@@ -1,7 +1,7 @@
-﻿using Explorer.API.Controllers.Administrator.Administration;
-using Explorer.Stakeholders.API.Public;
-using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
-using Explorer.Tours.API.Public;
+﻿using Explorer.API.Controllers.Administrator;
+using Explorer.Stakeholders.API.Public.Notifications;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TourProblems;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,7 @@ namespace Explorer.Tours.Tests.Integration.Administration
             badRequest.ShouldNotBeNull();
             badRequest.Value.ShouldBe("Cannot close tour: no unresolved problems with expired deadline.");
 
-            var tour = tourService.GetById(tourId);
+            var tour = tourService.Get(tourId);
             tour.Status.ShouldNotBe("Closed");
         }
 

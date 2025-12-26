@@ -1,4 +1,4 @@
-﻿using Explorer.Blog.API.Dtos;
+﻿using Explorer.Blog.API.Dtos.Posts;
 using Explorer.Blog.API.Public;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

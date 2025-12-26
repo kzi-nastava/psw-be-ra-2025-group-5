@@ -1,16 +1,16 @@
-﻿using Explorer.API.Controllers.Tourist;
-using Explorer.Payments.Core.Domain;
+﻿using Explorer.Payments.Core.Domain;
 using Explorer.Payments.Infrastructure.Database;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
-using Explorer.Tours.Core.Domain;
+using Explorer.API.Controllers.Tours.Execution;
+using Explorer.Tours.API.Dtos.Locations;
+using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System.Linq;
-using Xunit;
+using Explorer.Tours.API.Dtos.Tours.Executions;
+using Explorer.Tours.API.Dtos.KeyPoints;
+using Explorer.Tours.API.Public.Tour;
 
 namespace Explorer.Tours.Tests.Integration.TourExe;
 
@@ -25,12 +25,12 @@ public class TourExecutionCommandTests : BaseToursIntegrationTest
             authorId: 1,
             name: "Test Tour",
             description: "Opis test ture",
-            difficulty: Explorer.Tours.Core.Domain.TourDifficulty.Easy,
+            difficulty: TourDifficulty.Easy,
             tags: new List<string> { "test" },
             price: 10.0
         );
 
-        var location = new Explorer.Tours.Core.Domain.Location(44.818, 20.456);
+        var location = new Core.Domain.Tours.ValueObjects.Location(44.818, 20.456);
         tour.AddKeyPoint("Start", "Prva ključna tačka", location, null, null);
         tour.AddKeyPoint("End", "Druga ključna tačka", location, null, null);
 

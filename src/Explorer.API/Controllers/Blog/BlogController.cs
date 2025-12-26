@@ -1,13 +1,13 @@
-﻿using Explorer.Blog.API.Dtos;
-using Explorer.Blog.API.Public;
-using Explorer.Blog.Core.Domain;
+﻿using Explorer.Blog.API.Public;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Public.Administration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using static Explorer.Blog.Core.Domain.BlogPost;
-using Microsoft.Extensions.Hosting;
+using Explorer.Blog.API.Dtos.Posts;
+using Explorer.Blog.API.Dtos.Images;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
+using Explorer.Blog.API.Dtos;
 
 namespace Explorer.API.Controllers.Blog;
 
