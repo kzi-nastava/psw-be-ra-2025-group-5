@@ -1,7 +1,5 @@
-﻿using Explorer.BuildingBlocks.Core.Domain;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public.Shopping;
-using Explorer.Tours.Core.Domain;
+﻿using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +18,7 @@ public class ShoppingCartController : ControllerBase
     }
 
     [HttpGet("{touristId:long}")]
-    public ActionResult<ShoppingCart> GetByTourist(long touristId)
+    public ActionResult<ShoppingCartDto> GetByTourist(long touristId)
     {
         var result = _ShoppingCartService.GetByTourist(touristId);
         return result is not null ? Ok(result) : NotFound();
@@ -35,8 +33,11 @@ public class ShoppingCartController : ControllerBase
     [HttpPost("{touristId:long}/items/{tourId:long}")]
     public ActionResult<ShoppingCartDto> AddOrderItem(long touristId, long tourId)
     {
-        var result = _ShoppingCartService.AddOrderItem(touristId, tourId);
-        return Ok(result);
+        try
+        {
+            var result = _ShoppingCartService.AddOrderItem(touristId, tourId);
+            return Ok(result);
+        } catch (InvalidOperationException ex) { return Conflict(ex.Message); }
     }
 
     [HttpDelete("{touristId:long}/items/{tourId:long}")]
