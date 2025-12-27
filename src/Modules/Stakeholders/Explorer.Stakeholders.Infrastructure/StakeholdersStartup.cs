@@ -7,6 +7,7 @@ using Explorer.Stakeholders.API.Public.Positions;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
+using Explorer.Encounters.API.Internal;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.AppRatings;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Clubs;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Diaries;
@@ -21,6 +22,7 @@ using Explorer.Stakeholders.Core.UseCases.Administration.Social;
 using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.Core.UseCases.Reporting;
 using Explorer.Stakeholders.Core.UseCases.Statistics;
+using Explorer.Stakeholders.Core.UseCases.Internal;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories;
@@ -63,6 +65,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IDiaryService, DiaryService>();
             services.AddScoped<IClubInviteService, ClubInviteService>();
             services.AddScoped<IClubJoinRequestService, ClubJoinRequestService>();
+            services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)

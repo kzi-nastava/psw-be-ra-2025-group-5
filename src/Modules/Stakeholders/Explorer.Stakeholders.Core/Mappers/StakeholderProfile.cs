@@ -28,10 +28,14 @@ namespace Explorer.Stakeholders.Core.Mappers
         public StakeholderProfile()
         {
             CreateMap<Person, ProfileDto>()
-                .ForMember(dest => dest.Statistics, opt => opt.Ignore()); 
+                .ForMember(dest => dest.Statistics, opt => opt.Ignore())
+                .ForMember(dest => dest.XPForNextLevel, opt => opt.MapFrom(src => src.GetXPForNextLevel()))
+                .ForMember(dest => dest.CanCreateChallenges, opt => opt.MapFrom(src => src.CanCreateChallenges())); 
 
             CreateMap<ProfileDto, Person>()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore()); 
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Level, opt => opt.Ignore())
+                .ForMember(dest => dest.ExperiencePoints, opt => opt.Ignore()); 
 
             // ========================= AppRating <-> AppRatingDto =========================
             CreateMap<AppRating, AppRatingDto>();

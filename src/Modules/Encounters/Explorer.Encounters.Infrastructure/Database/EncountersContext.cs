@@ -6,6 +6,7 @@ namespace Explorer.Encounters.Infrastructure.Database
     public class EncountersContext : DbContext
     {
         public DbSet<Challenge> Challenges { get; set; }
+        public DbSet<ChallengeExecution> ChallengeExecutions { get; set; }
 
         public EncountersContext(DbContextOptions<EncountersContext> options) : base(options) { }
 
