@@ -7,6 +7,7 @@ using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Tours.Tests.Integration.Administration;
 
@@ -34,11 +35,11 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var kp1 = new CreateKeyPointDto
         {
             Name = "First Point",
@@ -53,7 +54,7 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
             Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 },
             Secret = "Second secret"
         };
-        
+
         controller.AddKeyPoint(tourId, kp1);
         controller.AddKeyPoint(tourId, kp2);
 
@@ -75,7 +76,7 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
@@ -96,18 +97,18 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var keyPoint = new CreateKeyPointDto
         {
             Name = "Location Test Point",
             Location = new LocationDto { Latitude = 45.5, Longitude = 21.5 },
             Description = "Description Test"
         };
-        
+
         controller.AddKeyPoint(tourId, keyPoint);
 
         // Act
@@ -128,20 +129,20 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var keyPoint = new CreateKeyPointDto
         {
             Name = "Complete Point",
             Description = "Full description",
             Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
-            Image = new byte[] { 1, 2, 3, 4, 5 },
+            ImagePath = CreateTestImage(),
             Secret = "Hidden secret"
         };
-        
+
         controller.AddKeyPoint(tourId, keyPoint);
 
         // Act
@@ -152,8 +153,9 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
         var retrievedKp = result.KeyPoints.FirstOrDefault(kp => kp.Name == "Complete Point");
         retrievedKp.ShouldNotBeNull();
         retrievedKp.Description.ShouldBe("Full description");
-        retrievedKp.Image.ShouldNotBeNull();
-        retrievedKp.Image.Length.ShouldBe(5);
+        retrievedKp.ImagePath.ShouldNotBeNull();
+        retrievedKp.ImagePath.ShouldNotBeNull();
+        retrievedKp.ImagePath.Length.ShouldBeGreaterThan(0);
         retrievedKp.Secret.ShouldBe("Hidden secret");
     }
 
@@ -162,6 +164,17 @@ public class KeyPointQueryTests : BaseToursIntegrationTest
         return new TourController(scope.ServiceProvider.GetRequiredService<ITourService>())
         {
             ControllerContext = BuildContext("-1")
+        };
+    }
+
+    private static IFormFile CreateTestImage(string name = "image.png")
+    {
+        var bytes = new byte[] { 1, 2, 3 };
+        var stream = new MemoryStream(bytes);
+        return new FormFile(stream, 0, bytes.Length, name, name)
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/png"
         };
     }
 }

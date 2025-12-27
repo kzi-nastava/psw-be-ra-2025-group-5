@@ -61,16 +61,18 @@ public class TourController : ControllerBase
 
     // KeyPoint operacije
     [HttpPost("{tourId:long}/keypoints")]
-    public ActionResult<TourDto> AddKeyPoint(long tourId, [FromBody] CreateKeyPointDto keyPoint)
+    [Consumes("multipart/form-data")]
+    public ActionResult<TourDto> AddKeyPoint(long tourId, [FromForm] CreateKeyPointDto dto)
     {
-        var result = _tourService.AddKeyPoint(tourId, keyPoint);
+        var result = _tourService.AddKeyPoint(tourId, dto);
         return Ok(result);
     }
 
     [HttpPut("{tourId:long}/keypoints/{keyPointId:long}")]
-    public ActionResult<TourDto> UpdateKeyPoint(long tourId, long keyPointId, [FromBody] CreateKeyPointDto keyPoint)
+    [Consumes("multipart/form-data")]
+    public ActionResult<TourDto> UpdateKeyPoint(long tourId, long keyPointId, [FromForm] CreateKeyPointDto dto)
     {
-        var result = _tourService.UpdateKeyPoint(tourId, keyPointId, keyPoint);
+        var result = _tourService.UpdateKeyPoint(tourId, keyPointId, dto);
         return Ok(result);
     }
 
@@ -122,5 +124,25 @@ public class TourController : ControllerBase
     {
         var result = _tourService.RemoveRequiredEquipment(tourId, equipmentId);
         return Ok(result);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{keyPointId:long}/keypoints/images/{*fileName}")]
+    public IActionResult GetImage(long keyPointId, string fileName)
+    {
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads", "keypoints", keyPointId.ToString(), fileName);
+
+        if (!System.IO.File.Exists(filePath))
+            return NotFound();
+
+        var ext = Path.GetExtension(fileName).ToLower();
+        var mime = ext switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream"
+        };
+        return PhysicalFile(filePath, mime);
     }
 }
