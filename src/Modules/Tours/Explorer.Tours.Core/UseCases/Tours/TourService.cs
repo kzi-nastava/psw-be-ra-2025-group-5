@@ -150,7 +150,7 @@ public class TourService : ITourService, ITourSharedService
 
         var keyPoint = tour.KeyPoints.FirstOrDefault(kp => kp.Id == keyPointId);
         if (keyPoint == null)
-            throw new Exception("KeyPoint not found");
+            throw new InvalidOperationException("KeyPoint not found");
 
         string? imagePath = keyPoint.ImagePath;
         if (keyPointDto.ImagePath != null)
