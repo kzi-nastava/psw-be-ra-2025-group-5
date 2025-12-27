@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Blog\Explorer.Blog.API\Explorer.Blog.API.csproj" />
     <ProjectReference Include="..\..\Tours\Explorer.Tours.Core\Explorer.Tours.Core.csproj" />
+    <ProjectReference Include="..\..\Encounters\Explorer.Encounters.API\Explorer.Encounters.API.csproj" />
     <ProjectReference Include="..\Explorer.Stakeholders.API\Explorer.Stakeholders.API.csproj" />
   </ItemGroup>
 

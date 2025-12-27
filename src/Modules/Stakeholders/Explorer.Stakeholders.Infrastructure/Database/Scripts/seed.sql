@@ -21,16 +21,16 @@ INSERT INTO stakeholders."Users" VALUES (8, 'mika', 'mika', 'mika@gmail.com', 1,
 
 
 INSERT INTO stakeholders."People"(
-    "Id", "UserId", "Name", "Surname", "Email", "Biography", "Motto", "ProfileImagePath")
+    "Id", "UserId", "Name", "Surname", "Email", "Biography", "Motto", "ProfileImagePath", "Level", "ExperiencePoints")
 VALUES 
-(1, 1, 'Ana', 'Anić', 'autor1@gmail.com', NULL, NULL, NULL),
-(2, 2, 'Lena', 'Lenić', 'autor2@gmail.com', NULL, NULL, NULL),
-(3, 3, 'Sara', 'Sarić', 'autor3@gmail.com', NULL, NULL, NULL),
-(4, 4, 'Pera', 'Perić', 'turista1@gmail.com', 'Biografija Pere Perića', 'Moto Pere', '/images/profiles/profilna1.jpg'),
-(5, 5, 'Mika', 'Mikić', 'turista2@gmail.com', NULL, NULL, NULL),
-(6, 6, 'Steva', 'Stević', 'turista3@gmail.com', NULL, 'Carpe Diem', NULL),
-(7, 7, 'Zika', 'Zikić', 'zika@gmail.com', NULL, 'Carpe Diem', NULL),
-(8, 8, 'Mika', 'Mikić', 'mika@gmail.com', NULL, 'Carpe Diem', NULL);
+(1, 1, 'Ana', 'Anić', 'autor1@gmail.com', NULL, NULL, NULL, 0, 0),
+(2, 2, 'Lena', 'Lenić', 'autor2@gmail.com', NULL, NULL, NULL, 0, 0),
+(3, 3, 'Sara', 'Sarić', 'autor3@gmail.com', NULL, NULL, NULL, 0, 0),
+(4, 4, 'Pera', 'Perić', 'turista1@gmail.com', 'Biografija Pere Perića', 'Moto Pere', '/images/profiles/profilna1.jpg', 0, 0),
+(5, 5, 'Mika', 'Mikić', 'turista2@gmail.com', NULL, NULL, NULL, 0, 0),
+(6, 6, 'Steva', 'Stević', 'turista3@gmail.com', NULL, 'Carpe Diem', NULL, 0, 0),
+(7, 7, 'Zika', 'Zikić', 'zika@gmail.com', NULL, 'Carpe Diem', NULL, 0, 0),
+(8, 8, 'Mika', 'Mikić', 'mika@gmail.com', NULL, 'Carpe Diem', NULL, 0, 0);
 
 INSERT INTO stakeholders."AppRatings" 
 ("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES

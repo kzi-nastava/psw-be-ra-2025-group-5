@@ -2,7 +2,7 @@ using Explorer.BuildingBlocks.Core.Domain;
 
 namespace Explorer.Encounters.Core.Domain;
 
-public class Challenge : Entity
+public class Challenge : AggregateRoot
 {
     public string Name { get; private set; }
     public string Description { get; private set; }

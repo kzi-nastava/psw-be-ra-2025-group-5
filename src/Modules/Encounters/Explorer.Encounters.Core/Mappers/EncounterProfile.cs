@@ -14,6 +14,9 @@ namespace Explorer.Encounters.Core.Mappers
             CreateMap<ChallengeType, string>().ConvertUsing(src => src.ToString());
             CreateMap<string, ChallengeType>().ConvertUsing(src => Enum.Parse<ChallengeType>(src, true));
 
+            CreateMap<ChallengeExecutionStatus, string>().ConvertUsing(src => src.ToString());
+            CreateMap<string, ChallengeExecutionStatus>().ConvertUsing(src => Enum.Parse<ChallengeExecutionStatus>(src, true));
+
             CreateMap<ChallengeDto, Challenge>()
                 .ConstructUsing(dto => new Challenge(
                     dto.Name,
@@ -35,6 +38,19 @@ namespace Explorer.Encounters.Core.Mappers
             CreateMap<Challenge, ChallengeDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+
+            CreateMap<ChallengeExecution, ChallengeExecutionDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<ChallengeExecutionDto, ChallengeExecution>()
+                .ConstructUsing(dto => new ChallengeExecution(dto.ChallengeId, dto.TouristId))
+                .AfterMap((dto, execution) =>
+                {
+                    if (dto.Id != 0)
+                    {
+                        typeof(ChallengeExecution).GetProperty("Id")!.SetValue(execution, dto.Id);
+                    }
+                });
         }
     }
 }
