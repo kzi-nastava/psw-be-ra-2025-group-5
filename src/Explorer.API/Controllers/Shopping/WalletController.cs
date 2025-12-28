@@ -1,5 +1,7 @@
 ﻿using Explorer.Payments.API.Dtos;
 using Explorer.Payments.API.Public;
+using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.API.Internal;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +14,7 @@ namespace Explorer.API.Controllers.Shopping
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
+
         public WalletController(IWalletService walletService)
         {
             _walletService = walletService;
@@ -32,8 +35,8 @@ namespace Explorer.API.Controllers.Shopping
         }
 
         [Authorize(Policy = "administratorPolicy")]
-        [HttpPost("deposit")]
-        public IActionResult Deposit([FromBody] WalletDto request)
+        [HttpPost("credit")]
+        public IActionResult Credit([FromBody] WalletDto request)
         {
             try
             {
@@ -53,5 +56,24 @@ namespace Explorer.API.Controllers.Shopping
                 });
             }
         }
+        [Authorize(Policy = "administratorPolicy")]
+        [HttpGet("all-tourists")]
+        public ActionResult<List<WalletUserDto>> GetAllTourists()
+        {
+            try
+            {
+                var tourists = _walletService.GetAllTourist();
+                return Ok(tourists);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+
     }
 }

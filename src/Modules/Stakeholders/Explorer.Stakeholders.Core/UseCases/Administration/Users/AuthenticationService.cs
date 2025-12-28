@@ -51,7 +51,8 @@ public class AuthenticationService : IAuthenticationService
         var user = _userRepository.Create(new User(account.Username, account.Password, account.Email, UserRole.Tourist, true));
         var person = _personRepository.Create(new Person(user.Id, account.Name, account.Surname, account.Email));
 
-        _walletService.CreateWalletForPerson(person.Id);
+        if(user.Role == UserRole.Tourist)
+            _walletService.CreateWalletForPerson(user.Id);
 
         return _tokenGenerator.GenerateAccessToken(user, person.Id);
     }

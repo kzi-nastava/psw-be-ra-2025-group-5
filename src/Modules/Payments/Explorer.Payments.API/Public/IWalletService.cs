@@ -11,6 +11,8 @@ namespace Explorer.Payments.API.Public
     {
         WalletDto GetWalletForTourist(long touristId);
         void CreditToTourist(long touristId, double amount);
+        List<WalletUserDto> GetAllTourist();
+
 
     }
 }

@@ -28,10 +28,7 @@ namespace Explorer.Payments.Infrastructure.Database.Repositories
 
         public Wallet GetByTouristId(long userId)
         {
-            var wallet = _dbSet.FirstOrDefault(w => w.TouristId == userId);
-            if (wallet == null)
-                throw new NotFoundException($"Wallet for UserId {userId} not found.");
-            return wallet;
+            return _dbSet.FirstOrDefault(w => w.TouristId == userId);
         }
 
         public Wallet Create(Wallet entity)

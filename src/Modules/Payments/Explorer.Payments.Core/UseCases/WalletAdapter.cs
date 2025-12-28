@@ -20,9 +20,12 @@ namespace Explorer.Payments.Core.UseCases
 
         public void CreateWalletForPerson(long personId)
         {
-            var wallet = new Wallet(personId); 
+            var existingWallet = _walletRepository.GetByTouristId(personId);
+            if (existingWallet != null)
+                return;
+
+            var wallet = new Wallet(personId);
             _walletRepository.Create(wallet);
-            Console.WriteLine($"Wallet created for person {personId}");
         }
     }
 }
