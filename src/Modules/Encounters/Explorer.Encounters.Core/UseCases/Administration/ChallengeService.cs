@@ -47,4 +47,10 @@ public class ChallengeService : IChallengeService
         var result = _challengeRepository.GetAll().Where(c => c.Status == ChallengeStatus.Active);
         return result.Select(_mapper.Map<ChallengeDto>).ToList();
     }
+
+    public ChallengeDto GetById(long challengeId)
+    {
+        var result = _challengeRepository.Get(challengeId);
+        return _mapper.Map<ChallengeDto>(result);
+    }
 }

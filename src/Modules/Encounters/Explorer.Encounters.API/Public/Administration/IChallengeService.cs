@@ -10,4 +10,5 @@ public interface IChallengeService
     ChallengeDto Update(ChallengeDto challenge);
     void Delete(long id);
     List<ChallengeDto> GetAllActive();
+    ChallengeDto GetById(long challengeId);
 }

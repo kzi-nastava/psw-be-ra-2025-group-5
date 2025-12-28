@@ -9,4 +9,5 @@ public interface IChallengeRepository
     Challenge Update(Challenge challenge);
     void Delete(long id);
     List<Challenge> GetAll();
+    Challenge Get(long id);
 }
