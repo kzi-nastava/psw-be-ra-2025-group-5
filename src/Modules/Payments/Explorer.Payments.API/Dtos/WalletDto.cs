@@ -9,6 +9,6 @@ namespace Explorer.Payments.API.Dtos
     public class WalletDto
     {
         public long TouristId { get; set; }
-        public long Balance { get; set; }
+        public double Balance { get; set; }
     }
 }
