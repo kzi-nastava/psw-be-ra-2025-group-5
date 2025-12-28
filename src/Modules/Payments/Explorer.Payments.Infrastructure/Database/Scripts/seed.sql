@@ -7,7 +7,7 @@ INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (
 INSERT INTO payments."Wallets" ("Id", "TouristId", "Balance") VALUES 
 (1, 4, 0), 
 (2, 5, 0),
-(3, 6, 0);
+(3, 6, 20);
 
 SELECT setval(pg_get_serial_sequence('payments."ShoppingCarts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."ShoppingCarts"));
 SELECT setval(pg_get_serial_sequence('payments."TourPurchaseTokens"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."TourPurchaseTokens"));

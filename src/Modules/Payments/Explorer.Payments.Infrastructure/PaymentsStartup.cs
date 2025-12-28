@@ -28,6 +28,7 @@ public static class PaymentsStartup
         services.AddScoped<ITourPurchaseTokenService, TourPurchaseTokenService>();
         services.AddScoped<ITourPurchaseTokenSharedService, TourPurchaseTokenService>();
         services.AddScoped<IInternalWalletService, WalletAdapter>();
+        services.AddScoped<IWalletService, WalletService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)

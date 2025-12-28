@@ -24,6 +24,12 @@ namespace Explorer.Payments.Core.Domain
         {
             if (TouristId == 0) throw new ArgumentException("Invalid UserId");
         }
+        public void Credit(double amount)
+        {
+            if (amount <= 0)
+                throw new ArgumentException("Amount must be positive", nameof(amount));
 
+            Balance += amount;
+        }
     }
 }

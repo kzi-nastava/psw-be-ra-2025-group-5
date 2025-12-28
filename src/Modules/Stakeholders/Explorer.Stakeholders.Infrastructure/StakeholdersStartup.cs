@@ -35,6 +35,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.API.Internal;
 
 namespace Explorer.Stakeholders.Infrastructure
 {
@@ -63,6 +64,8 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IDiaryService, DiaryService>();
             services.AddScoped<IClubInviteService, ClubInviteService>();
             services.AddScoped<IClubJoinRequestService, ClubJoinRequestService>();
+            services.AddScoped<IPaymentNotificationService, NotificationService>();
+
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
