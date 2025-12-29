@@ -36,6 +36,7 @@ public static class PaymentsStartup
         services.AddScoped<IShoppingCartRepository, ShoppingCartDbRepository>();
         services.AddScoped<ITourPurchaseTokenRepository, TourPurchaseTokenDbRepository>();
         services.AddScoped<IWalletRepository, WalletDbRepository>();
+        services.AddScoped<IPaymentRepository, PaymentDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("payments"));
         dataSourceBuilder.EnableDynamicJson();

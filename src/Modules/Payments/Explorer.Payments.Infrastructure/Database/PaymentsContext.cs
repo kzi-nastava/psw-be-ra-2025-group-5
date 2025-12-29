@@ -10,6 +10,8 @@ public class PaymentsContext: DbContext
     public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+
 
     public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) {}
 
@@ -47,7 +49,7 @@ public class PaymentsContext: DbContext
             builder.Property(w => w.TouristId).IsRequired();
             builder.Property(w => w.Balance).IsRequired();
 
-            builder.HasIndex(w => w.TouristId).IsUnique(); // samo jedan wallet po korisniku
+            builder.HasIndex(w => w.TouristId).IsUnique(); 
         });
     }
 }
