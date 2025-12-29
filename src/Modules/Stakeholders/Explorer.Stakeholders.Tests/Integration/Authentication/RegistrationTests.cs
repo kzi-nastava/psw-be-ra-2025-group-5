@@ -13,7 +13,8 @@ namespace Explorer.Stakeholders.Tests.Integration.Authentication;
 [Collection("Sequential")]
 public class RegistrationTests : BaseStakeholdersIntegrationTest
 {
-    public RegistrationTests(StakeholdersTestFactory factory) : base(factory) { }
+    public RegistrationTests(StakeholdersTestFactory factory) : base(factory) {
+    }
 
     [Fact]
     public void Successfully_registers_tourist()
@@ -51,6 +52,7 @@ public class RegistrationTests : BaseStakeholdersIntegrationTest
         storedPerson.ShouldNotBeNull();
         storedPerson.UserId.ShouldBe(storedAccount.Id);
         storedPerson.Name.ShouldBe(account.Name);
+
     }
 
     private static AuthenticationController CreateController(IServiceScope scope)

@@ -9,11 +9,12 @@ using Explorer.Stakeholders.Core.Domain.Users;
 using Explorer.Stakeholders.Core.Domain.Users.Entities;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
+using Explorer.Stakeholders.API.Internal;
 
 
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
 {
-    public class UserService : IUserService
+    public class UserService : IUserService, IUserInfoService
     {
         private readonly IUserRepository _userRepository;
         private readonly IPersonRepository _personRepository;
@@ -109,5 +110,33 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
                 throw new Exception("User not found.");
             return _mapper.Map<UserDto>(user);
         }
+        public List<ProfileDto> GetTourists()
+        {
+            var users = _userRepository.GetAll()
+                .Where(u => u.Role == UserRole.Tourist)
+                .ToList();
+
+            var result = new List<ProfileDto>();
+
+            foreach (var user in users)
+            {
+                if (user.IsActive)
+                {
+                    var person = _personRepository.GetByUserId(user.Id);
+
+                    result.Add(new ProfileDto
+                    {
+                        Id = user.Id,
+                        Username = user.Username,
+                        ProfileImagePath = person.ProfileImagePath,
+                        Name = person.Name,
+                        Surname = person.Surname
+                    });
+                }
+            }
+
+            return result;
+        }
+
     }
 }
