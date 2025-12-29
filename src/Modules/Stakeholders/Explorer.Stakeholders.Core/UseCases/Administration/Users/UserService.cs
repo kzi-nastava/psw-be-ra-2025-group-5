@@ -110,17 +110,33 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
                 throw new Exception("User not found.");
             return _mapper.Map<UserDto>(user);
         }
-        public List<UserDto> GetTourists()
+        public List<ProfileDto> GetTourists()
         {
             var users = _userRepository.GetAll()
-                .Where(u => u.Role == UserRole.Tourist);
+                .Where(u => u.Role == UserRole.Tourist)
+                .ToList();
 
-            return users.Select(u => new UserDto
+            var result = new List<ProfileDto>();
+
+            foreach (var user in users)
             {
-                Id = u.Id,
-                Username = u.Username,
-                IsActive = u.IsActive
-            }).ToList();
+                if (user.IsActive)
+                {
+                    var person = _personRepository.GetByUserId(user.Id);
+
+                    result.Add(new ProfileDto
+                    {
+                        Id = user.Id,
+                        Username = user.Username,
+                        ProfileImagePath = person.ProfileImagePath,
+                        Name = person.Name,
+                        Surname = person.Surname
+                    });
+                }
+            }
+
+            return result;
         }
+
     }
 }

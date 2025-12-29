@@ -9,6 +9,6 @@ namespace Explorer.Stakeholders.API.Internal
 {
     public interface IUserInfoService
     {
-        List<UserDto> GetTourists();
+        List<ProfileDto> GetTourists();
     }
 }

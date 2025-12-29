@@ -81,7 +81,8 @@ namespace Explorer.Payments.Core.UseCases
                 {
                     Id = tourist.Id,
                     Username = tourist.Username,
-                    IsActive = tourist.IsActive,
+                    FullName = $"{tourist.Name} {tourist.Surname}",
+                    ProfileImagePath = tourist.ProfileImagePath,
                     Balance = balance
                 });
             }
