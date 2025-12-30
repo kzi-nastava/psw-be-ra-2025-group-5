@@ -2,6 +2,7 @@
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Tours.API.Public.Tour;
 
@@ -43,4 +44,10 @@ public interface ITourService
     TourDto RemoveRequiredEquipment(long tourId, long equipmentId);
     void CloseTour(long tourId);
     TourDto Get(long id);
+
+    // thumbnail operacije
+
+    TourDto UploadThumbnail(long tourId, IFormFile file);
+    bool CanEditTour(long tourId, long userId);
+
 }

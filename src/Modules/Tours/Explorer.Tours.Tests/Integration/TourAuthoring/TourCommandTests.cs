@@ -446,4 +446,6 @@ public class TourCommandTests : BaseToursIntegrationTest
         }
         return equipment.Id;
     }
+
 }
+

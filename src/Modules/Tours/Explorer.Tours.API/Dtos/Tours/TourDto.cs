@@ -21,4 +21,6 @@ public class TourDto
     public List<TourDurationDto> Durations { get; set; }
     public double TourLength { get; set; }
     public List<long> RequiredEquipmentIds { get; set; }
+    public string? ThumbnailPath { get; set; }
+
 }

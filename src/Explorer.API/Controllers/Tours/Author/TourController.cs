@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Tour;
@@ -122,5 +123,48 @@ public class TourController : ControllerBase
     {
         var result = _tourService.RemoveRequiredEquipment(tourId, equipmentId);
         return Ok(result);
+    }
+
+    [Authorize(Roles = "author")]
+    [HttpPost("{tourId:long}/thumbnail")]
+    [Consumes("multipart/form-data")]
+    public ActionResult<TourDto> UploadThumbnail(
+     long tourId,
+     [FromForm] UploadTourThumbnailDto dto)
+    {
+        var userId = User.PersonId();
+
+        if (!_tourService.CanEditTour(tourId, userId))
+            return Forbid();
+
+        var result = _tourService.UploadThumbnail(tourId, dto.Thumbnail);
+        return Ok(result);
+    }
+
+
+    [AllowAnonymous]
+    [HttpGet("{tourId:long}/thumbnail/{*fileName}")]
+    public IActionResult GetThumbnail(long tourId, string fileName)
+    {
+        var filePath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "UserUploads",
+            "tours",
+            tourId.ToString(),
+            fileName);
+
+        if (!System.IO.File.Exists(filePath))
+            return NotFound();
+
+        var ext = Path.GetExtension(fileName).ToLower();
+        var mime = ext switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream"
+        };
+
+        return PhysicalFile(filePath, mime);
     }
 }
