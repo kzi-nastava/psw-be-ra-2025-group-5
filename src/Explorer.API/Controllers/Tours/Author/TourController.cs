@@ -143,7 +143,6 @@ public class TourController : ControllerBase
         return Ok(result);
     }
 
-
     [AllowAnonymous]
     [HttpGet("{tourId:long}/thumbnail/{*fileName}")]
     public IActionResult GetThumbnail(long tourId, string fileName)
@@ -155,7 +154,21 @@ public class TourController : ControllerBase
             tourId.ToString(),
             fileName);
 
-            }
+        if (!System.IO.File.Exists(filePath))
+            return NotFound();
+
+        var ext = Path.GetExtension(fileName).ToLower();
+        var mime = ext switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream"
+        };
+
+        return PhysicalFile(filePath, mime);
+    }
+    
     [AllowAnonymous]
     [HttpGet("{keyPointId:long}/keypoints/images/{*fileName}")]
     public IActionResult GetImage(long keyPointId, string fileName)
