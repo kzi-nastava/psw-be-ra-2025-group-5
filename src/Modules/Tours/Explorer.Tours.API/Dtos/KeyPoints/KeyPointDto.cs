@@ -8,7 +8,7 @@ public class KeyPointDto
     public string Name { get; set; }
     public string Description { get; set; }
     public LocationDto Location { get; set; }
-    public byte[]? Image { get; set; }
+    public string? ImagePath { get; set; }
     public string? Secret { get; set; }
     public int Position { get; set; }
 }

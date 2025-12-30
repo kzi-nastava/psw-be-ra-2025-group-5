@@ -64,13 +64,13 @@ public class Tour : AggregateRoot
         TourLength = 0;
     }
 
-    public void AddKeyPoint(string name, string description, Location location, byte[]? image, string? secret)
+    public void AddKeyPoint(string name, string description, Location location, string? imagePath, string? secret)
     {
         if (Status != TourStatus.Draft)
             throw new InvalidOperationException("Key points can only be added to tours in draft status.");
 
         int nextPosition = KeyPoints.Any() ? KeyPoints.Max(kp => kp.Position) + 1 : 0;
-        var keyPoint = new KeyPoint(name, description, location, image, secret, nextPosition);
+        var keyPoint = new KeyPoint(name, description, location, imagePath, secret, nextPosition);
         KeyPoints.Add(keyPoint);
     }
 
@@ -88,7 +88,7 @@ public class Tour : AggregateRoot
         ReorderKeyPoints();
     }
 
-    public void UpdateKeyPoint(long keyPointId, string name, string description, byte[]? image, string? secret, Location location)
+    public void UpdateKeyPoint(long keyPointId, string name, string description, string? imagePath, string? secret, Location location)
     {
         if (Status != TourStatus.Draft)
             throw new InvalidOperationException("Key points can only be updated in tours in draft status.");
@@ -97,7 +97,7 @@ public class Tour : AggregateRoot
         if (keyPoint == null)
             throw new InvalidOperationException("Key point not found.");
 
-        keyPoint.Update(name, description, image, secret, location);
+        keyPoint.Update(name, description, imagePath, secret, location);
     }
 
     public void ReorderKeyPoints(List<long> orderedKeyPointIds)

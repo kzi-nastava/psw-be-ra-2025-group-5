@@ -82,10 +82,11 @@ public class ToursContext : DbContext
                 l => new Location(l.Latitude, l.Longitude)
             ));
 
-        // Konfiguracija Image kao bytea
         modelBuilder.Entity<KeyPoint>()
-            .Property(kp => kp.Image)
-            .HasColumnType("bytea");
+            .Property(kp => kp.ImagePath)
+            .HasColumnType("text");
+
+
 
         modelBuilder.Entity<Tour>()
         .HasMany(t => t.RequiredEquipment)

@@ -12,7 +12,11 @@ using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
+using Explorer.Payments.API.Internal;
+using Explorer.Tours.API.Internal;
+using Explorer.BuildingBlocks.Core.FileStorage;
 using Microsoft.AspNetCore.Http;
+using System.Security.Cryptography;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -23,6 +27,7 @@ public class TourService : ITourService, ITourSharedService
     private readonly ITourExecutionRepository _tourExecutionRepository;
     private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
     private readonly IEquipmentRepository _equipmentRepository;
+    private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
     private readonly IImageStorage _imageStorage;
 
@@ -62,6 +67,21 @@ public class TourService : ITourService, ITourSharedService
         var result = _tourRepository.GetAll();
         var items = result.SelectMany(t => t.Tags).Distinct().ToList();
         return items;
+    }
+
+    private string? SaveKeyPointImage(IFormFile? image, long authorId)
+    {
+        if (image == null) return null;
+
+        using var ms = new MemoryStream();
+        image.CopyTo(ms);
+
+        return _imageStorage.SaveImage(
+            "keypoints",
+            authorId,
+            ms.ToArray(),
+            image.ContentType
+        );
     }
 
     public TourDto Create(CreateTourDto dto)
@@ -116,11 +136,13 @@ public class TourService : ITourService, ITourSharedService
         var tour = _tourRepository.Get(tourId);
         var location = _mapper.Map<Location>(keyPointDto.Location);
 
+        var imagePath = SaveKeyPointImage(keyPointDto.ImagePath, tour.AuthorId);
+
         tour.AddKeyPoint(
             keyPointDto.Name,
             keyPointDto.Description,
             location,
-            keyPointDto.Image,
+            imagePath,
             keyPointDto.Secret);
 
         if (tour.KeyPoints.Count > 1)
@@ -137,11 +159,21 @@ public class TourService : ITourService, ITourSharedService
         var tour = _tourRepository.Get(tourId);
         var location = _mapper.Map<Location>(keyPointDto.Location);
 
+        var keyPoint = tour.KeyPoints.FirstOrDefault(kp => kp.Id == keyPointId);
+        if (keyPoint == null)
+            throw new InvalidOperationException("KeyPoint not found");
+
+        string? imagePath = keyPoint.ImagePath;
+        if (keyPointDto.ImagePath != null)
+        {
+            imagePath = SaveKeyPointImage(keyPointDto.ImagePath, tour.AuthorId);
+        }
+
         tour.UpdateKeyPoint(
             keyPointId,
             keyPointDto.Name,
             keyPointDto.Description,
-            keyPointDto.Image,
+            imagePath,
             keyPointDto.Secret,
             location);
 
@@ -326,7 +358,6 @@ public class TourService : ITourService, ITourSharedService
         var tour = _tourRepository.Get(tourId);
 
         tour.RemoveReview(reviewId);
-
         var updatedTour = _tourRepository.Update(tour);
         return _mapper.Map<TourDto>(updatedTour);
     }

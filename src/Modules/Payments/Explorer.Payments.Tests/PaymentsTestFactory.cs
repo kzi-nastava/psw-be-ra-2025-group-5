@@ -1,5 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Tests;
 using Explorer.Payments.Infrastructure.Database;
+using Explorer.Payments.Tests.Stub;
+using Explorer.Stakeholders.API.Internal;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,16 @@ public class PaymentsTestFactory : BaseTestFactory<PaymentsContext>
         descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<ToursContext>));
         services.Remove(descriptor!);
         services.AddDbContext<ToursContext>(SetupTestContext());
+
+        var notificationDescriptor = services.SingleOrDefault(
+            d => d.ServiceType == typeof(IPaymentNotificationService));
+
+        if (notificationDescriptor != null)
+        {
+            services.Remove(notificationDescriptor);
+        }
+
+        services.AddScoped<IPaymentNotificationService, StubPaymentNotificationService>();
 
         return services;
     }

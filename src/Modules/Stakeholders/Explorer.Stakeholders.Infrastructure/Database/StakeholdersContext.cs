@@ -35,7 +35,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("stakeholders");
-
+            
             // Unique constraint na Username
             modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
 

@@ -54,17 +54,17 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var newKeyPoint = new CreateKeyPointDto
         {
             Name = "New Key Point",
             Description = "Test description",
             Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
-            Image = null,
+            ImagePath = null,
             Secret = "Test secret"
         };
 
@@ -88,11 +88,11 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var invalidKeyPoint = new CreateKeyPointDto
         {
             Name = "",
@@ -110,11 +110,11 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var invalidKeyPoint = new CreateKeyPointDto
         {
             Name = "Test",
@@ -134,11 +134,11 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var invalidKeyPoint = new CreateKeyPointDto
         {
             Name = "Test Point",
@@ -156,7 +156,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         // Kreiraj novu turu
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
@@ -169,7 +169,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         controller.AddKeyPoint(tourId, kp1);
         controller.AddKeyPoint(tourId, kp2);
         controller.Publish(tourId);
-        
+
         var newKeyPoint = new CreateKeyPointDto
         {
             Name = "Test",
@@ -188,11 +188,11 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var newKeyPoint = new CreateKeyPointDto
         {
             Name = "Original Name",
@@ -234,11 +234,11 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var updatedKeyPoint = new CreateKeyPointDto
         {
             Name = "Test",
@@ -257,24 +257,24 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var kp1 = new CreateKeyPointDto { Name = "KP1", Description = "Desc 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "KP2", Description = "Desc 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
         var kp3 = new CreateKeyPointDto { Name = "KP3", Description = "Desc 3", Location = new LocationDto { Latitude = 44.2, Longitude = 20.2 } };
-        
+
         controller.AddKeyPoint(tourId, kp1);
         controller.AddKeyPoint(tourId, kp2);
         var addResult = ((ObjectResult)controller.AddKeyPoint(tourId, kp3).Result)?.Value as TourDto;
-        
+
         var keyPointIdToDelete = addResult.KeyPoints.First(kp => kp.Name == "KP2").Id;
         var initialCount = addResult.KeyPoints.Count;
 
         // Act
-        var result = ((ObjectResult)controller.RemoveKeyPoint(tourId, keyPointIdToDelete,0.0).Result)?.Value as TourDto;
+        var result = ((ObjectResult)controller.RemoveKeyPoint(tourId, keyPointIdToDelete, 0.0).Result)?.Value as TourDto;
 
         // Assert
         result.ShouldNotBeNull();
@@ -284,7 +284,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         var storedTour = dbContext.Tours.FirstOrDefault(t => t.Id == tourId);
         storedTour.ShouldNotBeNull();
         storedTour.KeyPoints.Any(kp => kp.Id == keyPointIdToDelete).ShouldBeFalse();
-        
+
         var deletedKeyPoint = dbContext.Set<KeyPoint>().FirstOrDefault(kp => kp.Id == keyPointIdToDelete);
         deletedKeyPoint.ShouldBeNull();
     }
@@ -295,13 +295,13 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() => controller.RemoveKeyPoint(tourId, -9999,0.0));
+        Should.Throw<InvalidOperationException>(() => controller.RemoveKeyPoint(tourId, -9999, 0.0));
     }
 
     [Fact]
@@ -310,7 +310,7 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
@@ -319,11 +319,11 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
 
         var kp1 = new CreateKeyPointDto { Name = "KP1", Description = "Desc 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "KP2", Description = "Desc 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
-        
+
         controller.AddKeyPoint(tourId, kp1);
         var addResult = ((ObjectResult)controller.AddKeyPoint(tourId, kp2).Result)?.Value as TourDto;
         var keyPointId = addResult.KeyPoints.First().Id;
-        
+
         controller.Publish(tourId);
 
         // Act & Assert
@@ -336,19 +336,19 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var kp1 = new CreateKeyPointDto { Name = "First", Description = "Desc 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "Second", Description = "Desc 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
         var kp3 = new CreateKeyPointDto { Name = "Third", Description = "Desc 3", Location = new LocationDto { Latitude = 44.2, Longitude = 20.2 } };
-        
+
         controller.AddKeyPoint(tourId, kp1);
         controller.AddKeyPoint(tourId, kp2);
         var addResult = ((ObjectResult)controller.AddKeyPoint(tourId, kp3).Result)?.Value as TourDto;
-        
+
         var firstId = addResult.KeyPoints.First(kp => kp.Name == "First").Id;
         var secondId = addResult.KeyPoints.First(kp => kp.Name == "Second").Id;
         var thirdId = addResult.KeyPoints.First(kp => kp.Name == "Third").Id;
@@ -378,19 +378,19 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var kp1 = new CreateKeyPointDto { Name = "KP1", Description = "Desc 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "KP2", Description = "Desc 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
-        
+
         controller.AddKeyPoint(tourId, kp1);
         var addResult = ((ObjectResult)controller.AddKeyPoint(tourId, kp2).Result)?.Value as TourDto;
-        
+
         var firstId = addResult.KeyPoints.First().Id;
-        
+
         var reorderDto = new ReorderKeyPointsDto
         {
             OrderedKeyPointIds = new List<long> { firstId }
@@ -406,17 +406,17 @@ public class KeyPointCommandTests : BaseToursIntegrationTest
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
-        
+
         var newTour = CreateTestTour();
         var createdTour = ((ObjectResult)controller.Create(newTour).Result)?.Value as TourDto;
         var tourId = createdTour.Id;
-        
+
         var kp1 = new CreateKeyPointDto { Name = "KP1", Description = "Desc 1", Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 } };
         var kp2 = new CreateKeyPointDto { Name = "KP2", Description = "Desc 2", Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 } };
-        
+
         controller.AddKeyPoint(tourId, kp1);
         controller.AddKeyPoint(tourId, kp2);
-        
+
         var reorderDto = new ReorderKeyPointsDto
         {
             OrderedKeyPointIds = new List<long> { -9999, -8888 }
