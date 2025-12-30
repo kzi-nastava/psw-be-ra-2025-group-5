@@ -29,7 +29,6 @@ public class TourService : ITourService, ITourSharedService
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
-    private readonly IImageStorage _imageStorage;
 
 
     public TourService(
