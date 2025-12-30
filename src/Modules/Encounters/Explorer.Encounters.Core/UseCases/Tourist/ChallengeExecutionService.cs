@@ -31,6 +31,7 @@ public class ChallengeExecutionService : IChallengeExecutionService
 
     public ChallengeExecutionDto StartChallenge(long challengeId, long touristId)
     {
+        Console.WriteLine($"[StartChallenge] TouristId = {touristId}");
         var challenges = _challengeRepository.GetAll();
         var challenge = challenges.FirstOrDefault(c => c.Id == challengeId);
         

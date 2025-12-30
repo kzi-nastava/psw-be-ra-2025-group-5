@@ -51,7 +51,9 @@ public class ChallengeDbRepository : IChallengeRepository
                 entity.Longitude,
                 entity.ExperiencePoints,
                 entity.Status,
-                entity.Type
+                entity.Type,
+                entity.RequiredParticipants,
+                entity.RadiusInMeters
             );
             DbContext.SaveChanges();
             return existingChallenge;
