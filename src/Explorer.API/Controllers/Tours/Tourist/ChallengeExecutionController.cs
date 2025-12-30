@@ -1,5 +1,6 @@
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public.Tourist;
+using Explorer.Tours.API.Dtos.Locations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,6 +59,15 @@ public class ChallengeExecutionController : ControllerBase
         
         var result = _challengeExecutionService.GetByTourist(touristId);
         return Ok(result);
+    }
+
+    [HttpPost("{challengeId:long}/update-location")]
+    public IActionResult UpdateTouristLocation(long challengeId, [FromBody] LocationDto location)
+    {
+        var touristId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        
+        _challengeExecutionService.UpdateTouristLocation(challengeId, touristId, location.Latitude, location.Longitude);
+        return Ok();
     }
 }
 

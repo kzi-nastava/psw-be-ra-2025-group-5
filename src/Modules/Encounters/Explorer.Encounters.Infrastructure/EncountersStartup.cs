@@ -2,11 +2,13 @@ using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Encounters.API.Public.Administration;
 using Explorer.Encounters.API.Public.Tourist;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces;
+using Explorer.Encounters.Core.Domain.RepositoryInterfaces.Social;
 using Explorer.Encounters.Core.Mappers;
 using Explorer.Encounters.Core.UseCases.Administration;
 using Explorer.Encounters.Core.UseCases.Tourist;
 using Explorer.Encounters.Infrastructure.Database;
 using Explorer.Encounters.Infrastructure.Database.Repositories;
+using Explorer.Encounters.Infrastructure.Database.Repositories.Social;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -33,6 +35,7 @@ namespace Explorer.Encounters.Infrastructure
         {
             services.AddScoped<IChallengeRepository, ChallengeDbRepository>();
             services.AddScoped<IChallengeExecutionRepository, ChallengeExecutionDbRepository>();
+            services.AddScoped<IChallengeParticipationRepository, ChallengeParticipationDbRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("encounters"));
             dataSourceBuilder.EnableDynamicJson();

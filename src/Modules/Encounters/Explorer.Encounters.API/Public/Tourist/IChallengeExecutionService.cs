@@ -9,6 +9,7 @@ public interface IChallengeExecutionService
     ChallengeExecutionDto AbandonChallenge(long executionId, long touristId);
     ChallengeExecutionDto GetById(long id);
     List<ChallengeExecutionDto> GetByTourist(long touristId);
+    void UpdateTouristLocation(long challengeId, long touristId, double latitude, double longitude);
 }
 
 

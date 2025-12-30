@@ -25,8 +25,9 @@ namespace Explorer.Encounters.Core.Mappers
                     dto.Longitude,
                     dto.ExperiencePoints,
                     Enum.Parse<ChallengeStatus>(dto.Status, true),
-                    Enum.Parse<ChallengeType>(dto.Type, true)
-                ))
+                    Enum.Parse<ChallengeType>(dto.Type, true),
+                    dto.RequiredParticipants, dto.RadiusInMeters)
+                )
                 .AfterMap((dto, challenge) =>
                 {
                     if (dto.Id != 0)

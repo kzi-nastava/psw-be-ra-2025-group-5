@@ -10,4 +10,6 @@ public class ChallengeDto
     public int ExperiencePoints { get; set; }
     public string Status { get; set; }
     public string Type { get; set; }
+    public int? RequiredParticipants { get; set; }
+    public int? RadiusInMeters { get; set; }
 }

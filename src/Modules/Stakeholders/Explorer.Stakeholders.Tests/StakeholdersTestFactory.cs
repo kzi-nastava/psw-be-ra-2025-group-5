@@ -94,4 +94,10 @@ public class StubChallengeExecutionService : IChallengeExecutionService
     {
         return new List<ChallengeExecutionDto>();
     }
+
+    public void UpdateTouristLocation(long challengeId, long touristId, double latitude, double longitude)
+    {
+        // za test stub, ne radi ništa
+    }
+
 }

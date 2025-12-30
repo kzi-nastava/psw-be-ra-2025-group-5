@@ -26,7 +26,7 @@ public class TouristChallengeController : ControllerBase
         var result = _challengeService.GetAllActive();
         // Izbaci one koje je korisnik vec zavrsio
         var completed = _challengeExecutionService.GetByTourist(long.Parse(User.Claims.First(c => c.Type == "id").Value))
-            .Where(e => e.Status == "Completed")
+            .Where(e => e.Status == "Completed" || e.Status == "InProgress")
             .Select(e => e.ChallengeId)
             .ToHashSet();
         
