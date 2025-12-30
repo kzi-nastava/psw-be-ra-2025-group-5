@@ -154,6 +154,8 @@ public class TourController : ControllerBase
             "tours",
             tourId.ToString(),
             fileName);
+
+            }
     [AllowAnonymous]
     [HttpGet("{keyPointId:long}/keypoints/images/{*fileName}")]
     public IActionResult GetImage(long keyPointId, string fileName)
