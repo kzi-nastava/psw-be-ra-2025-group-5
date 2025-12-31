@@ -24,7 +24,7 @@ namespace Explorer.API.FileStorage
             {
                 "image/png" => ".png",
                 "image/jpeg" => ".jpg",
-                "image/jpg" => ".jpg",
+                "image/jpg" => ".jpg",  
                 _ => throw new ArgumentException("Unsupported image type")
             };
 

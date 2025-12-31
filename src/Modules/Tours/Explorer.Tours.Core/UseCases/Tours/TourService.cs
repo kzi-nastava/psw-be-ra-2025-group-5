@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Equipments;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
@@ -27,7 +30,14 @@ public class TourService : ITourService, ITourSharedService
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenSharedService purchaseToken, IEquipmentRepository equipmentRepository, IImageStorage imageStorage)
+
+    public TourService(
+     ITourRepository repository,
+     IMapper mapper,
+     ITourExecutionRepository execution,
+     ITourPurchaseTokenSharedService purchaseToken,
+     IEquipmentRepository equipmentRepository,
+     IImageStorage imageStorage)
     {
         _tourRepository = repository;
         _mapper = mapper;
@@ -427,6 +437,37 @@ public class TourService : ITourService, ITourSharedService
     {
         var tour = _tourRepository.Get(id);
         return _mapper.Map<TourDto>(tour);
+    }
+    public TourDto UploadThumbnail(long tourId, IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            throw new ArgumentException("Image file is required");
+
+        var tour = _tourRepository.Get(tourId);
+        if (tour == null)
+            throw new KeyNotFoundException("Tour not found");
+
+        using var ms = new MemoryStream();
+        file.CopyTo(ms);
+
+        var imagePath = _imageStorage.SaveImage(
+            "tours",
+            tourId,
+            ms.ToArray(),
+            file.ContentType);
+
+        tour.SetThumbnail(imagePath);
+
+        var updated = _tourRepository.Update(tour);
+        return _mapper.Map<TourDto>(updated);
+    }
+
+    public bool CanEditTour(long tourId, long userId)
+    {
+        var tour = _tourRepository.Get(tourId);
+        if (tour == null) return false;
+
+        return tour.AuthorId == userId;
     }
 
 }
