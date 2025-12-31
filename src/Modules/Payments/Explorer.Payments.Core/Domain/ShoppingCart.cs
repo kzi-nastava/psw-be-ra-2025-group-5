@@ -7,9 +7,9 @@ namespace Explorer.Payments.Core.Domain;
 public class ShoppingCart : AggregateRoot
 {
     public long TouristId { get; private set; }
-    public List<OrderItem> Items { get; private set; } = [];
+    public List<OrderItem> Items { get; private set; } = new List<OrderItem>();
 
-    private ShoppingCart() { }
+    public ShoppingCart() { }
 
     public ShoppingCart(long touristId)
     {
