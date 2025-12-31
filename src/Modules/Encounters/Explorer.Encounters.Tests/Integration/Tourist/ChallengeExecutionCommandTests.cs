@@ -182,6 +182,38 @@ public class ChallengeExecutionCommandTests : BaseEncountersIntegrationTest, IDi
         result.ShouldAllBe(e => e.TouristId == -21);
     }
 
+    [Fact]
+    public void Social_challenge_completes_for_all_when_enough_participants_in_range()
+    {
+        // Arrange
+        var controller1 = CreateController(_scope, "-21");
+        var controller2 = CreateController(_scope, "-22");
+        long challengeId = -2;
+
+        var exec1 = ((ObjectResult)controller1.StartChallenge(challengeId).Result)?.Value as ChallengeExecutionDto;
+        var exec2 = ((ObjectResult)controller2.StartChallenge(challengeId).Result)?.Value as ChallengeExecutionDto;
+
+        exec1.ShouldNotBeNull();
+        exec2.ShouldNotBeNull();
+
+        var service = _scope.ServiceProvider.GetRequiredService<IChallengeExecutionService>();
+        service.UpdateTouristLocation(challengeId, exec1.TouristId, 44.815556, 20.460833);
+        service.UpdateTouristLocation(challengeId, exec2.TouristId, 44.815556, 20.460833);
+
+        var storedExec1 = _dbContext.ChallengeExecutions.FirstOrDefault(e => e.Id == exec1.Id);
+        var storedExec2 = _dbContext.ChallengeExecutions.FirstOrDefault(e => e.Id == exec2.Id);
+
+        storedExec1.ShouldNotBeNull();
+        storedExec2.ShouldNotBeNull();
+
+        storedExec1.Status.ToString().ShouldBe("Completed");
+        storedExec2.Status.ToString().ShouldBe("Completed");
+
+        storedExec1.CompletedAt.ShouldNotBeNull();
+        storedExec2.CompletedAt.ShouldNotBeNull();
+    }
+
+
     private static ChallengeExecutionController CreateController(IServiceScope scope, string touristId = "-21")
     {
         return new ChallengeExecutionController(
