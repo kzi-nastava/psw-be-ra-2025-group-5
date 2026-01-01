@@ -1,5 +1,3 @@
-
-﻿
 namespace Explorer.Payments.Core.Domain.RepositoryInterfaces;
 
 public interface IShoppingCartRepository

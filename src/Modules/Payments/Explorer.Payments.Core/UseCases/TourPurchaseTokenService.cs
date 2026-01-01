@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Dtos.PurchaseToken;
 using Explorer.Payments.API.Internal;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Core.Domain;
