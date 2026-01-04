@@ -12,5 +12,7 @@ namespace Explorer.Encounters.API.Public.Tourist
     {
         ChallengeDto CreateByTourist(CreateTouristChallengeDto dto, long creatorId);
         ChallengeDto Update(UpdateTouristChallengeDto entity, long userId);
+        List<ChallengeDto> GetByTourist(long touristId);
+
     }
 }

@@ -100,5 +100,15 @@ public class TouristChallengeController : ControllerBase
         }
     }
 
+    [HttpGet("my")]
+    public ActionResult<List<ChallengeDto>> GetMyChallenges()
+    {
+        var userClaim = User.FindFirst("Id");
+        if (userClaim == null || !long.TryParse(userClaim.Value, out var userId))
+            return Unauthorized("UserId not found in token");
+
+        var result = _challengeTouristService.GetByTourist(userId);
+        return Ok(result);
+    }
 
 }

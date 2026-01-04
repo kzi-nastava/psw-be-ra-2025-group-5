@@ -56,5 +56,14 @@ namespace Explorer.Encounters.Core.UseCases.Tourist
             return _mapper.Map<ChallengeDto>(updatedChallenge);
         }
 
+        public List<ChallengeDto> GetByTourist(long touristId)
+        {
+            var challenges = _challengeRepository.GetAll()
+                .Where(c => c.CreatedByTouristId == touristId)
+                .ToList();
+
+            return _mapper.Map<List<ChallengeDto>>(challenges);
+        }
+
     }
 }
