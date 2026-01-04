@@ -42,4 +42,18 @@ public class ChallengeController : ControllerBase
         _challengeService.Delete(id);
         return Ok();
     }
+
+    [HttpPost("{id}/approve")]
+    public ActionResult ApproveChallenge(long id)
+    {
+        _challengeService.Approve(id);
+        return Ok();
+    }
+
+    [HttpPost("{id}/reject")]
+    public ActionResult RejectChallenge(long id)
+    {
+        _challengeService.Reject(id);
+        return Ok();
+    }
 }

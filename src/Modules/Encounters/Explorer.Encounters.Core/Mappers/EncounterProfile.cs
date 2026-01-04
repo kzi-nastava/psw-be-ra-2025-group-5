@@ -26,6 +26,7 @@ namespace Explorer.Encounters.Core.Mappers
                     dto.ExperiencePoints,
                     Enum.Parse<ChallengeStatus>(dto.Status, true),
                     Enum.Parse<ChallengeType>(dto.Type, true),
+                    dto.CreatedById,
                     dto.RequiredParticipants, dto.RadiusInMeters)
                 )
                 .AfterMap((dto, challenge) =>
@@ -38,7 +39,8 @@ namespace Explorer.Encounters.Core.Mappers
 
             CreateMap<Challenge, ChallengeDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+                .ForMember(dest => dest.CreatedById, opt => opt.MapFrom(src => src.CreatedByTouristId)); 
 
             CreateMap<ChallengeExecution, ChallengeExecutionDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));

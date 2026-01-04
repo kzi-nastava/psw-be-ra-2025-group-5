@@ -53,4 +53,52 @@ public class ChallengeService : IChallengeService
         var result = _challengeRepository.Get(challengeId);
         return _mapper.Map<ChallengeDto>(result);
     }
+
+    public void Approve(long challengeId)
+    {
+        Challenge challenge = _challengeRepository.Get(challengeId);
+        if (challenge == null) 
+            throw new KeyNotFoundException();
+
+        if (challenge.Status != ChallengeStatus.Pending)
+            throw new InvalidOperationException("Challenge is not pending approval.");
+
+        challenge.Update(
+            challenge.Name,
+            challenge.Description,
+            challenge.Latitude,
+            challenge.Longitude,
+            challenge.ExperiencePoints,
+            ChallengeStatus.Active,
+            challenge.Type,
+            challenge.RequiredParticipants,
+            challenge.RadiusInMeters
+        );
+
+        _challengeRepository.Update( challenge );
+    }
+
+    public void Reject(long challengeId)
+    {
+        Challenge challenge = _challengeRepository.Get(challengeId);
+        if (challenge == null)
+            throw new KeyNotFoundException();
+
+        if (challenge.Status != ChallengeStatus.Pending)
+            throw new InvalidOperationException("Challenge is not pending approval.");
+
+        challenge.Update(
+            challenge.Name,
+            challenge.Description,
+            challenge.Latitude,
+            challenge.Longitude,
+            challenge.ExperiencePoints,
+            ChallengeStatus.Archived,
+            challenge.Type,
+            challenge.RequiredParticipants,
+            challenge.RadiusInMeters
+        );
+
+        _challengeRepository.Update(challenge);
+    }
 }

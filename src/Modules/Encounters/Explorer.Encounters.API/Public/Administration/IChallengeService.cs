@@ -11,4 +11,6 @@ public interface IChallengeService
     void Delete(long id);
     List<ChallengeDto> GetAllActive();
     ChallengeDto GetById(long challengeId);
+    void Approve(long challengeId);
+    void Reject(long challengeId);
 }
