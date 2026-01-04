@@ -12,23 +12,26 @@ namespace Explorer.API.Controllers.Author
     [ApiController]
     public class AuthorAnalyticsController : ControllerBase
     {
-        private readonly ITourStatisticsService _tourStatisticsService;
+        private readonly ITourAnalyticsService _tourAnalyticsService;
 
-        public AuthorAnalyticsController(ITourStatisticsService tourStatisticsService)
+        public AuthorAnalyticsController(ITourAnalyticsService tourAnalyticsService)
         {
-            _tourStatisticsService = tourStatisticsService;
+            _tourAnalyticsService = tourAnalyticsService;
         }
 
-        //[HttpGet("purchased/count/{userId:long}")]
-        //public ActionResult<int> GetPurchasedToursCount(long userId)
-        //{
-        //    return Ok(_tourStatisticsService.GetPurchasedToursCount(userId));
-        //}
+        [HttpGet("by-price")]
+        public ActionResult<IReadOnlyCollection<ToursByPriceDto>> GetToursCountByPrice([FromQuery] long userId)
+        {
+            var result = _tourAnalyticsService.GetToursCountByPrice(userId);
+            return Ok(result);
+        }
 
-        //[HttpGet("completed/{userId:long}")]
-        //public ActionResult<IReadOnlyCollection<TourStatisticsItemDto>> GetCompletedTours(long userId)
-        //{
-        //    return Ok(_tourStatisticsService.GetCompletedTours(userId));
-        //}
+        [HttpGet("reviews")]
+        public ActionResult<TourReviewStatisticsDto> GetReviewStatistics([FromQuery] long userId, [FromQuery] string period = "all")
+        {
+            var result = _tourAnalyticsService.GetReviewStatistics(userId, period);
+            return Ok(result);
+        }
+
     }
 }
