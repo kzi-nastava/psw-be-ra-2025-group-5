@@ -36,11 +36,11 @@ public class TourStatisticsDbRepository : ITourStatisticsDbRepository
             ),
             new ToursByPrice(
                 tours.Count(t => t.Price > 20 && t.Price <= 50),
-                "21–50"
+                "20–50"
             ),
             new ToursByPrice(
                 tours.Count(t => t.Price > 50 && t.Price <= 100),
-                "51–100"
+                "50–100"
             ),
             new ToursByPrice(
                 tours.Count(t => t.Price > 100),
