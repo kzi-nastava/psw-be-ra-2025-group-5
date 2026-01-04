@@ -63,11 +63,6 @@ public class TouristChallengeController : ControllerBase
         {
             return Forbid();
         }
-        catch (Exception ex)
-        {
-            // Bilo koja druga greška
-            return StatusCode(500, $"Unexpected error: {ex.Message}");
-        }
 
         if (profile == null || profile.Level < 10)
         {
@@ -76,5 +71,34 @@ public class TouristChallengeController : ControllerBase
 
         return Ok(_challengeTouristService.CreateByTourist(challenge, profile.Id));
     }
+
+    [HttpPut("{id:long}")]
+    public ActionResult<ChallengeDto> Update(long id, [FromBody] UpdateTouristChallengeDto challenge)
+    {
+        challenge.Id = id;
+
+        var userClaim = User.FindFirst("Id");
+        if (userClaim == null || !long.TryParse(userClaim.Value, out var userId))
+            return Unauthorized("UserId not found in token");
+
+        try
+        {
+            var updatedChallenge = _challengeTouristService.Update(challenge, userId);
+            return Ok(updatedChallenge);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid("You can only edit your own challenges.");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
 
 }

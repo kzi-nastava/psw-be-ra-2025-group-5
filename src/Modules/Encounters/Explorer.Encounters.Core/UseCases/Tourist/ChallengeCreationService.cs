@@ -41,5 +41,20 @@ namespace Explorer.Encounters.Core.UseCases.Tourist
             return _mapper.Map<ChallengeDto>(result);
         }
 
+        public ChallengeDto Update(UpdateTouristChallengeDto entity, long userId)
+        {
+            var existingChallenge = _challengeRepository.Get(entity.Id);
+            if (existingChallenge == null)
+                throw new KeyNotFoundException($"Challenge with id {entity.Id} not found.");
+
+            if (existingChallenge.CreatedByTouristId != userId)
+                throw new UnauthorizedAccessException("You can only edit your own challenges.");
+
+            _mapper.Map(entity, existingChallenge);
+
+            var updatedChallenge = _challengeRepository.Update(existingChallenge);
+            return _mapper.Map<ChallengeDto>(updatedChallenge);
+        }
+
     }
 }

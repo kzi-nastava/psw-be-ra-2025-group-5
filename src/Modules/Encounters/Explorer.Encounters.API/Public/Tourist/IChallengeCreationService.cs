@@ -11,5 +11,6 @@ namespace Explorer.Encounters.API.Public.Tourist
     public interface IChallengeCreationService
     {
         ChallengeDto CreateByTourist(CreateTouristChallengeDto dto, long creatorId);
+        ChallengeDto Update(UpdateTouristChallengeDto entity, long userId);
     }
 }

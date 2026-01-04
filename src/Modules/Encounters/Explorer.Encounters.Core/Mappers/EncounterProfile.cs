@@ -54,6 +54,11 @@ namespace Explorer.Encounters.Core.Mappers
                         typeof(ChallengeExecution).GetProperty("Id")!.SetValue(execution, dto.Id);
                     }
                 });
+
+            CreateMap<UpdateTouristChallengeDto, Challenge>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByTouristId, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore());
         }
     }
 }
