@@ -30,8 +30,9 @@ namespace Explorer.Tours.Tests.Integration.TourAuthoring
                 .GetRequiredService<ITourPurchaseTokenSharedService>();
 
             var repository = new TourStatisticsDbRepository(dbContext);
+            var repositoryTour = new TourDbRepository(dbContext);
 
-            var service = new TourStatisticsService(repository, mapper, tokenService);
+            var service = new TourStatisticsService(repository, mapper, tokenService, repositoryTour);
 
             var controller = new AuthorAnalyticsController(service)
             {
