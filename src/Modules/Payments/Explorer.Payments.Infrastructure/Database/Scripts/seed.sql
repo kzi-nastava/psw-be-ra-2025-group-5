@@ -8,7 +8,9 @@ INSERT INTO payments."Wallets" ("Id", "TouristId", "Balance") VALUES
 (1, 4, 0), 
 (2, 5, 0),
 (3, 6, 20);
+INSERT INTO payments."TourSales"("Id", "AuthorId", "TourIds", "CreationDate", "ExpirationDate", "DiscountPercentage") VALUES (1, 7, '{2}', '2026-01-04', '2026-01-14', 50);
 
 SELECT setval(pg_get_serial_sequence('payments."ShoppingCarts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."ShoppingCarts"));
 SELECT setval(pg_get_serial_sequence('payments."TourPurchaseTokens"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."TourPurchaseTokens"));
 SELECT setval(pg_get_serial_sequence('payments."Wallets"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."Wallets"));
+SELECT setval(pg_get_serial_sequence('payments."TourSales"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."TourSales"));
