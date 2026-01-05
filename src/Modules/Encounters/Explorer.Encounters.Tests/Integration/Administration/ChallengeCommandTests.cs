@@ -221,6 +221,34 @@ public class ChallengeCommandTests : BaseEncountersIntegrationTest
         result.TotalCount.ShouldBeGreaterThan(0);
     }
 
+    [Fact]
+    public void ApproveChallenge_should_set_status_to_active()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        controller.ApproveChallenge(-5);
+
+        var db = scope.ServiceProvider.GetRequiredService<EncountersContext>();
+        var challenge = db.Challenges.First(c => c.Id == -5);
+        challenge.Status.ToString().ShouldBe("Active");
+    }
+
+    [Fact]
+    public void RejectChallenge_should_set_status_to_archived()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        controller.RejectChallenge(-4);
+
+        var db = scope.ServiceProvider.GetRequiredService<EncountersContext>();
+        var challenge = db.Challenges.First(c => c.Id == -4);
+        challenge.Status.ToString().ShouldBe("Archived");
+    }
+
+
+
     private static ChallengeController CreateController(IServiceScope scope)
     {
         return new ChallengeController(scope.ServiceProvider.GetRequiredService<IChallengeService>())

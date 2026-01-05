@@ -29,6 +29,7 @@ namespace Explorer.Encounters.Infrastructure
         {
             services.AddScoped<IChallengeService, ChallengeService>();
             services.AddScoped<IChallengeExecutionService, ChallengeExecutionService>();
+            services.AddScoped<IChallengeCreationService, ChallengeCreationService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
