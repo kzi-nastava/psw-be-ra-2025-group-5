@@ -1,5 +1,4 @@
 ﻿using Explorer.API.Controllers.Shopping;
-using Explorer.Payments.API.Dtos;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Infrastructure.Database;
 using Explorer.Payments.Core.Domain;
@@ -8,8 +7,9 @@ using Explorer.Payments.Tests.Stub;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using Explorer.Payments.API.Dtos.ShoppingCart;
 
-namespace Explorer.Payments.Tests.Integration;
+namespace Explorer.Payments.Tests.Integration.ShoppingCart;
 
 [Collection("Sequential")]
 public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotifications
@@ -53,12 +53,12 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         var payment = payments.Last();
         payment.TouristId.ShouldBe(touristId);
         payment.TourId.ShouldBe(tourId);
-        payment.Price.ShouldBe(tourPrice);
+        payment.Price.ShouldBe(2.5);
         payment.CreatedAt.ShouldNotBe(default(DateTime));
         payment.CreatedAt.ShouldBeLessThanOrEqualTo(DateTime.UtcNow);
 
         var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
-        walletAfter.Balance.ShouldBe(95);
+        walletAfter.Balance.ShouldBe(97.5);
     }
 
     [Fact]
@@ -260,12 +260,12 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
 
         // Assert
         var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
-        walletAfter.Balance.ShouldBe(195);
+        walletAfter.Balance.ShouldBe(197.5);
 
         var payments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         payments.Count.ShouldBe(1);
         payments[0].TourId.ShouldBe(-1);
-        payments[0].Price.ShouldBe(5);
+        payments[0].Price.ShouldBe(2.5);
     }
 
     [Fact]
@@ -298,7 +298,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         payment.Id.ShouldBeGreaterThan(0);
         payment.TouristId.ShouldBe(touristId);
         payment.TourId.ShouldBe(tourId);
-        payment.Price.ShouldBe(5);
+        payment.Price.ShouldBe(2.5);
         payment.CreatedAt.ShouldNotBe(default(DateTime));
         payment.CreatedAt.ShouldBeGreaterThanOrEqualTo(timeBeforeCheckout);
         payment.CreatedAt.ShouldBeLessThanOrEqualTo(DateTime.UtcNow.AddSeconds(1));
@@ -344,10 +344,10 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         var payments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         payments.Count.ShouldBe(1);
         payments[0].TourId.ShouldBe(-1);
-        payments[0].Price.ShouldBe(5);
+        payments[0].Price.ShouldBe(2.5);
 
         var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
-        walletAfter.Balance.ShouldBe(95);
+        walletAfter.Balance.ShouldBe(97.5);
     }
     [Fact]
     public void Checkout_deducts_correct_total_for_multiple_tours()

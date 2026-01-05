@@ -1,6 +1,6 @@
 ﻿using Explorer.API.Controllers.Tourist;
 using Explorer.API.Controllers.Tours.Tourist;
-using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Dtos.PurchaseToken;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Tests;
 using Microsoft.AspNetCore.Mvc;
