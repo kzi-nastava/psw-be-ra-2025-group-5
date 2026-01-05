@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Public.Tour;
 
 public class TourExpirationWorker : BackgroundService
 {

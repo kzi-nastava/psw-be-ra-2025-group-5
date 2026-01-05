@@ -1,10 +1,11 @@
-﻿using Explorer.API.Controllers.Author;
-using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Shopping;
+using Explorer.API.Controllers.Tours.Author;
+using Explorer.API.Controllers.Tours.Tourist;
 using Explorer.Payments.API.Dtos;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Infrastructure.Database;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

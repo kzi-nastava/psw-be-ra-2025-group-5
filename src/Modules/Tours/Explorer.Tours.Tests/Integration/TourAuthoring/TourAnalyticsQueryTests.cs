@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
-using Explorer.API.Controllers.Author;
+using Explorer.API.Controllers.Tours.Author;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
+using Explorer.Tours.Infrastructure.Database.Repositories.Tours;
+using Explorer.Tours.Infrastructure.Database.Repositories.Statistics;
 using Explorer.Tours.Core.UseCases;
 using Explorer.Tours.Infrastructure.Database.Repositories;
 using Explorer.Tours.Infrastructure.Database;

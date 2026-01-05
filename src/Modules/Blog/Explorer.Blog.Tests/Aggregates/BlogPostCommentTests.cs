@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
 using Xunit;
-
-using Explorer.Blog.Core.Domain;        
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
 
 namespace Explorer.Blog.Tests.Aggregates
 {

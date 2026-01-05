@@ -1,9 +1,17 @@
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.Core.Domain;
+using Explorer.Tours.Core.Domain.Equipments;
+using Explorer.Tours.Core.Domain.Equipments.Entities;
+using Explorer.Tours.Core.Domain.Facilities;
+using Explorer.Tours.Core.Domain.Monuments;
+using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.Tours.Core.Domain.Preferences;
+using Explorer.Tours.Core.Domain.Tours;
+using Explorer.Tours.Core.Domain.Tours.Entities;
+using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
-using TransportationType = Explorer.Tours.Core.Domain.TransportationType;
+using TransportationType = Explorer.Tours.Core.Domain.Preferences.TransportationType;
+using Explorer.Tours.API.Dtos.Locations;
 
 namespace Explorer.Tours.Infrastructure.Database;
 
@@ -74,10 +82,11 @@ public class ToursContext : DbContext
                 l => new Location(l.Latitude, l.Longitude)
             ));
 
-        // Konfiguracija Image kao bytea
         modelBuilder.Entity<KeyPoint>()
-            .Property(kp => kp.Image)
-            .HasColumnType("bytea");
+            .Property(kp => kp.ImagePath)
+            .HasColumnType("text");
+
+
 
         modelBuilder.Entity<Tour>()
         .HasMany(t => t.RequiredEquipment)

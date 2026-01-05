@@ -1,3 +1,4 @@
+
 ﻿
 namespace Explorer.Payments.Core.Domain.RepositoryInterfaces;
 

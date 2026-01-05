@@ -1,4 +1,4 @@
-﻿
+
 using Explorer.Payments.API.Dtos;
 
 namespace Explorer.Payments.Core.Domain.RepositoryInterfaces;

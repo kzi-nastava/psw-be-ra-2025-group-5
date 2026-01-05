@@ -1,4 +1,4 @@
-﻿
+
 namespace Explorer.Payments.API.Dtos;
 
 public class TourPurchaseTokenDto

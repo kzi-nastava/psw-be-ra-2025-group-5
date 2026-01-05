@@ -1,6 +1,6 @@
-﻿using Explorer.API.Controllers.Administrator.Administration;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.Core.UseCases;
+﻿using Explorer.API.Controllers.Administrator;
+using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

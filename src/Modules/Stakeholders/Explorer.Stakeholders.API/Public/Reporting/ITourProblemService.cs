@@ -1,5 +1,6 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Dtos.Comments;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 
 namespace Explorer.Stakeholders.API.Public.Reporting
 {

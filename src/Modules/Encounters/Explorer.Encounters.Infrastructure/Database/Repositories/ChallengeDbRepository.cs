@@ -68,4 +68,9 @@ public class ChallengeDbRepository : IChallengeRepository
         _dbSet.Remove(entity);
         DbContext.SaveChanges();
     }
+
+    public List<Challenge> GetAll()
+    {
+        return _dbSet.ToList();
+    }
 }

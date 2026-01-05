@@ -1,0 +1,37 @@
+﻿using Explorer.Stakeholders.API.Dtos.Authentication;
+using Explorer.Stakeholders.API.Public.Users;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Explorer.API.Controllers.Authentication;
+
+[Route("api/users")]
+[ApiController]
+public class AuthenticationController : ControllerBase
+{
+    private readonly IAuthenticationService _authenticationService;
+
+    public AuthenticationController(IAuthenticationService authenticationService)
+    {
+        _authenticationService = authenticationService;
+    }
+
+    [HttpPost]
+    public ActionResult<AuthenticationTokensDto> RegisterTourist([FromBody] AccountRegistrationDto account)
+    {
+        return Ok(_authenticationService.RegisterTourist(account));
+    }
+
+    [HttpPost("login")]
+    public ActionResult<AuthenticationTokensDto> Login([FromBody] CredentialsDto credentials)
+    {
+        try
+        {
+            var result = _authenticationService.Login(credentials);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+}
