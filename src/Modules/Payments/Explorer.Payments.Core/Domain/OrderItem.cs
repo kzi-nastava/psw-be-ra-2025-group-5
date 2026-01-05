@@ -8,7 +8,7 @@ public class OrderItem : ValueObject
 {
     public long TourId { get; }
     public string TourName { get; }
-    public double ItemPrice { get; }
+    public double ItemPrice { get; set; }
 
     [JsonConstructor]
     public OrderItem(long tourId, string tourName, double itemPrice)

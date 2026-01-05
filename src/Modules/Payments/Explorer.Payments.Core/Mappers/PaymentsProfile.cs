@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Explorer.Payments.API.Dtos;
 using Explorer.Payments.API.Dtos.Pricing;
 using Explorer.Payments.API.Dtos.PurchaseToken;
 using Explorer.Payments.API.Dtos.ShoppingCart;
@@ -35,5 +36,7 @@ public class PaymentsProfile: Profile
 
         CreateMap<TourSaleDto, TourSale>().ReverseMap();
         CreateMap<CreateTourSaleDto, TourSale>();
+
+        CreateMap<Coupon, CouponDto>().ReverseMap();
     }
 }

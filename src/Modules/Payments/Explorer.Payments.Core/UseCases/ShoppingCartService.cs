@@ -20,8 +20,11 @@ public class ShoppingCartService : IShoppingCartService
     private readonly IPaymentRepository _paymentRepository;
     private readonly IPaymentNotificationService _notificationService;
     private readonly ITourSaleService _TourSaleService;
+    private readonly ICouponRepository _couponRepository;
 
-    public ShoppingCartService(IShoppingCartRepository repository, ITourSharedService tourService, IMapper mapper, ITourPurchaseTokenService tokenService, IWalletRepository walletRepository, IPaymentRepository paymentRepository, IPaymentNotificationService notificationService, ITourSaleService tourSaleService)
+    public ShoppingCartService(IShoppingCartRepository repository, ITourSharedService tourService, IMapper mapper, ITourPurchaseTokenService tokenService, 
+        IWalletRepository walletRepository, IPaymentRepository paymentRepository, IPaymentNotificationService notificationService, ITourSaleService tourSaleService, 
+        ICouponRepository couponRepository)
     {
         _ShoppingCartRepository = repository;
         _TourService = tourService;
@@ -31,6 +34,7 @@ public class ShoppingCartService : IShoppingCartService
         _paymentRepository = paymentRepository;
         _notificationService = notificationService;
         _TourSaleService = tourSaleService;
+        _couponRepository = couponRepository;
     }
 
     private ShoppingCartDto ValidateCart(ShoppingCartDto cart)
@@ -99,6 +103,34 @@ public class ShoppingCartService : IShoppingCartService
         }
 
         double totalPrice = purchasableItems.Sum(i => i.ItemPrice.FinalPrice);
+
+        if (cart.AppliedCouponId.HasValue)
+        {
+            var coupon = _couponRepository.Get(cart.AppliedCouponId.Value);
+            if (coupon != null)
+            {
+                OrderItemDto targetItem;
+
+                if (coupon.TourId.HasValue)
+                {
+                    targetItem = purchasableItems.FirstOrDefault(i => i.TourId == coupon.TourId.Value);
+                }
+                else
+                {
+                    var authorId = coupon.AuthorId; 
+                    targetItem = purchasableItems
+                        .Where(i => tours[i.TourId].AuthorId == authorId)
+                        .OrderByDescending(i => i.ItemPrice)
+                        .FirstOrDefault();
+                }
+
+                if (targetItem != null)
+                {
+                    totalPrice -= targetItem.ItemPrice.FinalPrice * coupon.Percentage / 100.0;
+                }
+            }
+        }
+
         var wallet = _walletRepository.GetByTouristId(touristId);
 
         if (wallet == null)
@@ -143,5 +175,31 @@ public class ShoppingCartService : IShoppingCartService
             Type = "TourPurchased",
             CreatedAt = DateTime.UtcNow
         });
+    }
+
+    public ShoppingCartDto ApplyCouponToCart(long touristId, string couponCode)
+    {
+        var cart = _ShoppingCartRepository.GetByTourist(touristId)
+            ?? _ShoppingCartRepository.Create(new ShoppingCart(touristId));
+
+        var coupon = _couponRepository.GetByCode(couponCode);
+        if (coupon == null)
+            throw new InvalidOperationException("Coupon not found");
+
+        OrderItem targetItem = null;
+        if (coupon.TourId.HasValue)
+            targetItem = cart.Items.FirstOrDefault(i => i.TourId == coupon.TourId.Value);
+        else
+            targetItem = cart.Items.OrderByDescending(i => i.ItemPrice).FirstOrDefault();
+
+        if (targetItem != null)
+        {
+            targetItem.ItemPrice -= targetItem.ItemPrice * coupon.Percentage / 100.0;
+            _couponRepository.Delete(coupon.Id);
+        }
+
+        var updatedCart = _ShoppingCartRepository.Update(cart);
+
+        return _mapper.Map<ShoppingCartDto>(updatedCart);
     }
 }

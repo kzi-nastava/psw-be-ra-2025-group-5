@@ -7,6 +7,7 @@ public class ShoppingCart : AggregateRoot
 {
     public long TouristId { get; private set; }
     public List<OrderItem> Items { get; private set; } = [];
+    public long? AppliedCouponId { get; private set; }
 
     private ShoppingCart() { }
 
@@ -32,6 +33,11 @@ public class ShoppingCart : AggregateRoot
             throw new InvalidOperationException("Item not found in the cart.");
 
         Items.Remove(item);
+    }
+
+    public void ApplyCoupon(long couponId)
+    {
+        AppliedCouponId = couponId;
     }
 
     public void ClearShoppingCart() => Items.Clear();

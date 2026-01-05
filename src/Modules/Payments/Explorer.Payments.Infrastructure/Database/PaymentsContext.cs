@@ -12,6 +12,7 @@ public class PaymentsContext: DbContext
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<TourSale> TourSales { get; set; }
+    public DbSet<Coupon> Coupons { get; set; }
 
     public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) {}
 
@@ -22,6 +23,7 @@ public class PaymentsContext: DbContext
         ConfigureShoppingCart(modelBuilder);
         ConfigureWallet(modelBuilder);
         ConfigureTourSale(modelBuilder);
+        ConfigureCoupon(modelBuilder);
     }
 
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
@@ -64,5 +66,33 @@ public class PaymentsContext: DbContext
         .Property(ts => ts.CreationDate)
         .ValueGeneratedOnAdd()
         .HasDefaultValueSql("NOW()");
+    }
+
+    private static void ConfigureCoupon(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Coupon>(builder =>
+        {
+            builder.ToTable("Coupons");
+            builder.HasKey(c => c.Id);
+
+            builder.Property(c => c.Code)
+                .IsRequired()
+                .HasMaxLength(8);
+
+            builder.Property(c => c.Percentage)
+                .IsRequired();
+
+            builder.Property(c => c.ExpirationDate)
+                .IsRequired(false);
+
+            builder.Property(c => c.AuthorId)
+                .IsRequired();
+
+            builder.Property(c => c.TourId)
+                .IsRequired(false);
+
+            builder.HasIndex(c => c.Code)
+                .IsUnique();
+        });
     }
 }

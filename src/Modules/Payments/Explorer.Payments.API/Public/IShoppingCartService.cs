@@ -10,4 +10,5 @@ public interface IShoppingCartService
     ShoppingCartDto AddOrderItem(long touristId, long tourId);
     ShoppingCartDto RemoveOrderItem(long touristId, long tourId);
     ShoppingCartDto Checkout(long touristId);
+    ShoppingCartDto ApplyCouponToCart(long touristId, string couponCode);
 }
