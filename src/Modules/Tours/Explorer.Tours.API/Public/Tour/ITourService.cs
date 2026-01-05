@@ -9,6 +9,7 @@ public interface ITourService
 {
     PagedResult<TourDto> GetPaged(int page, int pageSize);
     PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize);
+    List<TourDto> GetMultiple(long[] ids);
     List<string> GetAllTags();
     TourDto Create(CreateTourDto tour);
     TourDto Update(long id, UpdateTourDto tour);

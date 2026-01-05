@@ -25,6 +25,12 @@ namespace Explorer.API.Controllers.Tours
             return Ok(_tourService.GetPagedPublished(page, pageSize));
         }
 
+        [HttpGet("batch")]
+        public ActionResult<List<TourDto>> GetMultiple([FromQuery] long[] ids)
+        {
+            return Ok(_tourService.GetMultiple(ids));
+        }
+
         [HttpGet("{id:long}")]
         public ActionResult<TourDto> GetPublished(long id)
         {

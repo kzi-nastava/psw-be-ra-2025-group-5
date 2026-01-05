@@ -11,7 +11,7 @@ public class PaymentsContext: DbContext
     public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<Payment> Payments { get; set; }
-
+    public DbSet<TourSale> TourSales { get; set; }
 
     public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) {}
 
@@ -21,6 +21,7 @@ public class PaymentsContext: DbContext
 
         ConfigureShoppingCart(modelBuilder);
         ConfigureWallet(modelBuilder);
+        ConfigureTourSale(modelBuilder);
     }
 
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
@@ -51,5 +52,17 @@ public class PaymentsContext: DbContext
 
             builder.HasIndex(w => w.TouristId).IsUnique(); 
         });
+    }
+
+    private static void ConfigureTourSale(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourSale>()
+        .Property(s => s.TourIds)
+        .HasColumnType("integer[]");
+
+        modelBuilder.Entity<TourSale>()
+        .Property(ts => ts.CreationDate)
+        .ValueGeneratedOnAdd()
+        .HasDefaultValueSql("NOW()");
     }
 }
