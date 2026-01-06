@@ -1,4 +1,5 @@
-﻿using Explorer.Stakeholders.API.Dtos;
+﻿using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Infrastructure.Authentication;
@@ -35,6 +36,10 @@ public class ProfileController : ControllerBase
         {
             var profile = _profileService.GetByUserId(userId);
             return Ok(profile);
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
         }
         catch (KeyNotFoundException ex)
         {
@@ -105,6 +110,24 @@ public class ProfileController : ControllerBase
         return PhysicalFile(filePath, mime);
     }
 
+    [Authorize]
+    [HttpGet("public/profile/{userId}")]
+    public ActionResult<ProfileDto> GetPublicProfile(long userId)
+    {
+        try
+        {
+            var profile = _profileService.GetPublicProfile(userId); 
+            return Ok(profile);
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
 }
 

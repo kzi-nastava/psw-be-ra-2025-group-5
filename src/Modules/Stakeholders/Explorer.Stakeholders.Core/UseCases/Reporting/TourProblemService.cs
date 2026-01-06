@@ -77,6 +77,7 @@ public class TourProblemService : ITourProblemService
 
         var user = _userRepository.GetById(authorId);
         dto.AuthorRole = user.Role.ToString();
+        dto.AuthorUsername = user.Username;
 
         return dto;
     }
@@ -110,6 +111,7 @@ public class TourProblemService : ITourProblemService
                     var commentDto = _mapper.Map<CommentDto>(c);
                     var user = _userRepository.GetById(c.AuthorId);
                     commentDto.AuthorRole = user.Role.ToString();
+                    commentDto.AuthorUsername = user.Username;
                     return commentDto;
                 })
                 .ToList(),
@@ -135,6 +137,7 @@ public class TourProblemService : ITourProblemService
 
             var user = _userRepository.GetById(c.AuthorId);
             dto.AuthorRole = user.Role.ToString();
+            dto.AuthorUsername = user.Username;
 
             return dto;
         }).ToList();
