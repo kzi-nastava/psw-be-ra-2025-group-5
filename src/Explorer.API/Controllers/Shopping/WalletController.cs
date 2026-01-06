@@ -1,4 +1,4 @@
-﻿using Explorer.Payments.API.Dtos;
+﻿using Explorer.Payments.API.Dtos.Wallet;
 using Explorer.Payments.API.Public;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Internal;

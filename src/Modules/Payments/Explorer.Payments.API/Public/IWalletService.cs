@@ -1,4 +1,4 @@
-﻿using Explorer.Payments.API.Dtos;
+﻿using Explorer.Payments.API.Dtos.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
