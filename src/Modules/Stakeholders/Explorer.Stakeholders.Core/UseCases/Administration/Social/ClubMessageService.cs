@@ -29,7 +29,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             if (club == null)
                 throw new NotFoundException($"Club with ID {clubId} not found.");
 
-            if (!club.IsMember(authorId))
+            if (!club.IsMember(authorId) && authorId != club.CreatorId)
                 throw new UnauthorizedAccessException("Only club members can post messages.");
 
             var message = new ClubMessage(
