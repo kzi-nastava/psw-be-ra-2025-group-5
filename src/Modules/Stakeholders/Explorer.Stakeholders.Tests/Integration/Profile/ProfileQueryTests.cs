@@ -84,6 +84,39 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
         result.ShouldBeOfType<NotFoundObjectResult>();
     }
 
+    [Fact]
+    public void Successfully_retrieves_paged_profiles()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IProfileService>();
+
+        int page = 1;
+        int pageSize = 2;
+
+        // Act
+        var pagedResult = service.GetPaged(page, pageSize);
+
+        // Assert
+        pagedResult.ShouldNotBeNull();
+        pagedResult.Results.Count.ShouldBeLessThanOrEqualTo(pageSize);
+        pagedResult.TotalCount.ShouldBeGreaterThan(0);
+
+        foreach (var profile in pagedResult.Results)
+        {
+            profile.ShouldNotBeNull();
+            profile.Id.ShouldBeLessThan(0);
+            profile.Name.ShouldNotBeNullOrEmpty();
+            profile.Surname.ShouldNotBeNullOrEmpty();
+
+            profile.Statistics.ShouldNotBeNull();
+        }
+
+        var firstProfile = pagedResult.Results.First();
+        firstProfile.Name.ShouldBe("Ana");
+    }
+
+
 
     private static ProfileController CreateController(IServiceScope scope)
     {

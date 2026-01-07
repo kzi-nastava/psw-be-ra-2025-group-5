@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
@@ -125,5 +127,20 @@ public class ProfileService : IProfileService
         }
         return paths;
     }
-    
+
+    public PagedResult<ProfileDto> GetPaged(int page, int pageSize)
+    {
+        var pagedPersons = _personRepository.GetPaged(page, pageSize);
+
+        var profileDtos = pagedPersons.Results.Select(person =>
+        {
+            var dto = _mapper.Map<ProfileDto>(person);
+            dto.Statistics = _touristStatisticsService.GetStatistics(person.UserId);
+
+            return dto;
+        }).ToList();
+
+        return new PagedResult<ProfileDto>(profileDtos, pagedPersons.TotalCount);
+    }
+
 }

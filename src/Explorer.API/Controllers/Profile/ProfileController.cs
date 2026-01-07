@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Users;
@@ -127,6 +128,14 @@ public class ProfileController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+    }
+
+    [Authorize]
+    [HttpGet("all-profiles")]
+    public ActionResult<PagedResult<ProfileDto>> GetAllProfiles([FromQuery] int page, [FromQuery] int pageSize)
+    {
+        var result = _profileService.GetPaged(page, pageSize);
+        return Ok(result);
     }
 
 }
