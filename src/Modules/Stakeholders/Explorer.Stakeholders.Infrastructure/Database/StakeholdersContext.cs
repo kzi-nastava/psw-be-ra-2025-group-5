@@ -1,6 +1,7 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Clubs;
+using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
@@ -19,6 +20,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<Club> Clubs { get; set; }
+        public DbSet<ClubMessage> ClubMessages { get; set; }
         public DbSet<AppRating> AppRatings { get; set; }
         public DbSet<TourProblem> TourProblems { get; set; }
         public DbSet<Position> Positions { get; set; }
@@ -47,6 +49,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureNotification(modelBuilder);
             ConfigureDiary(modelBuilder);
             ConfigureClub(modelBuilder);
+            ConfigureClubMessage(modelBuilder);
             ConfigureClubInvite(modelBuilder);
             ConfigureClubMember(modelBuilder);
             ConfigureClubJoinRequest(modelBuilder);
@@ -164,6 +167,47 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                        .OnDelete(DeleteBehavior.Cascade);
 
                 builder.ToTable("ClubMembers");
+            });
+        }
+
+        private static void ConfigureClubMessage(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClubMessage>(builder =>
+            {
+                builder.HasKey(cm => cm.Id);
+
+                builder.Property(cm => cm.ClubId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.AuthorId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.Content)
+                    .IsRequired()
+                    .HasMaxLength(280);
+
+                builder.Property(cm => cm.AttachedResourceType)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(cm => cm.AttachedResourceId)
+                    .IsRequired(false);
+
+                builder.Property(cm => cm.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(cm => cm.UpdatedAt)
+                    .IsRequired(false);
+
+                builder.HasOne<Club>()
+                    .WithMany()
+                    .HasForeignKey(cm => cm.ClubId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasIndex(cm => cm.ClubId);
+                builder.HasIndex(cm => cm.AuthorId);
+
+                builder.ToTable("ClubMessages");
             });
         }
 
