@@ -26,7 +26,8 @@ namespace Explorer.Encounters.Core.Mappers
                     dto.ExperiencePoints,
                     Enum.Parse<ChallengeStatus>(dto.Status, true),
                     Enum.Parse<ChallengeType>(dto.Type, true),
-                    dto.RequiredParticipants, dto.RadiusInMeters,
+                    dto.CreatedById,
+                    dto.RequiredParticipants, dto.RadiusInMeters)
                     dto.ImageUrl)
                 )
                 .AfterMap((dto, challenge) =>
@@ -39,7 +40,8 @@ namespace Explorer.Encounters.Core.Mappers
 
             CreateMap<Challenge, ChallengeDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+                .ForMember(dest => dest.CreatedById, opt => opt.MapFrom(src => src.CreatedByTouristId)); 
 
             CreateMap<ChallengeExecution, ChallengeExecutionDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
@@ -53,6 +55,11 @@ namespace Explorer.Encounters.Core.Mappers
                         typeof(ChallengeExecution).GetProperty("Id")!.SetValue(execution, dto.Id);
                     }
                 });
+
+            CreateMap<UpdateTouristChallengeDto, Challenge>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByTouristId, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore());
         }
     }
 }

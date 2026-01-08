@@ -11,12 +11,14 @@ public class Challenge : AggregateRoot
     public int ExperiencePoints { get; private set; }
     public ChallengeStatus Status { get; private set; }
     public ChallengeType Type { get; private set; }
+    public long? CreatedByTouristId { get; private set; }
     public int? RequiredParticipants { get; private set; }
     public int? RadiusInMeters { get; private set; }
     public string? ImageUrl { get; private set; }
 
-    public Challenge(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
-        int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
+    private Challenge() { }
+
+        long? createdByTouristId, int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Invalid Name.");
         if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Invalid Description.");
@@ -39,6 +41,7 @@ public class Challenge : AggregateRoot
         ExperiencePoints = experiencePoints;
         Status = status;
         Type = type;
+        CreatedByTouristId = createdByTouristId;
         RequiredParticipants = requiredParticipants;
         RadiusInMeters = radiusInMeters;
         ImageUrl = imageUrl;
@@ -77,7 +80,8 @@ public enum ChallengeStatus
 {
     Draft,
     Active,
-    Archived
+    Archived,
+    Pending
 }
 public enum ChallengeType
 {
