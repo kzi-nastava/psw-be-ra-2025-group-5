@@ -19,7 +19,6 @@ using Explorer.Tours.Infrastructure.Database.Repositories.Preferences;
 using Explorer.Tours.Infrastructure.Database.Repositories.Statistics;
 using Explorer.Tours.Infrastructure.Database.Repositories.Tours;
 using Explorer.Tours.Infrastructure.Database.Repositories.Tours.Executions;
-using Explorer.Tours.API.Public;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -47,7 +46,6 @@ public static class ToursStartup
         services.AddScoped<IFacilityService, FacilityService>();
         services.AddScoped<ITourExecutionService, TourExecutionService>();
         services.AddScoped<ITourStatisticsService, TourStatisticsService>();
-        services.AddScoped<ITourAnalyticsService, TourStatisticsService>();
         services.AddScoped<ITourManualService, TourManualService>(); 
     }
 
@@ -61,7 +59,6 @@ public static class ToursStartup
         services.AddScoped<IFacilityRepository, FacilityDbRepository>();
         services.AddScoped<ITourExecutionRepository, TourExecutionDbRepository>();
         services.AddScoped<ITourStatisticsDbRepository, TourStatisticsDbRepository>();
-        services.AddScoped<ITourAnalyticsService, TourStatisticsService>();
         services.AddScoped<ITourManualRepository, TourManualDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("tours"));
