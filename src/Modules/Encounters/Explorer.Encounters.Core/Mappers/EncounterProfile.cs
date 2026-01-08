@@ -27,7 +27,7 @@ namespace Explorer.Encounters.Core.Mappers
                     Enum.Parse<ChallengeStatus>(dto.Status, true),
                     Enum.Parse<ChallengeType>(dto.Type, true),
                     dto.CreatedById,
-                    dto.RequiredParticipants, dto.RadiusInMeters)
+                    dto.RequiredParticipants, dto.RadiusInMeters,
                     dto.ImageUrl)
                 )
                 .AfterMap((dto, challenge) =>

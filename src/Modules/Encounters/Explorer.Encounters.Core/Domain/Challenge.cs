@@ -18,7 +18,8 @@ public class Challenge : AggregateRoot
 
     private Challenge() { }
 
-        long? createdByTouristId, int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
+    public Challenge(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
+        long? createdByTouristId = null, int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Invalid Name.");
         if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Invalid Description.");
