@@ -12,4 +12,5 @@ public class ChallengeDto
     public string Type { get; set; }
     public int? RequiredParticipants { get; set; }
     public int? RadiusInMeters { get; set; }
+    public string? ImageUrl { get; set; }
 }
