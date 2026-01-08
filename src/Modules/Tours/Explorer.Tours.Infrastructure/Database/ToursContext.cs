@@ -27,6 +27,7 @@ public class ToursContext : DbContext
     public DbSet<TourReview> TourReviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
     public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
+    public DbSet<TourManualProgress> TourManualProgress { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -40,6 +41,7 @@ public class ToursContext : DbContext
         ConfigureTouristPreferences(modelBuilder);
         ConfigureTourExecution(modelBuilder);
         ConfigureReview(modelBuilder);
+        ConfigureTourManual(modelBuilder); 
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -198,5 +200,23 @@ public class ToursContext : DbContext
                 .HasDefaultValue("")
                 .IsRequired(false);
         });
+    }
+
+    private static void ConfigureTourManual(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourManualProgress>(b =>
+        {
+            b.ToTable("TourManualProgress");
+
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.PageKey)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            b.HasIndex(x => new { x.UserId, x.PageKey })
+                .IsUnique();
+        });
+
     }
 }
