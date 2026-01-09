@@ -36,12 +36,6 @@ namespace Explorer.Stakeholders.Core.Domain.ClubMessages
 
         private void Validate()
         {
-            if (ClubId <= 0)
-                throw new ArgumentException("Club ID must be valid.");
-
-            if (AuthorId <= 0)
-                throw new ArgumentException("Author ID must be valid.");
-
             if (string.IsNullOrWhiteSpace(Content))
                 throw new ArgumentException("Message content cannot be empty.");
 
