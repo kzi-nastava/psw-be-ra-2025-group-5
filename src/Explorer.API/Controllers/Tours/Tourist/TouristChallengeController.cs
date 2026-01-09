@@ -27,7 +27,7 @@ public class TouristChallengeController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<ChallengeDto>> GetAllActive()
+    public ActionResult<List<ChallengeResponseDto>> GetAllActive()
     {
         var result = _challengeService.GetAllActive();
         // Izbaci one koje je korisnik vec zavrsio
@@ -42,13 +42,14 @@ public class TouristChallengeController : ControllerBase
     }
 
     [HttpGet("{challengeId:long}")]
-    public ActionResult<ChallengeDto> GetById(long challengeId)
+    public ActionResult<ChallengeResponseDto> GetById(long challengeId)
     {
         return Ok(_challengeService.GetById(challengeId));
     }
 
     [HttpPost]
-    public ActionResult<ChallengeDto> Create([FromBody] CreateTouristChallengeDto challenge)
+    [Consumes("multipart/form-data")]
+    public ActionResult<ChallengeResponseDto> Create([FromForm] CreateTouristChallengeDto challenge)
     {
         var userClaim = User.FindFirst("Id");
         if (userClaim == null || !long.TryParse(userClaim.Value, out var userId))
@@ -69,11 +70,41 @@ public class TouristChallengeController : ControllerBase
             return Forbid();
         }
 
-        return Ok(_challengeTouristService.CreateByTourist(challenge, profile.Id));
+        try
+        {
+            var challengeDto = new ChallengeResponseDto
+            {
+                Name = challenge.Name,
+                Description = challenge.Description,
+                Latitude = challenge.Latitude,
+                Longitude = challenge.Longitude,
+                ExperiencePoints = challenge.ExperiencePoints,
+                Type = challenge.Type,
+                RequiredParticipants = challenge.RequiredParticipants,
+                RadiusInMeters = challenge.RadiusInMeters
+            };
+
+            return Ok(_challengeTouristService.CreateByTourist(challengeDto, profile.Id, challenge.Image));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+
+        
     }
 
     [HttpPut("{id:long}")]
-    public ActionResult<ChallengeDto> Update(long id, [FromBody] UpdateTouristChallengeDto challenge)
+    [Consumes("multipart/form-data")]
+    public ActionResult<ChallengeResponseDto> Update(long id, [FromForm] UpdateTouristChallengeDto challenge)
     {
         challenge.Id = id;
 
@@ -101,7 +132,7 @@ public class TouristChallengeController : ControllerBase
     }
 
     [HttpGet("my")]
-    public ActionResult<List<ChallengeDto>> GetMyChallenges()
+    public ActionResult<List<ChallengeResponseDto>> GetMyChallenges()
     {
         var userClaim = User.FindFirst("Id");
         if (userClaim == null || !long.TryParse(userClaim.Value, out var userId))
