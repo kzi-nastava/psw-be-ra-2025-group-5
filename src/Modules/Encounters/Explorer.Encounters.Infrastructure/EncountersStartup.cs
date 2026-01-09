@@ -1,10 +1,12 @@
 using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Encounters.API.Public.Administration;
+using Explorer.Encounters.API.Public.Author;
 using Explorer.Encounters.API.Public.Tourist;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces.Social;
 using Explorer.Encounters.Core.Mappers;
 using Explorer.Encounters.Core.UseCases.Administration;
+using Explorer.Encounters.Core.UseCases.Author;
 using Explorer.Encounters.Core.UseCases.Tourist;
 using Explorer.Encounters.Infrastructure.Database;
 using Explorer.Encounters.Infrastructure.Database.Repositories;
@@ -30,6 +32,7 @@ namespace Explorer.Encounters.Infrastructure
             services.AddScoped<IChallengeService, ChallengeService>();
             services.AddScoped<IChallengeExecutionService, ChallengeExecutionService>();
             services.AddScoped<IChallengeCreationService, ChallengeCreationService>();
+            services.AddScoped<IKeyPointChallengeCreationService, KeyPointChallengeCreationService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
@@ -37,6 +40,7 @@ namespace Explorer.Encounters.Infrastructure
             services.AddScoped<IChallengeRepository, ChallengeDbRepository>();
             services.AddScoped<IChallengeExecutionRepository, ChallengeExecutionDbRepository>();
             services.AddScoped<IChallengeParticipationRepository, ChallengeParticipationDbRepository>();
+            services.AddScoped<IKeyPointChallengeRepository, KeyPointChallengeDbRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("encounters"));
             dataSourceBuilder.EnableDynamicJson();

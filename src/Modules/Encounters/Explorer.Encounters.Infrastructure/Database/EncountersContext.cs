@@ -9,6 +9,7 @@ namespace Explorer.Encounters.Infrastructure.Database
         public DbSet<Challenge> Challenges { get; set; }
         public DbSet<ChallengeExecution> ChallengeExecutions { get; set; }
         public DbSet<ChallengeParticipation> ChallengeParticipations { get; set; }
+        public DbSet<KeyPointChallenge> KeyPointChallenges { get; set; }
 
         public EncountersContext(DbContextOptions<EncountersContext> options) : base(options) { }
 

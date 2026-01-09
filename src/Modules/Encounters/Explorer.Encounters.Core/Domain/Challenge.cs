@@ -46,6 +46,32 @@ public class Challenge : AggregateRoot
         RadiusInMeters = radiusInMeters;
     }
 
+    public Challenge(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type, long? createdByTouristId)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Invalid Name.");
+        if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Invalid Description.");
+        if (experiencePoints < 0) throw new ArgumentException("Experience points must be non-negative.");
+        if (latitude < -90 || latitude > 90) throw new ArgumentException("Latitude must be between -90 and 90.");
+        if (longitude < -180 || longitude > 180) throw new ArgumentException("Longitude must be between -180 and 180.");
+        //if (type == ChallengeType.Social)
+        //{
+        //    if (requiredParticipants is null || requiredParticipants < 2)
+        //        throw new ArgumentException("Social challenge must require at least 2 participants.");
+
+        //    if (radiusInMeters is null || radiusInMeters <= 0)
+        //        throw new ArgumentException("Social challenge must have a positive radius.");
+        //}
+
+        Name = name;
+        Description = description;
+        Latitude = latitude;
+        Longitude = longitude;
+        ExperiencePoints = experiencePoints;
+        Status = status;
+        Type = type;
+        CreatedByTouristId = createdByTouristId;    
+    }
+
     public void Update(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type, int? requiredParticipants = null, int? radiusInMeters = null)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Invalid Name.");
