@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Explorer.Payments.API.Dtos
+namespace Explorer.Payments.API.Dtos.Wallet
 {
-    public class TouristWalletInfoDto
+    public class WalletUserDto
     {
-        public long TouristId { get; set; }
+        public long Id { get; set; }
         public string Username { get; set; }
-        public bool IsActive { get; set; }
+        public string FullName { get; set; }
+        public string? ProfileImagePath { get; set; }
         public double Balance { get; set; }
     }
 }

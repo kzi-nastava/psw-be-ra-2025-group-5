@@ -13,7 +13,6 @@ using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Internal;
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -23,17 +22,15 @@ public class TourService : ITourService, ITourSharedService
     private readonly ITourRepository _tourRepository;
     private readonly ITourExecutionRepository _tourExecutionRepository;
     private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
-    private readonly IEquipmentRepository _equipmentRepository;
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
 
-    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenSharedService purchaseToken, IEquipmentRepository equipmentRepository, IImageStorage imageStorage)
+    public TourService(ITourRepository repository, IMapper mapper, ITourExecutionRepository execution, ITourPurchaseTokenSharedService purchaseToken, IImageStorage imageStorage)
     {
         _tourRepository = repository;
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenService = purchaseToken;
-        _equipmentRepository = equipmentRepository;
         _imageStorage = imageStorage;
     }
 
@@ -49,6 +46,14 @@ public class TourService : ITourService, ITourSharedService
         var result = _tourRepository.GetPagedByAuthor(authorId, page, pageSize);
         var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
         return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+
+    public List<TourDto> GetMultiple(long[] ids)
+    {
+        var result = _tourRepository.GetAll();
+        var filtered = result.Where(t => ids.Contains(t.Id)).ToList();
+        var items = filtered.Select(_mapper.Map<TourDto>).ToList();
+        return items;
     }
 
     public List<string> GetAllTags()

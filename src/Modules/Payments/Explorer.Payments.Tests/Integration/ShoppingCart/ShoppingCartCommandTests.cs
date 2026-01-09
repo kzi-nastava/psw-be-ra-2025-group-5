@@ -1,7 +1,8 @@
 ﻿using Explorer.API.Controllers.Shopping;
 using Explorer.API.Controllers.Tours.Author;
 using Explorer.API.Controllers.Tours.Tourist;
-using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Dtos.PurchaseToken;
+using Explorer.Payments.API.Dtos.ShoppingCart;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Infrastructure.Database;
 using Explorer.Tours.API.Dtos.Tours;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
-namespace Explorer.Payments.Tests.Integration;
+namespace Explorer.Payments.Tests.Integration.ShoppingCart;
 
 [Collection("Sequential")]
 public class ShoppingCartCommandTests : BasePaymentsIntegrationTest
@@ -76,15 +77,15 @@ public class ShoppingCartCommandTests : BasePaymentsIntegrationTest
         var tourController = CreateTourController(scope);
 
         // Act
-        var result = ((ObjectResult)cartController.AddOrderItem(-4, -2).Result)?.Value as ShoppingCartDto;
-        var tour = ((ObjectResult)tourController.Get(-2).Result)?.Value as TourDto;
+        var result = ((ObjectResult)cartController.AddOrderItem(-4, -5).Result)?.Value as ShoppingCartDto;
+        var tour = ((ObjectResult)tourController.Get(-5).Result)?.Value as TourDto;
 
         // Assert - Response
         result.ShouldNotBeNull();
         result.Id.ShouldBe(-2);
         result.TouristId.ShouldBe(-4);
         result.Total.ShouldBe(0);
-        result.Items.Count.ShouldBe(1);
+        result.Items.Count.ShouldBe(2);
         result.Items.ShouldContain(i => i.TourId == tour.Id);
 
         // Assert - Database
@@ -126,7 +127,7 @@ public class ShoppingCartCommandTests : BasePaymentsIntegrationTest
         result.ShouldNotBeNull();
         result.Id.ShouldBe(-1);
         result.TouristId.ShouldBe(-2);
-        result.Total.ShouldBe(5);
+        result.Total.ShouldBe(2.5);
         result.Items.Count.ShouldBe(1);
         result.Items.ShouldNotContain(i => i.TourId == tour.Id);
 

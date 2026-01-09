@@ -1,12 +1,11 @@
 ﻿using Explorer.API.Controllers.Shopping;
-using Explorer.API.Controllers.Tourist;
-using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Dtos.ShoppingCart;
 using Explorer.Payments.API.Public;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
-namespace Explorer.Payments.Tests.Integration;
+namespace Explorer.Payments.Tests.Integration.ShoppingCart;
 
 [Collection("Sequential")]
 public class ShoppingCartQueryTests : BasePaymentsIntegrationTest
@@ -28,7 +27,7 @@ public class ShoppingCartQueryTests : BasePaymentsIntegrationTest
         result.Items.Count.ShouldBe(2);
         result.Items[0].TourId.ShouldBe(-1);
         result.Items[1].TourId.ShouldBe(-2);
-        result.Total.ShouldBe(5);
+        result.Total.ShouldBe(2.5);
     }
 
     private static ShoppingCartController CreateController(IServiceScope scope)

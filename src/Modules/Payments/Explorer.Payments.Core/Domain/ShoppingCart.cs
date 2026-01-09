@@ -1,5 +1,4 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
-
 using Explorer.Payments.Core.Domain.Shared;
 
 namespace Explorer.Payments.Core.Domain;
@@ -7,9 +6,10 @@ namespace Explorer.Payments.Core.Domain;
 public class ShoppingCart : AggregateRoot
 {
     public long TouristId { get; private set; }
-    public List<OrderItem> Items { get; private set; } = new List<OrderItem>();
+    public List<OrderItem> Items { get; private set; } = [];
+    public long? AppliedCouponId { get; private set; }
 
-    public ShoppingCart() { }
+    private ShoppingCart() { }
 
     public ShoppingCart(long touristId)
     {
@@ -35,7 +35,10 @@ public class ShoppingCart : AggregateRoot
         Items.Remove(item);
     }
 
-    public void ClearShoppingCart() => Items.Clear();
+    public void ApplyCoupon(long couponId)
+    {
+        AppliedCouponId = couponId;
+    }
 
-    public double CalculateTotal() => Items.Sum(i => i.ItemPrice);
+    public void ClearShoppingCart() => Items.Clear();
 }

@@ -1,5 +1,4 @@
-﻿
-namespace Explorer.Payments.API.Dtos;
+﻿namespace Explorer.Payments.API.Dtos.PurchaseToken;
 
 public class CreateTourPurchaseTokenDto
 {
