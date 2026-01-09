@@ -19,5 +19,8 @@ public class PaymentsProfile: Profile
         CreateMap<CreateTourPurchaseTokenDto, TourPurchaseToken>();
 
         CreateMap<Wallet, WalletDto>();
+
+        CreateMap<Bundle, BundleDto>()
+            .ForMember(dest => dest.TourIds, opt => opt.MapFrom(src => src.BundleItems.Select(bi => bi.TourId).ToList()));
     }
 }

@@ -15,11 +15,11 @@ namespace Explorer.Payments.Core.Domain
     }
     public class Bundle : Entity
     {
-        public string Name { get; private set; }
-        public double Price { get; private set; }
-        public long AuthorId { get; private set; }
-        public BundleStatus Status { get; private set; }
-        public List<BundleItem> BundleItems { get; private set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public long AuthorId { get; set; }
+        public BundleStatus Status { get; set; }
+        public List<BundleItem> BundleItems { get; set; }
 
         public Bundle(string name, double price, long authorId, BundleStatus status)
         {
@@ -57,11 +57,8 @@ namespace Explorer.Payments.Core.Domain
             BundleItems.Clear();
         }
 
-        public void Publish(int publishedToursCount)
+        public void Publish()
         {
-            if (publishedToursCount < 2)
-                throw new InvalidOperationException("Bundle must contain at least two published tours to be published.");
-
             Status = BundleStatus.Published;
         }
 

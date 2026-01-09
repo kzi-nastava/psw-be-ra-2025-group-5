@@ -29,6 +29,7 @@ public static class PaymentsStartup
         services.AddScoped<ITourPurchaseTokenSharedService, TourPurchaseTokenService>();
         services.AddScoped<IInternalWalletService, WalletAdapter>();
         services.AddScoped<IWalletService, WalletService>();
+        services.AddScoped<IBundleService, BundleService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -37,6 +38,7 @@ public static class PaymentsStartup
         services.AddScoped<ITourPurchaseTokenRepository, TourPurchaseTokenDbRepository>();
         services.AddScoped<IWalletRepository, WalletDbRepository>();
         services.AddScoped<IPaymentRepository, PaymentDbRepository>();
+        services.AddScoped<IBundleRepository, BundleDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("payments"));
         dataSourceBuilder.EnableDynamicJson();
