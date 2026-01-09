@@ -1,7 +1,12 @@
-
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 namespace Explorer.Encounters.API.Dtos;
 
-public class ChallengeDto
+public class ChallengeResponseDto
 {
     public long Id { get; set; }
     public string Name { get; set; }

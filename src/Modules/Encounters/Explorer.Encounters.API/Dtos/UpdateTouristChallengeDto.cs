@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Explorer.Encounters.API.Dtos
         public double Longitude { get; set; }
         public int? RequiredParticipants { get; set; }
         public double? RadiusInMeters { get; set; }
+        public IFormFile? Image { get; set; }
     }
 
 }

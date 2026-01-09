@@ -16,7 +16,7 @@ public class Challenge : AggregateRoot
     public int? RadiusInMeters { get; private set; }
     public string? ImageUrl { get; private set; }
 
-    private Challenge() { }
+    public Challenge() { }
 
     public Challenge(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
         long? createdByTouristId = null, int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
@@ -45,7 +45,6 @@ public class Challenge : AggregateRoot
         CreatedByTouristId = createdByTouristId;
         RequiredParticipants = requiredParticipants;
         RadiusInMeters = radiusInMeters;
-        ImageUrl = imageUrl;
     }
 
     public void Update(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
@@ -75,6 +74,11 @@ public class Challenge : AggregateRoot
         RequiredParticipants = requiredParticipants;
         RadiusInMeters = radiusInMeters;
         ImageUrl = imageUrl;
+    }
+
+    public void UpdateImage(string? imagePath)
+    {
+        ImageUrl = imagePath;
     }
 }
 public enum ChallengeStatus
