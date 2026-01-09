@@ -13,6 +13,7 @@ builder.Services.ConfigureAuth();
 
 builder.Services.RegisterModules();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddHttpClient();
 
 builder.Services.AddHostedService<TourExpirationWorker>();
 builder.Services.AddScoped<IImageStorage, FileSystemImageStorage>();

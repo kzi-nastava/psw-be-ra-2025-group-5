@@ -551,3 +551,7 @@ $RECYCLE.BIN/
 src/**/Migrations/*
 
 src/**/UserUploads/**
+
+
+# Chatbot
+**/appsettings.Development.json
