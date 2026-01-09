@@ -131,7 +131,8 @@ namespace Explorer.Stakeholders.Core.Mappers
 
             // ========================= ClubMessage <-> ClubMessageDto =========================
             CreateMap<ClubMessage, ClubMessageDto>()
-                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType));
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
 
             CreateMap<ClubMessageDto, ClubMessage>();
 
