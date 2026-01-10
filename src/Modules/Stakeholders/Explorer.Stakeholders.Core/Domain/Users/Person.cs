@@ -1,7 +1,8 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
+using Explorer.Stakeholders.Core.Domain.Social;
 using System.Net.Mail;
 
-namespace Explorer.Stakeholders.Core.Domain.Users.Entities;
+namespace Explorer.Stakeholders.Core.Domain.Users;
 
 public class Person : Entity
 {
@@ -13,6 +14,12 @@ public class Person : Entity
     public string? Biography { get; set; }
     public string? Motto { get; set; }
     public string? ProfileImagePath { get; set; }
+
+    public ICollection<ProfileFollow> Following { get; private set; } = [];
+    public ICollection<ProfileFollow> Followers { get; private set; } = [];
+
+    private Person() { }
+
     public Person(long userId, string? name, string? surname, string email)
     {
         UserId = userId;
@@ -21,11 +28,6 @@ public class Person : Entity
         Email = email;
 
         Validate();
-    }
-
-    public Person()
-    {
-        
     }
 
     private void Validate()
