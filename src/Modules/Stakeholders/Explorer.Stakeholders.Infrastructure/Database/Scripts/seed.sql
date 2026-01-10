@@ -32,6 +32,8 @@ VALUES
 (7, 7, 'Zika', 'Zikić', 'zika@gmail.com', NULL, 'Carpe Diem', NULL),
 (8, 8, 'Mika', 'Mikić', 'mika@gmail.com', NULL, 'Carpe Diem', NULL);
 
+INSERT INTO stakeholders."ProfileFollows"("FollowerId", "FollowingId") VALUES (4, 7), (4, 6), (2, 1), (5, 1);
+
 INSERT INTO stakeholders."AppRatings" 
 ("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
 (1, 4, 5, 'Odlična aplikacija', NOW(), NOW()),

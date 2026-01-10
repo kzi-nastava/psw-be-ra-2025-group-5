@@ -1,8 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
-using Explorer.Stakeholders.Core.Domain.TourProblems;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
+using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Stakeholders.Infrastructure.Database.Repositories.Users;

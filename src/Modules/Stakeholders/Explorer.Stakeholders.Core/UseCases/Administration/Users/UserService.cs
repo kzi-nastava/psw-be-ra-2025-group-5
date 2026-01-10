@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Explorer.Stakeholders.API.Public;
-using AutoMapper;
+﻿using AutoMapper;
 using Explorer.Stakeholders.Core.Domain.Users;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using Explorer.Stakeholders.API.Internal;

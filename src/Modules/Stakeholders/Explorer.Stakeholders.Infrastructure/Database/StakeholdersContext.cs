@@ -6,9 +6,9 @@ using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -30,7 +30,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubInvite> ClubInvites { get; set; }
         public DbSet<ClubMember> ClubMembers { get; set; }
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
-
+        public DbSet<ProfileFollow> ProfileFollows { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -53,6 +53,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClubInvite(modelBuilder);
             ConfigureClubMember(modelBuilder);
             ConfigureClubJoinRequest(modelBuilder);
+            ConfigureFollow(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -396,5 +397,22 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             });
         }
 
+        private static void ConfigureFollow(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProfileFollow>(entity =>
+            {
+                entity.HasKey(f => new { f.FollowerId, f.FollowingId });
+
+                entity.HasOne(f => f.Follower)
+                      .WithMany(p => p.Following)
+                      .HasForeignKey(f => f.FollowerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.Following)
+                      .WithMany(p => p.Followers)
+                      .HasForeignKey(f => f.FollowingId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
     }
 }
