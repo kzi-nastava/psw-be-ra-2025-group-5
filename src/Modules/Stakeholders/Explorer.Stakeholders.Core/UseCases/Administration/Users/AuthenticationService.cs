@@ -4,7 +4,6 @@ using Explorer.Stakeholders.API.Dtos.Authentication;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using Explorer.Stakeholders.Core.Domain.Users;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
 
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Users;
 
