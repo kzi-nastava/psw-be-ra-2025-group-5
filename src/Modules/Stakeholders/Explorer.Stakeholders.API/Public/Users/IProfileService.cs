@@ -6,6 +6,7 @@ namespace Explorer.Stakeholders.API.Public.Users;
 
 public interface IProfileService
 {
+    ProfileDto Get(long profileId);
     ProfileDto GetByUserId(long userId);
     ProfileDto GetPublicProfile(long userId);
     ProfileDto Update(ProfileDto profile, IFormFile? profileImage);
