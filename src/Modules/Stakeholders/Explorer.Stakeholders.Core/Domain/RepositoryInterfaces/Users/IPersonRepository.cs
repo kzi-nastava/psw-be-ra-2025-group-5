@@ -1,5 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
+using Explorer.Stakeholders.Core.Domain.Users;
 
 namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 

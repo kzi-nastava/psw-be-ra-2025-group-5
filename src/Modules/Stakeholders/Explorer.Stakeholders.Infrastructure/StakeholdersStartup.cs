@@ -36,6 +36,9 @@ using Npgsql;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.API.Internal;
+using Explorer.Stakeholders.API.Public.Social;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Social;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.Social;
 
 namespace Explorer.Stakeholders.Infrastructure
 {
@@ -66,6 +69,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IClubInviteService, ClubInviteService>();
             services.AddScoped<IClubJoinRequestService, ClubJoinRequestService>();
             services.AddScoped<IPaymentNotificationService, NotificationService>();
+            services.AddScoped<IProfileFollowService, ProfileFollowService>();
 
         }
 
@@ -81,7 +85,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IDiaryRepository, DiaryRepository>();
             services.AddScoped<IClubInviteRepository, ClubInviteDbRepository>();
             services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
-
+            services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
             dataSourceBuilder.EnableDynamicJson();

@@ -2,17 +2,13 @@
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
-using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Net.Mail;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Users;
 
@@ -31,6 +27,15 @@ public class ProfileService : IProfileService
         _imageStorage = imageStorage;
         _touristStatisticsService = touristStatisticsService;
         _userRepository = userRepository;
+    }
+
+    public ProfileDto Get(long profileId)
+    {
+        var person = _personRepository.Get(profileId) ?? throw new NotFoundException("Profile not found.");
+
+        var profileDto = _mapper.Map<ProfileDto>(person);
+        profileDto.Statistics = _touristStatisticsService.GetStatistics(person.UserId);
+        return profileDto;
     }
 
     public ProfileDto GetByUserId(long userId)
