@@ -29,7 +29,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             _mapper = mapper;
         }
 
-        public ProfileMessageDto Create(long receiverId, long authorId, ProfileMessageDto dto)
+        public ProfileMessageDto Create(long receiverId, long authorId, CreateMessageDto dto)
         {
             var message = new ProfileMessage(
                 receiverId,
@@ -49,7 +49,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             return result;
         }
 
-        public ProfileMessageDto Update(long messageId, long authorId, ProfileMessageDto dto)
+        public ProfileMessageDto Update(long messageId, long authorId, UpdateMessageDto dto)
         {
             var message = _profileMessageRepository.GetById(messageId);
             if (message == null)

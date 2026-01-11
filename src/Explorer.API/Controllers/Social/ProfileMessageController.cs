@@ -19,7 +19,7 @@ namespace Explorer.API.Controllers.Social
         }
 
         [HttpPost("{receiverId}")]
-        public ActionResult<ProfileMessageDto> Create(long receiverId, [FromBody] ProfileMessageDto dto)
+        public ActionResult<ProfileMessageDto> Create(long receiverId, [FromBody] CreateMessageDto dto)
         {
             var result = _profileMessageService.Create(receiverId, User.PersonId(), dto);
             return Ok(result);
@@ -43,6 +43,13 @@ namespace Explorer.API.Controllers.Social
         public ActionResult<List<ProfileMessageDto>> GetByReceiverId()
         {
             var result = _profileMessageService.GetByReceiverId(User.PersonId());
+            return Ok(result);
+        }
+
+        [HttpGet("{messageId}")]
+        public ActionResult<ProfileMessageDto> GetById(long messageId)
+        {
+            var result = _profileMessageService.GetById(messageId);
             return Ok(result);
         }
     }
