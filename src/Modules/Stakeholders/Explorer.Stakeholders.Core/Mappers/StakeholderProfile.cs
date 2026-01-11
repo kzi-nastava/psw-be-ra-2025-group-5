@@ -2,6 +2,7 @@ using AutoMapper;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.AppRatings;
 using Explorer.Stakeholders.API.Dtos.Clubs;
+using Explorer.Stakeholders.API.Dtos.ClubMessages;
 using Explorer.Stakeholders.API.Dtos.Comments;
 using Explorer.Stakeholders.API.Dtos.Diaries;
 using Explorer.Stakeholders.API.Dtos.Locations;
@@ -12,6 +13,7 @@ using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Clubs;
+using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
@@ -125,6 +127,13 @@ namespace Explorer.Stakeholders.Core.Mappers
 
             CreateMap<ClubInvite, ClubInviteDto>()
                 .ForMember(dest => dest.TouristUsername, opt => opt.Ignore());
+
+            // ========================= ClubMessage <-> ClubMessageDto =========================
+            CreateMap<ClubMessage, ClubMessageDto>()
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
+
+            CreateMap<ClubMessageDto, ClubMessage>();
 
             // ========================= ProfileFollow <-> FollowDto =========================
             CreateMap<ProfileFollow, FollowerDto>()

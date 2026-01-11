@@ -1,6 +1,8 @@
 ﻿using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.Clubs;
+using Explorer.Stakeholders.API.Dtos.ClubMessages;
 using Explorer.Stakeholders.API.Public.Clubs;
+using Explorer.Stakeholders.API.Public.ClubMessages;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,10 +18,12 @@ namespace Explorer.API.Controllers.Social
     public class ClubController : ControllerBase
     {
         private readonly IClubService _clubService;
+        private readonly IClubMessageService _clubMessageService;
 
-        public ClubController(IClubService clubService)
+        public ClubController(IClubService clubService, IClubMessageService clubMessageService)
         {
             _clubService = clubService;
+            _clubMessageService = clubMessageService;
         }
 
         [HttpGet]
@@ -127,6 +131,13 @@ namespace Explorer.API.Controllers.Social
             var ownerId = User.PersonId();
             var members = _clubService.GetClubMembers(clubId, ownerId);
             return Ok(members);
+        }
+
+        [HttpDelete("{clubId}/owner/messages/{messageId}")]
+        public ActionResult DeleteMessageAsOwner(long clubId, long messageId)
+        {
+            _clubMessageService.Delete(messageId, User.PersonId(), true);
+            return Ok(new { message = "Message deleted successfully." });
         }
 
     }
