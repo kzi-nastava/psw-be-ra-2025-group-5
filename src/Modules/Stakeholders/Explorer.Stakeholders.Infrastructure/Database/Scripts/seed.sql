@@ -6,6 +6,8 @@ DELETE FROM stakeholders."Clubs";
 DELETE FROM stakeholders."Notifications";
 DELETE FROM stakeholders."ClubInvites";
 DELETE FROM stakeholders."ClubMembers";
+DELETE FROM stakeholders."ProfileFollows";
+DELETE FROM stakeholders."ProfileMessages";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
@@ -33,6 +35,12 @@ VALUES
 (8, 8, 'Mika', 'Mikić', 'mika@gmail.com', NULL, 'Carpe Diem', NULL);
 
 INSERT INTO stakeholders."ProfileFollows"("FollowerId", "FollowingId") VALUES (4, 7), (4, 6), (2, 1), (5, 1);
+
+INSERT INTO stakeholders."ProfileMessages"("Id", "AuthorId", "ReceiverId", "Content", "CreatedAt", "AttachedResourceType") VALUES
+(1, 4, 1, 'Zdravo, zanima me tvoja nova tura.', NOW(), 0),
+(2, 1, 4, 'Zdravo! Hvala na interesovanju. Tura je zakazana za sledeći vikend.', NOW(), 0),
+(3, 5, 2, 'Da li imaš slobodnih mesta za turu?', NOW(), 0),
+(4, 2, 5, 'Da, imamo još nekoliko mesta. Prijavi se što pre!', NOW(), 0);
 
 INSERT INTO stakeholders."AppRatings" 
 ("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
