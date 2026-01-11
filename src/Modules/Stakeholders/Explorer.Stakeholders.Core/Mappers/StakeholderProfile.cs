@@ -21,6 +21,8 @@ using Explorer.Stakeholders.Core.Domain.Positions;
 using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.API.Dtos.ProfileMessages;
 
 namespace Explorer.Stakeholders.Core.Mappers
 {
@@ -145,6 +147,13 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ForMember(dest => dest.FollowingName, opt => opt.MapFrom(src => $"{src.Following.Name} {src.Following.Surname}"));
 
             CreateMap<ProfileFollowDto, ProfileFollow>().ReverseMap();
+
+            // ========================= ProfileMessage <-> ProfileMessageDto =========================
+            CreateMap<ProfileMessage, ProfileMessageDto>()
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
+
+            CreateMap<ProfileMessageDto, ProfileMessage>();
         }
     }
 }
