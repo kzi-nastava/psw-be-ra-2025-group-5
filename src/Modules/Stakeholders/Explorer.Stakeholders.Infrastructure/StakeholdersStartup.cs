@@ -42,6 +42,8 @@ using Explorer.Stakeholders.API.Internal;
 using Explorer.Stakeholders.API.Public.Social;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Social;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.Social;
+using Explorer.Stakeholders.API.Public.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ProfileMessages;
 
 namespace Explorer.Stakeholders.Infrastructure
 {
@@ -75,7 +77,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IClubJoinRequestService, ClubJoinRequestService>();
             services.AddScoped<IPaymentNotificationService, NotificationService>();
             services.AddScoped<IProfileFollowService, ProfileFollowService>();
-
+            services.AddScoped<IProfileMessageService, ProfileMessageService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
@@ -93,6 +95,7 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IClubInviteRepository, ClubInviteDbRepository>();
             services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
             services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
+            services.AddScoped<IProfileMessageRepository, ProfileMessageDbRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
             dataSourceBuilder.EnableDynamicJson();

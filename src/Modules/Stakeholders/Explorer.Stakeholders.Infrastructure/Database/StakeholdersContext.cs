@@ -11,6 +11,7 @@ using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 
 
 namespace Explorer.Stakeholders.Infrastructure.Database
@@ -31,6 +32,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubMember> ClubMembers { get; set; }
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
         public DbSet<ProfileFollow> ProfileFollows { get; set; }
+        public DbSet<ProfileMessage> ProfileMessages { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -54,6 +56,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClubMember(modelBuilder);
             ConfigureClubJoinRequest(modelBuilder);
             ConfigureFollow(modelBuilder);
+            ConfigureProfileMessage(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -412,6 +415,45 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                       .WithMany(p => p.Followers)
                       .HasForeignKey(f => f.FollowingId)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        private static void ConfigureProfileMessage(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProfileMessage>(builder =>
+            {
+                builder.HasKey(cm => cm.Id);
+
+                builder.Property(cm => cm.Id)
+                    .ValueGeneratedOnAdd();
+
+                builder.Property(cm => cm.ReceiverId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.AuthorId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.Content)
+                    .IsRequired()
+                    .HasMaxLength(280);
+
+                builder.Property(cm => cm.AttachedResourceType)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(cm => cm.AttachedResourceId)
+                    .IsRequired(false);
+
+                builder.Property(cm => cm.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(cm => cm.UpdatedAt)
+                    .IsRequired(false);
+
+                builder.HasIndex(cm => cm.AuthorId);
+                builder.HasIndex(cm => cm.ReceiverId);
+
+                builder.ToTable("ProfileMessages");
             });
         }
     }
