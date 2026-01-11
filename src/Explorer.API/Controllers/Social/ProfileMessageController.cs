@@ -26,7 +26,7 @@ namespace Explorer.API.Controllers.Social
         }
 
         [HttpPut("{messageId}")]
-        public ActionResult<ProfileMessageDto> Update(long messageId, [FromBody] ProfileMessageDto dto)
+        public ActionResult<ProfileMessageDto> Update(long messageId, [FromBody] UpdateMessageDto dto)
         {
             var result = _profileMessageService.Update(messageId, User.PersonId(), dto);
             return Ok(result);
