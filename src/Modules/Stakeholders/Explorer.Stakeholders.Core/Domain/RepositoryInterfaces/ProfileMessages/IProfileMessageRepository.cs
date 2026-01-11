@@ -12,7 +12,7 @@ namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ProfileMessages
         ProfileMessage Create(ProfileMessage message);
         ProfileMessage Update(ProfileMessage message);
         void Delete(long id);
-        ProfileMessage GetById(long id);
+        ProfileMessage? GetById(long id);
         List<ProfileMessage> GetByReceiverId(long receiverId);
     }
 }

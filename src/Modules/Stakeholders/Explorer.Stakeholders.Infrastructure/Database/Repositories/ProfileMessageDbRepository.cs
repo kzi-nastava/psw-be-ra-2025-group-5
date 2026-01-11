@@ -41,7 +41,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
             }
         }
 
-        public ProfileMessage GetById(long id)
+        public ProfileMessage? GetById(long id)
         {
             return _dbContext.ProfileMessages.Find(id);
         }

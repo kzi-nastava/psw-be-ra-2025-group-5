@@ -31,9 +31,9 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
 
         public ProfileMessageDto Create(long receiverId, long authorId, CreateMessageDto dto)
         {
-            var message = new ProfileMessage(
-                receiverId,
+            var message = new ProfileMessage(          
                 authorId,
+                receiverId,
                 dto.Content,
                 (ProfileMessage.ResourceType)dto.AttachedResourceType,
                 dto.AttachedResourceId

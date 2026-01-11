@@ -424,6 +424,9 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             {
                 builder.HasKey(cm => cm.Id);
 
+                builder.Property(cm => cm.Id)
+                    .ValueGeneratedOnAdd();
+
                 builder.Property(cm => cm.ReceiverId)
                     .IsRequired();
 
