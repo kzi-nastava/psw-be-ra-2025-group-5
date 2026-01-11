@@ -39,10 +39,10 @@ namespace Explorer.API.Controllers.Social
             return Ok();
         }
 
-        [HttpGet]
-        public ActionResult<List<ProfileMessageDto>> GetByReceiverId()
+        [HttpGet("chat/{receiverId}")]
+        public ActionResult<List<ProfileMessageDto>> GetByReceiverId(long receiverId)
         {
-            var result = _profileMessageService.GetByReceiverId(User.PersonId());
+            var result = _profileMessageService.GetByReceiverId(User.PersonId(), receiverId);
             return Ok(result);
         }
 

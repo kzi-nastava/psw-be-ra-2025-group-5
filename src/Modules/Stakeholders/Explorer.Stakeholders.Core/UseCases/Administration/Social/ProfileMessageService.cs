@@ -89,9 +89,9 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             return result;
         }
 
-        public List<ProfileMessageDto> GetByReceiverId(long receiverId)
+        public List<ProfileMessageDto> GetByReceiverId(long authorId, long receiverId)
         {
-            var messages = _profileMessageRepository.GetByReceiverId(receiverId);
+            var messages = _profileMessageRepository.GetByReceiverId(authorId, receiverId);
             var result = _mapper.Map<List<ProfileMessageDto>>(messages);
             // Populate author names
             foreach (var msgDto in result)

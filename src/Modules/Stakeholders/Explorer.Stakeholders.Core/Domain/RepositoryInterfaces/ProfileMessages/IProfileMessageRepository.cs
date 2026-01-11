@@ -13,6 +13,6 @@ namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ProfileMessages
         ProfileMessage Update(ProfileMessage message);
         void Delete(long id);
         ProfileMessage? GetById(long id);
-        List<ProfileMessage> GetByReceiverId(long receiverId);
+        List<ProfileMessage> GetByReceiverId(long authorId, long receiverId);
     }
 }

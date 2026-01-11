@@ -8,6 +8,6 @@ namespace Explorer.Stakeholders.API.Public.ProfileMessages
         ProfileMessageDto Update(long messageId, long authorId, UpdateMessageDto dto);
         void Delete(long messageId, long userId);
         ProfileMessageDto GetById(long id);
-        List<ProfileMessageDto> GetByReceiverId(long receiverId);
+        List<ProfileMessageDto> GetByReceiverId(long authorId, long receiverId);
     }
 }

@@ -409,108 +409,108 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
         public void GetByReceiverId_ValidReceiver_ReturnsMessageList()
         {
             // Arrange
-            var mockRepository = new Mock<IProfileMessageRepository>();
-            var mockUserRepository = new Mock<IUserRepository>();
-            var mockMapper = new Mock<IMapper>();
+      var mockRepository = new Mock<IProfileMessageRepository>();
+var mockUserRepository = new Mock<IUserRepository>();
+          var mockMapper = new Mock<IMapper>();
 
-            var messages = new List<ProfileMessage>
-            {
-                new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
+          var messages = new List<ProfileMessage>
+      {
+    new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
                 new ProfileMessage(3, 2, "Message 2", ProfileMessage.ResourceType.Tour, 123)
             };
 
-            var mappedDtos = new List<ProfileMessageDto>
-            {
-                new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
-                new ProfileMessageDto { Id = 2, AuthorId = 3, ReceiverId = 2, Content = "Message 2", AuthorName = "User3" }
-            };
+var mappedDtos = new List<ProfileMessageDto>
+       {
+     new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
+       new ProfileMessageDto { Id = 2, AuthorId = 3, ReceiverId = 2, Content = "Message 2", AuthorName = "User3" }
+       };
 
-            var user1 = new User("user1", "user1@email.com", "password", UserRole.Tourist, true);
-            var user3 = new User("user3", "user3@email.com", "password", UserRole.Tourist, true);
+    var user1 = new User("user1", "user1@email.com", "password", UserRole.Tourist, true);
+        var user3 = new User("user3", "user3@email.com", "password", UserRole.Tourist, true);
 
-            mockRepository.Setup(r => r.GetByReceiverId(2)).Returns(messages);
+  mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
             mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
-            mockUserRepository.Setup(u => u.GetById(1)).Returns(user1);
-            mockUserRepository.Setup(u => u.GetById(3)).Returns(user3);
+        mockUserRepository.Setup(u => u.GetById(1)).Returns(user1);
+    mockUserRepository.Setup(u => u.GetById(3)).Returns(user3);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+   var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
 
-            // Act
-            var result = service.GetByReceiverId(2);
+          // Act
+            var result = service.GetByReceiverId(1, 2);
 
-            // Assert
-            result.ShouldNotBeNull();
-            result.Count.ShouldBe(2);
-            result[0].AuthorName.ShouldBe("user1");
-            result[1].AuthorName.ShouldBe("user3");
-            mockRepository.Verify(r => r.GetByReceiverId(2), Times.Once);
-            mockUserRepository.Verify(u => u.GetById(1), Times.Once);
-            mockUserRepository.Verify(u => u.GetById(3), Times.Once);
+         // Assert
+    result.ShouldNotBeNull();
+        result.Count.ShouldBe(2);
+        result[0].AuthorName.ShouldBe("user1");
+          result[1].AuthorName.ShouldBe("user3");
+            mockRepository.Verify(r => r.GetByReceiverId(1, 2), Times.Once);
+          mockUserRepository.Verify(u => u.GetById(1), Times.Once);
+    mockUserRepository.Verify(u => u.GetById(3), Times.Once);
         }
 
         [Fact]
         public void GetByReceiverId_NoMessages_ReturnsEmptyList()
-        {
+  {
             // Arrange
-            var mockRepository = new Mock<IProfileMessageRepository>();
+      var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
-            var mockMapper = new Mock<IMapper>();
+     var mockMapper = new Mock<IMapper>();
 
             var messages = new List<ProfileMessage>();
-            var mappedDtos = new List<ProfileMessageDto>();
+     var mappedDtos = new List<ProfileMessageDto>();
 
-            mockRepository.Setup(r => r.GetByReceiverId(2)).Returns(messages);
-            mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
+ mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
+      mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+     var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
 
-            // Act
-            var result = service.GetByReceiverId(2);
+         // Act
+      var result = service.GetByReceiverId(1, 2);
 
             // Assert
-            result.ShouldNotBeNull();
-            result.ShouldBeEmpty();
-            mockRepository.Verify(r => r.GetByReceiverId(2), Times.Once);
+        result.ShouldNotBeNull();
+result.ShouldBeEmpty();
+       mockRepository.Verify(r => r.GetByReceiverId(1, 2), Times.Once);
         }
 
-        [Fact]
+     [Fact]
         public void GetByReceiverId_SomeUsersNotFound_SetsEmptyAuthorNames()
-        {
-            // Arrange
-            var mockRepository = new Mock<IProfileMessageRepository>();
+{
+       // Arrange
+      var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
-            var mockMapper = new Mock<IMapper>();
+     var mockMapper = new Mock<IMapper>();
 
             var messages = new List<ProfileMessage>
-            {
-                new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
-                new ProfileMessage(999, 2, "Message 2", ProfileMessage.ResourceType.None, null)
-            };
+     {
+ new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
+            new ProfileMessage(999, 2, "Message 2", ProfileMessage.ResourceType.None, null)
+         };
 
-            var mappedDtos = new List<ProfileMessageDto>
-            {
-                new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
-                new ProfileMessageDto { Id = 2, AuthorId = 999, ReceiverId = 2, Content = "Message 2", AuthorName = "User999" }
-            };
+         var mappedDtos = new List<ProfileMessageDto>
+   {
+      new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
+         new ProfileMessageDto { Id = 2, AuthorId = 999, ReceiverId = 2, Content = "Message 2", AuthorName = "User999" }
+ };
 
             var user1 = new User("user1", "user1@email.com", "password", UserRole.Tourist, true);
 
-            mockRepository.Setup(r => r.GetByReceiverId(2)).Returns(messages);
-            mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
+            mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
+          mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
             mockUserRepository.Setup(u => u.GetById(1)).Returns(user1);
-            mockUserRepository.Setup(u => u.GetById(999)).Returns((User?)null);
+      mockUserRepository.Setup(u => u.GetById(999)).Returns((User?)null);
 
             var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
 
-            // Act
-            var result = service.GetByReceiverId(2);
+        // Act
+  var result = service.GetByReceiverId(1, 2);
 
             // Assert
-            result.ShouldNotBeNull();
-            result.Count.ShouldBe(2);
+          result.ShouldNotBeNull();
+result.Count.ShouldBe(2);
             result[0].AuthorName.ShouldBe("user1");
-            result[1].AuthorName.ShouldBe(string.Empty);
-        }
+         result[1].AuthorName.ShouldBe(string.Empty);
+      }
 
    #endregion
     }

@@ -46,10 +46,13 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
             return _dbContext.ProfileMessages.Find(id);
         }
 
-        public List<ProfileMessage> GetByReceiverId(long receiverId)
+        public List<ProfileMessage> GetByReceiverId(long authorId, long receiverId)
         {
             return _dbContext.ProfileMessages
-                .Where(pm => pm.ReceiverId == receiverId)
+                .Where(pm =>
+                        (pm.ReceiverId == receiverId && pm.AuthorId == authorId) ||
+                        (pm.ReceiverId == authorId && pm.AuthorId == receiverId)
+                )
                 .ToList();
         }
     }
