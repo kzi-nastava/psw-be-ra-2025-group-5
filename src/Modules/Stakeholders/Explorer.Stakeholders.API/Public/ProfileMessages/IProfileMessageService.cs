@@ -1,9 +1,4 @@
 ﻿using Explorer.Stakeholders.API.Dtos.ProfileMessages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Stakeholders.API.Public.ProfileMessages
 {
@@ -13,5 +8,6 @@ namespace Explorer.Stakeholders.API.Public.ProfileMessages
         ProfileMessageDto Update(long messageId, long authorId, ProfileMessageDto dto);
         void Delete(long messageId, long userId);
         ProfileMessageDto GetById(long id);
+        List<ProfileMessageDto> GetByReceiverId(long receiverId);
     }
 }

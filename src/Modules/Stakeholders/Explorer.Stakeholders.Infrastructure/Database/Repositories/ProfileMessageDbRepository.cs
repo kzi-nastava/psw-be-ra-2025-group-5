@@ -45,5 +45,12 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
         {
             return _dbContext.ProfileMessages.Find(id);
         }
+
+        public List<ProfileMessage> GetByReceiverId(long receiverId)
+        {
+            return _dbContext.ProfileMessages
+                .Where(pm => pm.ReceiverId == receiverId)
+                .ToList();
+        }
     }
 }
