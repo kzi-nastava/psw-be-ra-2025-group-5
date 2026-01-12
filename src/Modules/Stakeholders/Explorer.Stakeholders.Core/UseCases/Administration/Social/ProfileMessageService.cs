@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.API.Dtos.ClubMessages;
+using Explorer.Stakeholders.API.Dtos.Notifications;
 using Explorer.Stakeholders.API.Dtos.ProfileMessages;
-using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.ProfileMessages;
-using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
 {
@@ -20,12 +14,14 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
     {
         private readonly IProfileMessageRepository _profileMessageRepository;
         private readonly IUserRepository _userRepository;
+        private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
 
-        public ProfileMessageService(IProfileMessageRepository profileMessageRepository, IUserRepository userRepository, IMapper mapper)
+        public ProfileMessageService(IProfileMessageRepository profileMessageRepository, IUserRepository userRepository, INotificationService notificationService, IMapper mapper)
         {
             _profileMessageRepository = profileMessageRepository;
             _userRepository = userRepository;
+            _notificationService = notificationService;
             _mapper = mapper;
         }
 
@@ -45,6 +41,19 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             // Populate author name
             var author = _userRepository.GetById(authorId);
             result.AuthorName = author?.Username ?? string.Empty;
+
+            var notification = $"There is a new message from {result.AuthorName}";
+            _notificationService.Create(new NotificationDto
+            {
+                UserId = receiverId,
+                Title = "New message",
+                Message = notification,
+                Type = "NewMessage",
+                BlogId = dto.AttachedResourceType == 2 ? dto.AttachedResourceId : null,
+                TourId = dto.AttachedResourceType == 1 ? dto.AttachedResourceId : null,
+                ActionUrl = $"/stakeholders/messages/{authorId}",
+                CreatedAt = DateTime.UtcNow
+            });
 
             return result;
         }
