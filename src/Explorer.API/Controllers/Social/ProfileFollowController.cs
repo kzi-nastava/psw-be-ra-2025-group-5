@@ -1,6 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos.Social;
-using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Social;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +16,13 @@ public class ProfileFollowController : ControllerBase
     public ProfileFollowController(IProfileFollowService followService)
     {
         _FollowService = followService;
+    }
+
+    [HttpGet("{profileId:long}/follows/{targetProfileId:long}")]
+    public ActionResult<bool> IsFollowing(long profileId, long targetProfileId)
+    {
+        if (profileId == targetProfileId) return Ok(false);
+        return Ok(_FollowService.Exists(new ProfileFollowDto { FollowerId = profileId, FollowingId = targetProfileId }));
     }
 
     [HttpPost("{profileId:long}/follow/{targetProfileId:long}")]

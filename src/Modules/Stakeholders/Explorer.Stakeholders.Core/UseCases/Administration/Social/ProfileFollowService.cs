@@ -21,6 +21,11 @@ public class ProfileFollowService : IProfileFollowService
         _mapper = mapper;
     }
 
+    public bool Exists(ProfileFollowDto follow)
+    {
+        return _followRepository.Exists(follow.FollowerId, follow.FollowingId);
+    }
+
     public ProfileFollowDto Follow(ProfileFollowDto follow)
     {
         if (_personService.Get(follow.FollowerId) == null || _personService.Get(follow.FollowingId) == null)
