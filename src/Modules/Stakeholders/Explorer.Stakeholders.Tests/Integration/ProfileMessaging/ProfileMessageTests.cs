@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.Stakeholders.API.Dtos.Notifications;
 using Explorer.Stakeholders.API.Dtos.ProfileMessages;
-using Explorer.Stakeholders.API.Public.ProfileMessages;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
@@ -31,6 +27,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var createDto = new CreateMessageDto
             {
@@ -57,8 +54,9 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             mockRepository.Setup(r => r.Create(It.IsAny<ProfileMessage>())).Returns(profileMessage);
             mockMapper.Setup(m => m.Map<ProfileMessageDto>(It.IsAny<ProfileMessage>())).Returns(mappedDto);
             mockUserRepository.Setup(u => u.GetById(1)).Returns(user);
+            mockNotificationService.Setup(n => n.Create(It.IsAny<NotificationDto>())).Returns(new NotificationDto());
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             var result = service.Create(2, 1, createDto);
@@ -80,6 +78,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var createDto = new CreateMessageDto
             {
@@ -106,8 +105,9 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             mockRepository.Setup(r => r.Create(It.IsAny<ProfileMessage>())).Returns(profileMessage);
             mockMapper.Setup(m => m.Map<ProfileMessageDto>(It.IsAny<ProfileMessage>())).Returns(mappedDto);
             mockUserRepository.Setup(u => u.GetById(1)).Returns(user);
+            mockNotificationService.Setup(n => n.Create(It.IsAny<NotificationDto>())).Returns(new NotificationDto());
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             var result = service.Create(2, 1, createDto);
@@ -126,6 +126,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var createDto = new CreateMessageDto
             {
@@ -150,8 +151,9 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             mockRepository.Setup(r => r.Create(It.IsAny<ProfileMessage>())).Returns(profileMessage);
             mockMapper.Setup(m => m.Map<ProfileMessageDto>(It.IsAny<ProfileMessage>())).Returns(mappedDto);
             mockUserRepository.Setup(u => u.GetById(1)).Returns((User?)null);
+            mockNotificationService.Setup(n => n.Create(It.IsAny<NotificationDto>())).Returns(new NotificationDto());
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             var result = service.Create(2, 1, createDto);
@@ -168,6 +170,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var updateDto = new UpdateMessageDto
             {
@@ -192,8 +195,9 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             mockRepository.Setup(r => r.GetById(1)).Returns(existingMessage);
             mockRepository.Setup(r => r.Update(It.IsAny<ProfileMessage>())).Returns(updatedMessage);
             mockMapper.Setup(m => m.Map<ProfileMessageDto>(It.IsAny<ProfileMessage>())).Returns(mappedDto);
+            mockNotificationService.Setup(n => n.Create(It.IsAny<NotificationDto>())).Returns(new NotificationDto());
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             var result = service.Update(1, 1, updateDto);
@@ -214,6 +218,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var updateDto = new UpdateMessageDto
             {
@@ -224,7 +229,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
 
             mockRepository.Setup(r => r.GetById(1)).Returns((ProfileMessage?)null);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act & Assert
             Should.Throw<NotFoundException>(() => service.Update(1, 1, updateDto))
@@ -238,6 +243,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var updateDto = new UpdateMessageDto
             {
@@ -249,7 +255,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var existingMessage = new ProfileMessage(1, 2, "Original content", ProfileMessage.ResourceType.None, null);
             mockRepository.Setup(r => r.GetById(1)).Returns(existingMessage);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act & Assert
             Should.Throw<UnauthorizedAccessException>(() => service.Update(1, 2, updateDto))
@@ -263,11 +269,12 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var existingMessage = new ProfileMessage(1, 2, "Test message", ProfileMessage.ResourceType.None, null);
             mockRepository.Setup(r => r.GetById(1)).Returns(existingMessage);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             service.Delete(1, 1);
@@ -284,10 +291,11 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             mockRepository.Setup(r => r.GetById(1)).Returns((ProfileMessage?)null);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act & Assert
             Should.Throw<NotFoundException>(() => service.Delete(1, 1))
@@ -301,11 +309,12 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var existingMessage = new ProfileMessage(1, 2, "Test message", ProfileMessage.ResourceType.None, null);
             mockRepository.Setup(r => r.GetById(1)).Returns(existingMessage);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act & Assert
             Should.Throw<UnauthorizedAccessException>(() => service.Delete(1, 2))
@@ -319,6 +328,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var profileMessage = new ProfileMessage(1, 2, "Test message", ProfileMessage.ResourceType.None, null);
             var mappedDto = new ProfileMessageDto
@@ -339,7 +349,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             mockMapper.Setup(m => m.Map<ProfileMessageDto>(It.IsAny<ProfileMessage>())).Returns(mappedDto);
             mockUserRepository.Setup(u => u.GetById(1)).Returns(user);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             var result = service.GetById(1);
@@ -360,10 +370,11 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             mockRepository.Setup(r => r.GetById(1)).Returns((ProfileMessage?)null);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act & Assert
             Should.Throw<NotFoundException>(() => service.GetById(1))
@@ -377,6 +388,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var profileMessage = new ProfileMessage(1, 2, "Test message", ProfileMessage.ResourceType.None, null);
             var mappedDto = new ProfileMessageDto
@@ -395,7 +407,7 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
             mockMapper.Setup(m => m.Map<ProfileMessageDto>(It.IsAny<ProfileMessage>())).Returns(mappedDto);
             mockUserRepository.Setup(u => u.GetById(1)).Returns((User?)null);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
             // Act
             var result = service.GetById(1);
@@ -409,109 +421,112 @@ namespace Explorer.Stakeholders.Tests.Integration.ProfileMessaging
         public void GetByReceiverId_ValidReceiver_ReturnsMessageList()
         {
             // Arrange
-      var mockRepository = new Mock<IProfileMessageRepository>();
-var mockUserRepository = new Mock<IUserRepository>();
-          var mockMapper = new Mock<IMapper>();
+            var mockRepository = new Mock<IProfileMessageRepository>();
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
-          var messages = new List<ProfileMessage>
-      {
-    new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
+            var messages = new List<ProfileMessage>
+            {
+                new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
                 new ProfileMessage(3, 2, "Message 2", ProfileMessage.ResourceType.Tour, 123)
             };
 
-var mappedDtos = new List<ProfileMessageDto>
-       {
-     new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
-       new ProfileMessageDto { Id = 2, AuthorId = 3, ReceiverId = 2, Content = "Message 2", AuthorName = "User3" }
-       };
+            var mappedDtos = new List<ProfileMessageDto>
+            {
+                new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
+                new ProfileMessageDto { Id = 2, AuthorId = 3, ReceiverId = 2, Content = "Message 2", AuthorName = "User3" }
+            };
 
-    var user1 = new User("user1", "user1@email.com", "password", UserRole.Tourist, true);
-        var user3 = new User("user3", "user3@email.com", "password", UserRole.Tourist, true);
+            var user1 = new User("user1", "user1@email.com", "password", UserRole.Tourist, true);
+            var user3 = new User("user3", "user3@email.com", "password", UserRole.Tourist, true);
 
-  mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
+            mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
             mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
-        mockUserRepository.Setup(u => u.GetById(1)).Returns(user1);
-    mockUserRepository.Setup(u => u.GetById(3)).Returns(user3);
+            mockUserRepository.Setup(u => u.GetById(1)).Returns(user1);
+            mockUserRepository.Setup(u => u.GetById(3)).Returns(user3);
 
-   var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
-          // Act
+            // Act
             var result = service.GetByReceiverId(1, 2);
 
-         // Assert
-    result.ShouldNotBeNull();
-        result.Count.ShouldBe(2);
-        result[0].AuthorName.ShouldBe("user1");
-          result[1].AuthorName.ShouldBe("user3");
+            // Assert
+            result.ShouldNotBeNull();
+            result.Count.ShouldBe(2);
+            result[0].AuthorName.ShouldBe("user1");
+            result[1].AuthorName.ShouldBe("user3");
             mockRepository.Verify(r => r.GetByReceiverId(1, 2), Times.Once);
-          mockUserRepository.Verify(u => u.GetById(1), Times.Once);
-    mockUserRepository.Verify(u => u.GetById(3), Times.Once);
+            mockUserRepository.Verify(u => u.GetById(1), Times.Once);
+            mockUserRepository.Verify(u => u.GetById(3), Times.Once);
         }
 
         [Fact]
         public void GetByReceiverId_NoMessages_ReturnsEmptyList()
-  {
+        {
             // Arrange
-      var mockRepository = new Mock<IProfileMessageRepository>();
+            var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
-     var mockMapper = new Mock<IMapper>();
+            var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var messages = new List<ProfileMessage>();
-     var mappedDtos = new List<ProfileMessageDto>();
+            var mappedDtos = new List<ProfileMessageDto>();
 
- mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
-      mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
+            mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
+            mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
 
-     var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
-         // Act
-      var result = service.GetByReceiverId(1, 2);
+             // Act
+            var result = service.GetByReceiverId(1, 2);
 
-            // Assert
-        result.ShouldNotBeNull();
-result.ShouldBeEmpty();
-       mockRepository.Verify(r => r.GetByReceiverId(1, 2), Times.Once);
+             // Assert
+             result.ShouldNotBeNull();
+             result.ShouldBeEmpty();
+             mockRepository.Verify(r => r.GetByReceiverId(1, 2), Times.Once);
         }
 
-     [Fact]
+        [Fact]
         public void GetByReceiverId_SomeUsersNotFound_SetsEmptyAuthorNames()
-{
-       // Arrange
-      var mockRepository = new Mock<IProfileMessageRepository>();
+        {
+            // Arrange
+            var mockRepository = new Mock<IProfileMessageRepository>();
             var mockUserRepository = new Mock<IUserRepository>();
-     var mockMapper = new Mock<IMapper>();
+            var mockMapper = new Mock<IMapper>();
+            var mockNotificationService = new Mock<INotificationService>();
 
             var messages = new List<ProfileMessage>
-     {
- new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
-            new ProfileMessage(999, 2, "Message 2", ProfileMessage.ResourceType.None, null)
-         };
+            {
+                new ProfileMessage(1, 2, "Message 1", ProfileMessage.ResourceType.None, null),
+                new ProfileMessage(999, 2, "Message 2", ProfileMessage.ResourceType.None, null)
+            };
 
-         var mappedDtos = new List<ProfileMessageDto>
-   {
-      new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
-         new ProfileMessageDto { Id = 2, AuthorId = 999, ReceiverId = 2, Content = "Message 2", AuthorName = "User999" }
- };
+            var mappedDtos = new List<ProfileMessageDto>
+            {
+                new ProfileMessageDto { Id = 1, AuthorId = 1, ReceiverId = 2, Content = "Message 1", AuthorName = "User1" },
+                new ProfileMessageDto { Id = 2, AuthorId = 999, ReceiverId = 2, Content = "Message 2", AuthorName = "User999" }
+            };
 
             var user1 = new User("user1", "user1@email.com", "password", UserRole.Tourist, true);
 
             mockRepository.Setup(r => r.GetByReceiverId(1, 2)).Returns(messages);
-          mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
+            mockMapper.Setup(m => m.Map<List<ProfileMessageDto>>(It.IsAny<List<ProfileMessage>>())).Returns(mappedDtos);
             mockUserRepository.Setup(u => u.GetById(1)).Returns(user1);
-      mockUserRepository.Setup(u => u.GetById(999)).Returns((User?)null);
+            mockUserRepository.Setup(u => u.GetById(999)).Returns((User?)null);
 
-            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockMapper.Object);
+            var service = new ProfileMessageService(mockRepository.Object, mockUserRepository.Object, mockNotificationService.Object, mockMapper.Object);
 
-        // Act
-  var result = service.GetByReceiverId(1, 2);
+            // Act
+            var result = service.GetByReceiverId(1, 2);
 
             // Assert
-          result.ShouldNotBeNull();
-result.Count.ShouldBe(2);
+            result.ShouldNotBeNull();
+            result.Count.ShouldBe(2);
             result[0].AuthorName.ShouldBe("user1");
-         result[1].AuthorName.ShouldBe(string.Empty);
-      }
+            result[1].AuthorName.ShouldBe(string.Empty);
+        }
 
-   #endregion
+    #endregion
     }
 }

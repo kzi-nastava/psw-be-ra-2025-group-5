@@ -1,7 +1,10 @@
 using AutoMapper;
+using AutoMapper.Execution;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos.ClubMessages;
+using Explorer.Stakeholders.API.Dtos.Notifications;
 using Explorer.Stakeholders.API.Public.ClubMessages;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Clubs;
@@ -17,13 +20,15 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
         private readonly IClubMessageRepository _messageRepository;
         private readonly IClubRepository _clubRepository;
         private readonly IUserRepository _userRepository;
+        private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
 
-        public ClubMessageService(IClubMessageRepository messageRepository, IClubRepository clubRepository, IUserRepository userRepository, IMapper mapper)
+        public ClubMessageService(IClubMessageRepository messageRepository, IClubRepository clubRepository, IUserRepository userRepository, INotificationService notificationService, IMapper mapper)
         {
             _messageRepository = messageRepository;
             _clubRepository = clubRepository;
             _userRepository = userRepository;
+            _notificationService = notificationService;
             _mapper = mapper;
         }
 
@@ -50,7 +55,37 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             // Populate author name
             var author = _userRepository.GetById(authorId);
             result.AuthorName = author?.Username ?? string.Empty;
-            
+
+            var notification = $"There is a new message from {result.AuthorName} in {club.Name}";
+            foreach (var member in club.Members)
+            {
+                if (member.TouristId != authorId)
+                    _notificationService.Create(new NotificationDto
+                    {
+                        UserId = member.TouristId,
+                        Title = "New message",
+                        Message = notification,
+                        Type = "NewMessage",
+                        BlogId = dto.AttachedResourceType == 2 ? dto.AttachedResourceId : null,
+                        TourId = dto.AttachedResourceType == 1 ? dto.AttachedResourceId : null,
+                        ActionUrl = $"/clubs/details/{club.Id}/messages",
+                        CreatedAt = DateTime.UtcNow
+                    });
+            }
+
+            if(authorId != club.CreatorId)
+                _notificationService.Create(new NotificationDto
+                {
+                    UserId = club.CreatorId,
+                    Title = "New message",
+                    Message = notification,
+                    Type = "NewMessage",
+                    BlogId = dto.AttachedResourceType == 2 ? dto.AttachedResourceId : null,
+                    TourId = dto.AttachedResourceType == 1 ? dto.AttachedResourceId : null,
+                    ActionUrl = $"/clubs/details/{club.Id}/messages",
+                    CreatedAt = DateTime.UtcNow
+                });
+
             return result;
         }
 

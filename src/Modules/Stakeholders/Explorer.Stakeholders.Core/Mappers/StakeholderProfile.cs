@@ -109,7 +109,8 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.TourProblemId,
                     dto.TourId,
                     dto.ActionUrl,
-                    dto.ClubId
+                    dto.ClubId,
+                    dto.BlogId
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
