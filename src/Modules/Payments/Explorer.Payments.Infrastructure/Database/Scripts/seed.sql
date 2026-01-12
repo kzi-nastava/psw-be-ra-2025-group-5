@@ -17,6 +17,12 @@ VALUES
     (2, 'COUPON02', 15, 2, 3, TIMESTAMP '2027-06-30 12:00:00'),
     (3, 'COUPON03', 20, 1, NULL, TIMESTAMP '2027-09-15 00:00:00');
 
+INSERT INTO payments."Bundles" ("Id", "Name", "Price", "Status", "AuthorId")
+VALUES (1, 'Serbia Nature Pack', 50.0, 0, 7); 
+
+INSERT INTO payments."BundleItems" ("BundleId", "TourId") VALUES (1, 2);
+INSERT INTO payments."BundleItems" ("BundleId", "TourId") VALUES (1, 7);
+
 SELECT setval(pg_get_serial_sequence('payments."ShoppingCarts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."ShoppingCarts"));
 SELECT setval(pg_get_serial_sequence('payments."TourPurchaseTokens"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."TourPurchaseTokens"));
 SELECT setval(pg_get_serial_sequence('payments."Wallets"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."Wallets"));

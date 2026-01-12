@@ -58,8 +58,19 @@ namespace Explorer.API.Controllers.Tours.Author
         [HttpPut("{id:long}/publish")]
         public ActionResult<BundleDto> Publish(long id)
         {
-            var result = _bundleService.PublishBundle(id);
-            return Ok(result);
+            try
+            {
+                var result = _bundleService.PublishBundle(id);
+                return Ok(result);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
+            }
         }
 
         [HttpPut("{id:long}/archive")]

@@ -94,8 +94,12 @@ namespace Explorer.Payments.Tests.Integration
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
 
-            // Act & Assert
-            Should.Throw<InvalidOperationException>(() => controller.Publish(-4));
+            var result = controller.Publish(-4);
+            result.Result.ShouldNotBeNull();
+
+            var badRequest = result.Result.ShouldBeOfType<BadRequestObjectResult>();
+
+            badRequest.StatusCode.ShouldBe(400);
         }
 
         [Fact]
