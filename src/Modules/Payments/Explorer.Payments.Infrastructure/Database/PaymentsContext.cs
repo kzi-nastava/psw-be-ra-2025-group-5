@@ -13,6 +13,8 @@ public class PaymentsContext: DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<TourSale> TourSales { get; set; }
     public DbSet<Coupon> Coupons { get; set; }
+    public DbSet<Bundle> Bundles { get; set; }
+    public DbSet<BundleItem> BundleItems { get; set; }
 
     public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) {}
 
@@ -24,6 +26,7 @@ public class PaymentsContext: DbContext
         ConfigureWallet(modelBuilder);
         ConfigureTourSale(modelBuilder);
         ConfigureCoupon(modelBuilder);
+        ConfigureBundle(modelBuilder);
     }
 
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
@@ -93,6 +96,28 @@ public class PaymentsContext: DbContext
 
             builder.HasIndex(c => c.Code)
                 .IsUnique();
+        });
+    }
+
+    private static void ConfigureBundle(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Bundle>(b =>
+        {
+            b.ToTable("Bundles");
+            b.HasKey(x => x.Id);
+            b.Property(x => x.Name).IsRequired();
+
+            b.HasMany(x => x.BundleItems)
+             .WithOne()
+             .HasForeignKey(x => x.BundleId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<BundleItem>(bi =>
+        {
+            bi.ToTable("BundleItems");
+            bi.HasKey(x => x.Id);
+            bi.HasIndex(x => x.TourId);
         });
     }
 }
