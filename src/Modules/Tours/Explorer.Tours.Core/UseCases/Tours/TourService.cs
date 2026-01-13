@@ -12,9 +12,7 @@ using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
-using Explorer.Payments.API.Internal;
-using Explorer.Tours.API.Internal;
-using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 
@@ -61,6 +59,14 @@ public class TourService : ITourService, ITourSharedService
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
+    public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
+    {
+        var result = _tourRepository.SearchByLocation(searchDto.Latitude, searchDto.Longitude, searchDto.Distance, page, pageSize);
+
+        var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
+        return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+    
     public List<string> GetAllTags()
     {
         var result = _tourRepository.GetAll();

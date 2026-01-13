@@ -5,6 +5,7 @@ using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
+using Explorer.Tours.Core.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Tours.Infrastructure.Database.Repositories.Tours;
@@ -37,6 +38,38 @@ public class TourDbRepository : ITourRepository
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
         return task.Result;
+    }
+
+    public PagedResult<Tour> SearchByLocation(double latitude, double longitude, double distanceKm, int page, int pageSize)
+    {
+        var allPublishedTours = _dbSet
+            .Include(t => t.KeyPoints)
+            .Where(t => t.Status == TourStatus.Published)
+            .ToList();
+
+        var filteredTours = allPublishedTours
+            .Where(tour => tour.KeyPoints.Any(kp =>
+            {
+                var distance = GeographyHelper.CalculateDistance(
+                    latitude, longitude,
+                    kp.Location.Latitude, kp.Location.Longitude
+                );
+                return distance <= distanceKm;
+            }))
+            .ToList();
+
+        var count = filteredTours.Count;
+
+        if (pageSize != 0 && page != 0)
+        {
+            filteredTours = filteredTours
+                .OrderByDescending(t => t.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        return new PagedResult<Tour>(filteredTours, count);
     }
 
     public List<Tour> GetAll()

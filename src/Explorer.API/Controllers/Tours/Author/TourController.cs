@@ -3,6 +3,7 @@ using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,19 @@ public class TourController : ControllerBase
     public ActionResult<List<string>> GetAllTags()
     {
         return Ok(_tourService.GetAllTags());
+    }
+
+    [HttpGet("search")]
+    [AllowAnonymous]
+    public ActionResult<PagedResult<TourDto>> Search([FromQuery] double latitude, [FromQuery] double longitude, [FromQuery] double distance, [FromQuery] int page, [FromQuery] int pageSize)
+    {
+        var searchDto = new TourSearchDto
+        {
+            Latitude = latitude,
+            Longitude = longitude,
+            Distance = distance
+        };
+        return Ok(_tourService.SearchByLocation(searchDto, page, pageSize));
     }
 
     [HttpPost]
