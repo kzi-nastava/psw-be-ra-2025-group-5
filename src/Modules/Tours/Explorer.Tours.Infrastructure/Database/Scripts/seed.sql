@@ -4,8 +4,6 @@ DELETE FROM tours."Facilities";
 DELETE FROM tours."Monument";
 DELETE FROM tours."Equipment";
 DELETE FROM tours."TouristEquipment";
-DELETE FROM tours."ShoppingCarts";
-DELETE FROM tours."TourPurchaseTokens";
 DELETE FROM tours."TourReviews";
 
 INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
@@ -31,6 +29,13 @@ INSERT INTO tours."Facilities"(
 	"Id", "Name", "Latitude", "Longitude", "Type")
 VALUES (4, 'Hostel Drina', 44.1375, 19.4419, 0);
 
+INSERT INTO tours."KeyPoints"
+("Id", "Name", "Description", "Location", "ImagePath", "Secret", "Position", "TourId")
+VALUES 
+(1, 'Uvac Viewpoint', 'Best viewpoint over Uvac meanders.', '{"Latitude":43.123,"Longitude":19.456}', '/images/keypoints/uvac.jpg', false, 1, 1),
+(2, 'Bubanj Memorial', 'WWII memorial site in Niš.', '{"Latitude":43.312,"Longitude":21.899}', '/images/keypoints/bubanj.jpg', false, 2, 2),
+(3, 'Belgrade Fortress', 'Historic Kalemegdan Fortress.', '{"Latitude":44.820,"Longitude":20.456}', '/images/keypoints/kalemegdan.jpg', false, 1, 5);
+
 INSERT INTO tours."Monument" ("Id", "Name", "Description", "Year", "Status", "Location_Latitude", "Location_Longitude")
 VALUES
 (1, 'Test Monument One', 'Description 1', 1945, 0, 44.815, 20.460);
@@ -55,9 +60,6 @@ INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (
 INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (2, 4, 2);
 INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (3, 5, 3);
 
-INSERT INTO tours."ShoppingCarts" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
-INSERT INTO tours."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (1, 4, 5);
-
 -- TourReviews
 INSERT INTO tours."TourReviews" 
 ("Grade", "Comment", "ReviewTime", "Progress", "TouristID", "TourID", "TouristUsername")
@@ -72,6 +74,5 @@ SELECT setval(pg_get_serial_sequence('tours."Facilities"', 'Id'), (SELECT COALES
 SELECT setval(pg_get_serial_sequence('tours."Monument"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Monument"));
 SELECT setval(pg_get_serial_sequence('tours."Equipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Equipment"));
 SELECT setval(pg_get_serial_sequence('tours."TouristEquipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristEquipment"));
-SELECT setval(pg_get_serial_sequence('tours."ShoppingCarts"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."ShoppingCarts"));
-SELECT setval(pg_get_serial_sequence('tours."TourPurchaseTokens"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourPurchaseTokens"));
 SELECT setval(pg_get_serial_sequence('tours."TourReviews"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourReviews"));
+SELECT setval(pg_get_serial_sequence('tours."KeyPoints"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."KeyPoints"));

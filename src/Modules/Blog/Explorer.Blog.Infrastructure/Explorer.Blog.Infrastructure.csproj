@@ -7,8 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.GenAI" Version="0.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Explorer.BuildingBlocks.Infrastructure\Explorer.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\Explorer.Blog.Core\Explorer.Blog.Core.csproj" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

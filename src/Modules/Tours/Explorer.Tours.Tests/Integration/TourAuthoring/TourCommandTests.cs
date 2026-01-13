@@ -1,15 +1,19 @@
-﻿using Explorer.API.Controllers.Author;
-using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.API.Public;
-using Explorer.Tours.Core.Domain;
+﻿using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.Tours.API.Dtos.KeyPoints;
+using Explorer.Tours.API.Dtos.Locations;
+using Explorer.Tours.Core.Domain.Equipments;
 using Explorer.Tours.Infrastructure.Database;
 using Explorer.Tours.Tests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using TourDifficulty = Explorer.Tours.Core.Domain.TourDifficulty;
+using TourDifficulty = Explorer.Tours.Core.Domain.Tours.TourDifficulty;
 using Microsoft.EntityFrameworkCore;
+using Explorer.API.Controllers.Tours.Author;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.Core.Domain.Tours;
+using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Tours.Tests.Integration.TourAuthoring;
 
@@ -391,27 +395,31 @@ public class TourCommandTests : BaseToursIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
         var tour = dbContext.Tours.First(t => t.Id == tourId);
 
-        if (tour.Status != TourStatus.Draft) return; // samo Draft
+        if (tour.Status != TourStatus.Draft) return; 
 
         var kp1 = new CreateKeyPointDto
         {
             Name = "KP1",
             Description = "Description1",
             Location = new LocationDto { Latitude = 44.0, Longitude = 20.0 },
-            Image = null,
-            Secret = "Secret1"
+            ImagePath = CreateTestImage("kp1.png"),
+            Secret = "Secret1",
+            TourLength = 1.0
         };
         var kp2 = new CreateKeyPointDto
         {
             Name = "KP2",
             Description = "Description2",
             Location = new LocationDto { Latitude = 44.1, Longitude = 20.1 },
-            Image = null,
-            Secret = "Secret2"
+            ImagePath = CreateTestImage("kp2.png"),
+            Secret = "Secret2",
+            TourLength = 2.0
         };
 
         controller.AddKeyPoint(tourId, kp1);
         controller.AddKeyPoint(tourId, kp2);
+
+        dbContext.ChangeTracker.Clear();
     }
 
     private void AddDurations(TourController controller, long tourId)
@@ -443,4 +451,17 @@ public class TourCommandTests : BaseToursIntegrationTest
         }
         return equipment.Id;
     }
+
+    private static IFormFile CreateTestImage(string name = "image.png")
+    {
+        var bytes = new byte[] { 1, 2, 3 }; 
+        var stream = new MemoryStream(bytes);
+        return new FormFile(stream, 0, bytes.Length, name, name)
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/png"
+        };
+    }
+
+
 }

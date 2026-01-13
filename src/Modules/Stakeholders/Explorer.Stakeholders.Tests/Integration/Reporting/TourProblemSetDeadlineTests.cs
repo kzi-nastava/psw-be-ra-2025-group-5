@@ -1,9 +1,9 @@
-﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+﻿using Explorer.API.Controllers.ProblemReporting;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +30,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
             long problemId = -22;
-            var newDeadline = new DateTimeOffset(2025, 12, 24, 10, 30, 0, TimeSpan.Zero);
+            var newDeadline = new DateTimeOffset(2029, 12, 24, 10, 30, 0, TimeSpan.Zero);
 
             // Act
             var dto = new SetDeadlineDto { Deadline = newDeadline };
@@ -50,7 +50,8 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var controller = CreateController(scope, "-22", "tourist");
 
             long problemId = -22;
-            var newDeadline = new DateTimeOffset(2025, 12, 25, 12, 0, 0, TimeSpan.Zero);
+            
+            var newDeadline = new DateTimeOffset(2029, 12, 25, 12, 0, 0, TimeSpan.Zero);
 
             var dto = new SetDeadlineDto { Deadline = newDeadline };
 
@@ -66,7 +67,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var controller = CreateController(scope, "-2", "author");
 
             long problemId = -22;
-            var newDeadline = new DateTimeOffset(2025, 12, 26, 15, 0, 0, TimeSpan.Zero);
+            var newDeadline = new DateTimeOffset(2029, 12, 26, 15, 0, 0, TimeSpan.Zero);
 
             var dto = new SetDeadlineDto { Deadline = newDeadline };
 
@@ -79,8 +80,9 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
             var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+            var tourExecutionService = scope.ServiceProvider.GetRequiredService<ITourExecutionService>();
 
-            return new TourProblemController(tourProblemService, tourService, notificationService)
+            return new TourProblemController(tourProblemService, tourService, notificationService, tourExecutionService)
             {
                 ControllerContext = new ControllerContext
                 {

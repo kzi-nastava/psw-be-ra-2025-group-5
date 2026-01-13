@@ -1,7 +1,6 @@
-﻿using Explorer.API.Controllers.Administrator.Administration;
-using Explorer.API.Controllers.Author;
+﻿using Explorer.API.Controllers.Administrator;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Tours.API.Public.Administration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

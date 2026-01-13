@@ -1,9 +1,9 @@
-﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
+﻿using Explorer.API.Controllers.ProblemReporting;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -103,8 +103,9 @@ namespace Explorer.Stakeholders.Tests.Integration.Reporting
             var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
             var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+            var tourExecutionService = scope.ServiceProvider.GetRequiredService<ITourExecutionService>();
 
-            return new TourProblemController(tourProblemService, tourService, notificationService)
+            return new TourProblemController(tourProblemService, tourService, notificationService, tourExecutionService)
             {
                 ControllerContext = new ControllerContext
                 {

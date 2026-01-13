@@ -1,6 +1,6 @@
-﻿using Explorer.API.Controllers.Tourist;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+﻿using Explorer.API.Controllers.Location;
+using Explorer.Stakeholders.API.Dtos.Locations;
+using Explorer.Stakeholders.API.Public.Positions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

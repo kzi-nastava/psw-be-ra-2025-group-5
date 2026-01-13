@@ -1,7 +1,7 @@
-using Explorer.API.Controllers.Shared;
+using Explorer.API.Controllers.Notifications;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

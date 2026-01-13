@@ -1,5 +1,5 @@
-﻿using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.Core.Domain;
+﻿using Explorer.Stakeholders.API.Dtos.Authentication;
+using Explorer.Stakeholders.Core.Domain.Users;
 using Explorer.Stakeholders.Core.UseCases;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

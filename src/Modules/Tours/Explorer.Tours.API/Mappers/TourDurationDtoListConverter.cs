@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Explorer.Tours.API.Dtos;
+using Explorer.Tours.API.Dtos.Tours;
 
 namespace Explorer.Tours.API.Mappers
 {

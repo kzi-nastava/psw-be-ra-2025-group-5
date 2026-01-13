@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
 
 
 namespace Explorer.Blog.Infrastructure.Database.Repositories
@@ -51,7 +52,11 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
 
             existing.ContentType = image.ContentType;
             existing.Order = image.Order;
-            existing.Data = image.Data;
+
+            if (!string.IsNullOrEmpty(image.ImagePath))
+            {
+                existing.UpdateImagePath(image.ImagePath);
+            }
 
             _dbContext.SaveChanges();
             return existing;
@@ -112,9 +117,6 @@ namespace Explorer.Blog.Infrastructure.Database.Repositories
                 _dbContext.SaveChanges();
             }
         }
-
-
-
 
     }
 }

@@ -1,11 +1,11 @@
-﻿using Explorer.Blog.Core.Domain;
+﻿using Explorer.Blog.Core.Domain.BlogPosts.Entities;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Explorer.Blog.Core.Domain.BlogPost;
+using Explorer.Blog.Core.Domain.BlogPosts;
 
 namespace Explorer.Blog.Core.UseCases
 {

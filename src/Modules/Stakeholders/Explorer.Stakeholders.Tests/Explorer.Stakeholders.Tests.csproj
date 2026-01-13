@@ -25,6 +25,8 @@
 	</ItemGroup>
 
   <ItemGroup>
+	<PackageReference Include="Google.GenAI" Version="0.9.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.20" />
 	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
 	<PackageReference Include="Shouldly" Version="4.3.0" />
@@ -42,6 +44,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Explorer.BuildingBlocks.Tests\Explorer.BuildingBlocks.Tests.csproj" />
     <ProjectReference Include="..\..\..\Explorer.API\Explorer.API.csproj" />
+    <ProjectReference Include="..\..\Payments\Explorer.Payments.Tests\Explorer.Payments.Tests.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,14 +1,17 @@
-﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
+﻿using Explorer.API.Controllers.ProblemReporting;
 using Explorer.BuildingBlocks.Core.Exceptions;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
+using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using DomainProblemPriority = Explorer.Stakeholders.Core.Domain.ProblemPriority;
+using DomainProblemPriority = Explorer.Stakeholders.Core.Domain.TourProblems.ProblemPriority;
+using ProblemCategory = Explorer.Stakeholders.API.Dtos.Tours.Problems.ProblemCategory;
+using ProblemPriority = Explorer.Stakeholders.API.Dtos.Tours.Problems.ProblemPriority;
 
 namespace Explorer.Stakeholders.Tests.Integration.Reporting;
 
@@ -164,7 +167,8 @@ public class TourProblemCommandTests : BaseStakeholdersIntegrationTest
      return new TourProblemController(
             scope.ServiceProvider.GetRequiredService<ITourProblemService>(), 
             scope.ServiceProvider.GetRequiredService<ITourService>(),
-            scope.ServiceProvider.GetRequiredService<INotificationService>())
+            scope.ServiceProvider.GetRequiredService<INotificationService>(),
+            scope.ServiceProvider.GetRequiredService<ITourExecutionService>())
         {
         ControllerContext = BuildContext("-21")
         };

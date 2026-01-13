@@ -4,6 +4,8 @@ DELETE FROM stakeholders."Users";
 DELETE FROM stakeholders."AppRatings";
 DELETE FROM stakeholders."Clubs";
 DELETE FROM stakeholders."Notifications";
+DELETE FROM stakeholders."ClubInvites";
+DELETE FROM stakeholders."ClubMembers";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
@@ -19,23 +21,35 @@ INSERT INTO stakeholders."Users" VALUES (8, 'mika', 'mika', 'mika@gmail.com', 1,
 
 
 INSERT INTO stakeholders."People"(
-    "Id", "UserId", "Name", "Surname", "Email", "Biography", "Motto", "ProfileImage")
+    "Id", "UserId", "Name", "Surname", "Email", "Biography", "Motto", "ProfileImagePath")
 VALUES 
 (1, 1, 'Ana', 'Anić', 'autor1@gmail.com', NULL, NULL, NULL),
 (2, 2, 'Lena', 'Lenić', 'autor2@gmail.com', NULL, NULL, NULL),
 (3, 3, 'Sara', 'Sarić', 'autor3@gmail.com', NULL, NULL, NULL),
-(4, 4, 'Pera', 'Perić', 'turista1@gmail.com', 'Biografija Pere Perića', 'Moto Pere', NULL),
+(4, 4, 'Pera', 'Perić', 'turista1@gmail.com', 'Biografija Pere Perića', 'Moto Pere', '/images/profiles/profilna1.jpg'),
 (5, 5, 'Mika', 'Mikić', 'turista2@gmail.com', NULL, NULL, NULL),
 (6, 6, 'Steva', 'Stević', 'turista3@gmail.com', NULL, 'Carpe Diem', NULL),
 (7, 7, 'Zika', 'Zikić', 'zika@gmail.com', NULL, 'Carpe Diem', NULL),
 (8, 8, 'Mika', 'Mikić', 'mika@gmail.com', NULL, 'Carpe Diem', NULL);
 
-
-
 INSERT INTO stakeholders."AppRatings" 
 ("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
 (1, 4, 5, 'Odlična aplikacija', NOW(), NOW()),
 (2, 5, 4, 'Solidno', NOW(), NOW());
+
+INSERT INTO stakeholders."Clubs" 
+("Id", "Name", "Description", "ImagePaths", "CreatorId", "Status")
+VALUES
+(1, 'Planinski klub Vršac', 'Klub za ljubitelje planinarenja i prirode. Organizujemo vikend izlete na planine širom Srbije.', 
+ '/images/club/planinari1.jpeg', 4, 0),
+(2, 'Foto safari klub', 'Fotografisanje divljih životinja i prirode. Naše ture obuhvataju nacionalne parkove i rezervate.', 
+ '/images/club/safari1.jpg', 5, 0);
+
+INSERT INTO stakeholders."ClubMembers" 
+	("ClubId", "TouristId", "JoinedAt") 
+VALUES 
+	(1, 5, NOW());
+
 
 INSERT INTO stakeholders."TourProblems"(
 	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
@@ -52,3 +66,4 @@ SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELE
 SELECT setval(pg_get_serial_sequence('stakeholders."People"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."People"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Users"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Users"));
 SELECT setval(pg_get_serial_sequence('stakeholders."AppRatings"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."AppRatings"));
+SELECT setval(pg_get_serial_sequence('stakeholders."Clubs"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Clubs"));

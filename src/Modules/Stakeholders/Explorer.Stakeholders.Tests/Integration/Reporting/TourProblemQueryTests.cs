@@ -1,19 +1,14 @@
-﻿using Explorer.API.Controllers.Tourist.ProblemReporting;
+﻿using Explorer.API.Controllers.ProblemReporting;
 using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Reporting;
-using Explorer.Tours.API.Public;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Stakeholders.Tests.Integration.Reporting;
 
@@ -43,8 +38,9 @@ public class TourProblemQueryTests : BaseStakeholdersIntegrationTest
         var tourProblemService = scope.ServiceProvider.GetRequiredService<ITourProblemService>();
         var tourService = scope.ServiceProvider.GetRequiredService<ITourService>();
         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+        var tourExecutionService = scope.ServiceProvider.GetRequiredService<ITourExecutionService>();
 
-        return new TourProblemController(tourProblemService, tourService, notificationService)
+        return new TourProblemController(tourProblemService, tourService, notificationService, tourExecutionService)
         {
             ControllerContext = new ControllerContext
             {
