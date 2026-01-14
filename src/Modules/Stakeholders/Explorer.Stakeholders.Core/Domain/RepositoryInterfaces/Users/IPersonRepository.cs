@@ -1,4 +1,5 @@
-﻿using Explorer.Stakeholders.Core.Domain.Users.Entities;
+﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.Core.Domain.Users;
 
 namespace Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 
@@ -8,5 +9,6 @@ public interface IPersonRepository
     Person? GetByUserId(long userId);
     Person Update(Person person);
     Person? Get(long id);
+    PagedResult<Person> GetPaged(int page, int pageSize);
 
 }

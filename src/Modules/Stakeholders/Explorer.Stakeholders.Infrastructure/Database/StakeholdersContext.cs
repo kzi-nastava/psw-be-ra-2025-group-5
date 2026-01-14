@@ -1,15 +1,17 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Clubs;
+using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 
 
 namespace Explorer.Stakeholders.Infrastructure.Database
@@ -19,6 +21,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<Club> Clubs { get; set; }
+        public DbSet<ClubMessage> ClubMessages { get; set; }
         public DbSet<AppRating> AppRatings { get; set; }
         public DbSet<TourProblem> TourProblems { get; set; }
         public DbSet<Position> Positions { get; set; }
@@ -28,7 +31,8 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubInvite> ClubInvites { get; set; }
         public DbSet<ClubMember> ClubMembers { get; set; }
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
-
+        public DbSet<ProfileFollow> ProfileFollows { get; set; }
+        public DbSet<ProfileMessage> ProfileMessages { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -47,9 +51,12 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureNotification(modelBuilder);
             ConfigureDiary(modelBuilder);
             ConfigureClub(modelBuilder);
+            ConfigureClubMessage(modelBuilder);
             ConfigureClubInvite(modelBuilder);
             ConfigureClubMember(modelBuilder);
             ConfigureClubJoinRequest(modelBuilder);
+            ConfigureFollow(modelBuilder);
+            ConfigureProfileMessage(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -164,6 +171,47 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                        .OnDelete(DeleteBehavior.Cascade);
 
                 builder.ToTable("ClubMembers");
+            });
+        }
+
+        private static void ConfigureClubMessage(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClubMessage>(builder =>
+            {
+                builder.HasKey(cm => cm.Id);
+
+                builder.Property(cm => cm.ClubId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.AuthorId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.Content)
+                    .IsRequired()
+                    .HasMaxLength(280);
+
+                builder.Property(cm => cm.AttachedResourceType)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(cm => cm.AttachedResourceId)
+                    .IsRequired(false);
+
+                builder.Property(cm => cm.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(cm => cm.UpdatedAt)
+                    .IsRequired(false);
+
+                builder.HasOne<Club>()
+                    .WithMany()
+                    .HasForeignKey(cm => cm.ClubId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasIndex(cm => cm.ClubId);
+                builder.HasIndex(cm => cm.AuthorId);
+
+                builder.ToTable("ClubMessages");
             });
         }
 
@@ -352,5 +400,61 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             });
         }
 
+        private static void ConfigureFollow(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProfileFollow>(entity =>
+            {
+                entity.HasKey(f => new { f.FollowerId, f.FollowingId });
+
+                entity.HasOne(f => f.Follower)
+                      .WithMany(p => p.Following)
+                      .HasForeignKey(f => f.FollowerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.Following)
+                      .WithMany(p => p.Followers)
+                      .HasForeignKey(f => f.FollowingId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        private static void ConfigureProfileMessage(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProfileMessage>(builder =>
+            {
+                builder.HasKey(cm => cm.Id);
+
+                builder.Property(cm => cm.Id)
+                    .ValueGeneratedOnAdd();
+
+                builder.Property(cm => cm.ReceiverId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.AuthorId)
+                    .IsRequired();
+
+                builder.Property(cm => cm.Content)
+                    .IsRequired()
+                    .HasMaxLength(280);
+
+                builder.Property(cm => cm.AttachedResourceType)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(cm => cm.AttachedResourceId)
+                    .IsRequired(false);
+
+                builder.Property(cm => cm.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(cm => cm.UpdatedAt)
+                    .IsRequired(false);
+
+                builder.HasIndex(cm => cm.AuthorId);
+                builder.HasIndex(cm => cm.ReceiverId);
+
+                builder.ToTable("ProfileMessages");
+            });
+        }
     }
 }
