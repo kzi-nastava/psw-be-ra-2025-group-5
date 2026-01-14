@@ -12,9 +12,8 @@ using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
-using Explorer.Payments.API.Internal;
-using Explorer.Tours.API.Internal;
-using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.Tours.Core.Domain.Shared;
+using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 
@@ -61,6 +60,43 @@ public class TourService : ITourService, ITourSharedService
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
+    public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
+    {
+        Guard.AgainstNegative(searchDto.Distance, nameof(searchDto.Distance));
+        
+        if (searchDto.Latitude < -90 || searchDto.Latitude > 90)
+            throw new ArgumentException("Latitude must be between -90 and 90.", nameof(searchDto.Latitude));
+        
+        if (searchDto.Longitude < -180 || searchDto.Longitude > 180)
+            throw new ArgumentException("Longitude must be between -180 and 180.", nameof(searchDto.Longitude));
+
+        TourDifficulty? difficulty = null;
+        if (!string.IsNullOrWhiteSpace(searchDto.Difficulty))
+        {
+            if (Enum.TryParse<TourDifficulty>(searchDto.Difficulty, true, out var parsedDifficulty))
+            {
+                difficulty = parsedDifficulty;
+            }
+        }
+
+        var result = _tourRepository.SearchByLocation(
+            searchDto.Latitude,
+            searchDto.Longitude,
+            searchDto.Distance,
+            difficulty,
+            searchDto.MinPrice,
+            searchDto.MaxPrice,
+            searchDto.Tags,
+            searchDto.SortBy,
+            searchDto.SortOrder,
+            page,
+            pageSize
+        );
+
+        var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
+        return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+    
     public List<string> GetAllTags()
     {
         var result = _tourRepository.GetAll();

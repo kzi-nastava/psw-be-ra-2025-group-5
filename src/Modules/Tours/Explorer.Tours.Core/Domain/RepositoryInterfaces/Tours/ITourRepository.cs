@@ -1,5 +1,4 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.Tours.API.Dtos;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 
@@ -9,6 +8,7 @@ public interface ITourRepository
 {
     PagedResult<Tour> GetPaged(int page, int pageSize);
     PagedResult<Tour> GetPagedByAuthor(long authorId, int page, int pageSize);
+    PagedResult<Tour> SearchByLocation(double latitude, double longitude, double distance, TourDifficulty? difficulty, double? minPrice, double? maxPrice, List<string>? tags, string? sortBy, string? sortOrder, int page, int pageSize);
     List<Tour> GetAll();
     Tour Get(long id);
     Tour Create(Tour map);

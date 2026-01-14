@@ -58,12 +58,74 @@ public class TourQueryTests : BaseToursIntegrationTest
         // Assert
         result.ShouldNotBeNull();
         result.Count.ShouldBe(7);
-        //ovde izmena
+    }
+
+    [Fact]
+    public void Search_ReturnsTours_ForValidLocation()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        var result = ((ObjectResult)controller.Search(44.7866, 20.4489, 100, 1, 10, null, null, null, null, null, null).Result)?.Value as PagedResult<TourDto>;
+
+        result.ShouldNotBeNull();
+        result.Results.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void Search_ReturnsFilteredTours_ForDifficulty()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        var result = ((ObjectResult)controller.Search(44.7866, 20.4489, 100, 1, 10, "Easy", null, null, null, null, null).Result)?.Value as PagedResult<TourDto>;
+
+        result.ShouldNotBeNull();
+        result.Results.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void Search_ReturnsFilteredTours_ForPriceRange()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        var result = ((ObjectResult)controller.Search(44.7866, 20.4489, 100, 1, 10, null, 0, 100, null, null, null).Result)?.Value as PagedResult<TourDto>;
+
+        result.ShouldNotBeNull();
+        result.Results.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void Search_ReturnsSortedTours_ForSortBy()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        var result = ((ObjectResult)controller.Search(44.7866, 20.4489, 100, 1, 10, null, null, null, null, "price", "asc").Result)?.Value as PagedResult<TourDto>;
+
+        result.ShouldNotBeNull();
+        result.Results.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void Search_ReturnsPagedResults()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        var result = ((ObjectResult)controller.Search(44.7866, 20.4489, 100, 1, 2, null, null, null, null, null, null).Result)?.Value as PagedResult<TourDto>;
+
+        result.ShouldNotBeNull();
+        result.Results.Count.ShouldBeLessThanOrEqualTo(2);
+        result.TotalCount.ShouldBeGreaterThanOrEqualTo(result.Results.Count);
     }
 
     private static TourController CreateController(IServiceScope scope)
     {
-        return new TourController(scope.ServiceProvider.GetRequiredService<ITourService>())
+        return new TourController(
+            scope.ServiceProvider.GetRequiredService<ITourService>(),
+            scope.ServiceProvider.GetRequiredService<ITourSearchHistoryService>())
         {
             ControllerContext = BuildContext("-1")
         };

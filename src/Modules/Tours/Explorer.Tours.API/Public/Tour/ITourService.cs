@@ -2,6 +2,7 @@
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Tours.API.Public.Tour;
@@ -10,6 +11,7 @@ public interface ITourService
 {
     PagedResult<TourDto> GetPaged(int page, int pageSize);
     PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize);
+    PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize);
     List<string> GetAllTags();
     TourDto Create(CreateTourDto tour);
     TourDto Update(long id, UpdateTourDto tour);

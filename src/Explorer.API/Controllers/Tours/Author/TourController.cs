@@ -3,6 +3,7 @@ using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,12 @@ namespace Explorer.API.Controllers.Tours.Author;
 public class TourController : ControllerBase
 {
     private readonly ITourService _tourService;
+    private readonly ITourSearchHistoryService _searchHistoryService;
 
-    public TourController(ITourService tourService)
+    public TourController(ITourService tourService, ITourSearchHistoryService searchHistoryService)
     {
         _tourService = tourService;
+        _searchHistoryService = searchHistoryService;
     }
 
     [HttpGet]
@@ -39,6 +42,43 @@ public class TourController : ControllerBase
     public ActionResult<List<string>> GetAllTags()
     {
         return Ok(_tourService.GetAllTags());
+    }
+
+    [HttpGet("search")]
+    [AllowAnonymous]
+    public ActionResult<PagedResult<TourDto>> Search([FromQuery] double latitude, [FromQuery] double longitude, [FromQuery] double distance, [FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string? difficulty, [FromQuery] double? minPrice, [FromQuery] double? maxPrice, [FromQuery] List<string>? tags, [FromQuery] string? sortBy, [FromQuery] string? sortOrder)
+    {
+        var searchDto = new TourSearchDto
+        {
+            Latitude = latitude,
+            Longitude = longitude,
+            Distance = distance,
+            Difficulty = difficulty,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice,
+            Tags = tags,
+            SortBy = sortBy,
+            SortOrder = sortOrder
+        };
+
+        var result = _tourService.SearchByLocation(searchDto, page, pageSize);
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userId = long.Parse(User.FindFirst("id")?.Value ?? "0");
+            if (userId > 0)
+            {
+                try
+                {
+                    _searchHistoryService.SaveSearch(userId, searchDto);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        return Ok(result);
     }
 
     [HttpPost]
