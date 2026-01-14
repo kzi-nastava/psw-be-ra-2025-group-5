@@ -105,6 +105,8 @@ public class ToursProfile : Profile
 
         CreateMap<TourStatisticsItem, TourStatisticsItemDto>().ReverseMap();
 
+        CreateMap<TourSearchHistory, TourSearchHistoryDto>().ReverseMap();
+
         CreateMap<Tour, TourDto>()
             .ForMember(d => d.RequiredEquipmentIds,
                 opt => opt.MapFrom(s => s.RequiredEquipment.Select(re => re.EquipmentId)))

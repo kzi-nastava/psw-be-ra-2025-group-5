@@ -28,6 +28,7 @@ public class ToursContext : DbContext
     public DbSet<ReviewImage> ReviewImages { get; set; }
     public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
     public DbSet<TourManualProgress> TourManualProgress { get; set; }
+    public DbSet<TourSearchHistory> TourSearchHistory { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -41,7 +42,8 @@ public class ToursContext : DbContext
         ConfigureTouristPreferences(modelBuilder);
         ConfigureTourExecution(modelBuilder);
         ConfigureReview(modelBuilder);
-        ConfigureTourManual(modelBuilder); 
+        ConfigureTourManual(modelBuilder);
+        ConfigureSearchHistory(modelBuilder); 
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -57,7 +59,7 @@ public class ToursContext : DbContext
             .WithOne()
             .HasForeignKey("TourId")
             .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false); // TourId može biti null privremeno
+            .IsRequired(false); // TourId moï¿½e biti null privremeno
 
         modelBuilder.Entity<Tour>()
             .Property(t => t.Tags)
@@ -218,5 +220,28 @@ public class ToursContext : DbContext
                 .IsUnique();
         });
 
+    }
+
+    private static void ConfigureSearchHistory(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourSearchHistory>(b =>
+        {
+            b.ToTable("TourSearchHistory");
+
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.Tags)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = false }),
+                    v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>()
+                )
+                .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
+
+            b.Property(x => x.CreatedAt)
+                .IsRequired();
+
+            b.HasIndex(x => x.UserId);
+        });
     }
 }
