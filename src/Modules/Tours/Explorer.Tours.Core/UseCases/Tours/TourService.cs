@@ -61,7 +61,28 @@ public class TourService : ITourService, ITourSharedService
 
     public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
     {
-        var result = _tourRepository.SearchByLocation(searchDto.Latitude, searchDto.Longitude, searchDto.Distance, page, pageSize);
+        TourDifficulty? difficulty = null;
+        if (!string.IsNullOrWhiteSpace(searchDto.Difficulty))
+        {
+            if (Enum.TryParse<TourDifficulty>(searchDto.Difficulty, true, out var parsedDifficulty))
+            {
+                difficulty = parsedDifficulty;
+            }
+        }
+
+        var result = _tourRepository.SearchByLocation(
+            searchDto.Latitude,
+            searchDto.Longitude,
+            searchDto.Distance,
+            difficulty,
+            searchDto.MinPrice,
+            searchDto.MaxPrice,
+            searchDto.Tags,
+            searchDto.SortBy,
+            searchDto.SortOrder,
+            page,
+            pageSize
+        );
 
         var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
         return new PagedResult<TourDto>(items, result.TotalCount);

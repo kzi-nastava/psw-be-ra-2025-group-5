@@ -44,13 +44,19 @@ public class TourController : ControllerBase
 
     [HttpGet("search")]
     [AllowAnonymous]
-    public ActionResult<PagedResult<TourDto>> Search([FromQuery] double latitude, [FromQuery] double longitude, [FromQuery] double distance, [FromQuery] int page, [FromQuery] int pageSize)
+    public ActionResult<PagedResult<TourDto>> Search([FromQuery] double latitude, [FromQuery] double longitude, [FromQuery] double distance, [FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string? difficulty, [FromQuery] double? minPrice, [FromQuery] double? maxPrice, [FromQuery] List<string>? tags, [FromQuery] string? sortBy, [FromQuery] string? sortOrder)
     {
         var searchDto = new TourSearchDto
         {
             Latitude = latitude,
             Longitude = longitude,
-            Distance = distance
+            Distance = distance,
+            Difficulty = difficulty,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice,
+            Tags = tags,
+            SortBy = sortBy,
+            SortOrder = sortOrder
         };
         return Ok(_tourService.SearchByLocation(searchDto, page, pageSize));
     }
