@@ -1,4 +1,4 @@
-﻿using Explorer.Payments.API.Dtos;
+﻿using Explorer.Payments.API.Dtos.PurchaseToken;
 
 namespace Explorer.Payments.API.Public;
 

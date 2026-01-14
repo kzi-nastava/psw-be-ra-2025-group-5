@@ -15,7 +15,6 @@ using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -25,7 +24,6 @@ public class TourService : ITourService, ITourSharedService
     private readonly ITourRepository _tourRepository;
     private readonly ITourExecutionRepository _tourExecutionRepository;
     private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
-    private readonly IEquipmentRepository _equipmentRepository;
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
 
@@ -42,7 +40,6 @@ public class TourService : ITourService, ITourSharedService
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenService = purchaseToken;
-        _equipmentRepository = equipmentRepository;
         _imageStorage = imageStorage;
     }
 
@@ -58,6 +55,14 @@ public class TourService : ITourService, ITourSharedService
         var result = _tourRepository.GetPagedByAuthor(authorId, page, pageSize);
         var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
         return new PagedResult<TourDto>(items, result.TotalCount);
+    }
+
+    public List<TourDto> GetMultiple(long[] ids)
+    {
+        var result = _tourRepository.GetAll();
+        var filtered = result.Where(t => ids.Contains(t.Id)).ToList();
+        var items = filtered.Select(_mapper.Map<TourDto>).ToList();
+        return items;
     }
 
     public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)

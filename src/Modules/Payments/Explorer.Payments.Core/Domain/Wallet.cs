@@ -31,5 +31,18 @@ namespace Explorer.Payments.Core.Domain
 
             Balance += amount;
         }
+
+        public void Debit(double amount)
+        {
+            if (amount <= 0)
+                throw new ArgumentException("Amount must be positive");
+
+            if (Balance < amount)
+                throw new InvalidOperationException("Insufficient balance");
+
+            Balance -= amount;
+        }
+
+
     }
 }

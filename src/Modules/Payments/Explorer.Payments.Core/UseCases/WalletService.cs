@@ -1,4 +1,4 @@
-﻿using Explorer.Payments.API.Dtos;
+﻿using Explorer.Payments.API.Dtos.Wallet;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.API.Dtos.Notifications;
@@ -60,22 +60,11 @@ namespace Explorer.Payments.Core.UseCases
         public List<WalletUserDto> GetAllTourist()
         {
             var tourists = _userInfoService.GetTourists();
-
             var result = new List<WalletUserDto>();
 
             foreach (var tourist in tourists)
             {
-                double balance = 0;
-
-                try
-                {
-                    var wallet = _walletRepository.GetByTouristId(tourist.Id);
-                    balance = wallet.Balance;
-                }
-                catch
-                {
-
-                }
+                var wallet = _walletRepository.GetByTouristId(tourist.Id);
 
                 result.Add(new WalletUserDto
                 {
@@ -83,11 +72,12 @@ namespace Explorer.Payments.Core.UseCases
                     Username = tourist.Username,
                     FullName = $"{tourist.Name} {tourist.Surname}",
                     ProfileImagePath = tourist.ProfileImagePath,
-                    Balance = balance
+                    Balance = wallet?.Balance ?? 0
                 });
             }
 
             return result;
         }
+
     }
 }

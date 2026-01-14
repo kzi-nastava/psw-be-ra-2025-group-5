@@ -1,18 +1,12 @@
 ﻿using Explorer.API.Controllers.Shopping;
-using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Dtos.Wallet;
 using Explorer.Payments.API.Public;
-using Explorer.Payments.Core.Domain;
 using Explorer.Payments.Infrastructure.Database;
 using Explorer.Payments.Tests.Stub;
 using Explorer.Stakeholders.API.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Payments.Tests.Integration
 {

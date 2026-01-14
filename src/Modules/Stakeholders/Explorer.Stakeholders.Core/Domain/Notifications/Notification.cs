@@ -12,6 +12,7 @@ public enum NotificationType
     ClubInvite,
     ClubJoin,
     CreditAdded,
+   TourPurchased,
     NewMessage,
 }
 

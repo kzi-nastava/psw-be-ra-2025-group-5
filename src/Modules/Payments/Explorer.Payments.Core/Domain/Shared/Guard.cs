@@ -27,4 +27,17 @@ public static class Guard
         if (value < 0)
             throw new ArgumentException($"{paramName} cannot be negative.", paramName);
     }
+
+    public static void AgainstNullOrEmpty<T>(IEnumerable<T>? collection, string paramName)
+    {
+        if (collection is null) throw new ArgumentNullException(paramName);
+
+        if (!collection.Any()) throw new ArgumentException("Collection cannot be empty.", paramName);
+    }
+
+    public static void AgainstOutOfRange<T>(T value, T min, T max, string paramName) where T : IComparable<T>
+    {
+        if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
+            throw new ArgumentOutOfRangeException(paramName, value, $"Value must be between {min} and {max}.");
+    }
 }
