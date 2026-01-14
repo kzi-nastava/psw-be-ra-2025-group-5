@@ -12,6 +12,7 @@ using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
+using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
@@ -61,6 +62,14 @@ public class TourService : ITourService, ITourSharedService
 
     public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
     {
+        Guard.AgainstNegative(searchDto.Distance, nameof(searchDto.Distance));
+        
+        if (searchDto.Latitude < -90 || searchDto.Latitude > 90)
+            throw new ArgumentException("Latitude must be between -90 and 90.", nameof(searchDto.Latitude));
+        
+        if (searchDto.Longitude < -180 || searchDto.Longitude > 180)
+            throw new ArgumentException("Longitude must be between -180 and 180.", nameof(searchDto.Longitude));
+
         TourDifficulty? difficulty = null;
         if (!string.IsNullOrWhiteSpace(searchDto.Difficulty))
         {
