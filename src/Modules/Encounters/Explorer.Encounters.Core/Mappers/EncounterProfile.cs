@@ -60,35 +60,14 @@ namespace Explorer.Encounters.Core.Mappers
                 .ForMember(dest => dest.CreatedByTouristId, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.Ignore());
 
-            CreateMap<CreateAuthorChallengeDto, Challenge>()
-                .ConstructUsing(dto => new Challenge(
-                    dto.Name,
-                    dto.Description,
-                    dto.Latitude,
-                    dto.Longitude,
-                    dto.ExperiencePoints,
-                    Enum.Parse<ChallengeStatus>(dto.Status, true),
-                    Enum.Parse<ChallengeType>(dto.Type, true),
-                    dto.CreatedByTouristId
-                ));
+            //CreateMap<KeyPointChallengeDto, KeyPointChallenge>()
+            //    .ConstructUsing(dto => new KeyPointChallenge(
+            //        dto.ChallengeId,
+            //        dto.KeyPointId,
+            //        dto.IsRequiredForSecret,
+            //        dto.IsRequiredForCompletion));
 
-            CreateMap<CreateAuthorChallengeDto, KeyPointChallenge>()
-                .ConstructUsing(dto => new KeyPointChallenge(
-                    dto.KeyPointId,
-                    0, // ChallengeId æe se popuniti kada se Challenge kreira u bazi
-                    dto.IsRequiredForSecret,
-                    dto.IsRequiredForCompletion
-                ));
-
-            CreateMap<Challenge, CreateAuthorChallengeDto>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
-            .ForMember(dest => dest.CreatedByTouristId, opt => opt.MapFrom(src => src.CreatedByTouristId));
-
-            CreateMap<KeyPointChallenge, CreateAuthorChallengeDto>()
-                .ForMember(dest => dest.KeyPointId, opt => opt.MapFrom(src => src.KeyPointId))
-                .ForMember(dest => dest.IsRequiredForSecret, opt => opt.MapFrom(src => src.IsRequiredForSecret))
-                .ForMember(dest => dest.IsRequiredForCompletion, opt => opt.MapFrom(src => src.IsRequiredForCompletion));
+            CreateMap<KeyPointChallengeDto, KeyPointChallenge>().ReverseMap();
         }
     }
 }

@@ -13,9 +13,7 @@ namespace Explorer.Encounters.API.Dtos
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public int ExperiencePoints { get; set; }
-        public string Status { get; set; }
         public string Type { get; set; }
-        public long CreatedByTouristId { get; set; }
         public long KeyPointId { get; set; }
         public bool IsRequiredForSecret { get; set; }
         public bool IsRequiredForCompletion { get; set; }

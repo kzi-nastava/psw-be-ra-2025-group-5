@@ -65,5 +65,6 @@ namespace Explorer.Encounters.Core.UseCases.Tourist
             return _mapper.Map<List<ChallengeDto>>(challenges);
         }
 
+
     }
 }
