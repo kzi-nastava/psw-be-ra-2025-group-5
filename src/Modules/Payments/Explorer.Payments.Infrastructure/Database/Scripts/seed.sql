@@ -2,6 +2,9 @@
 DELETE FROM payments."TourPurchaseTokens";
 DELETE FROM payments."Wallets";
 DELETE FROM payments."Coupons";
+DELETE FROM payments."TourSales";
+DELETE FROM payments."Bundles";
+DELETE FROM payments."BundleItems";
 
 INSERT INTO payments."ShoppingCarts" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (1, 4, 5);
@@ -28,3 +31,5 @@ SELECT setval(pg_get_serial_sequence('payments."TourPurchaseTokens"', 'Id'), (SE
 SELECT setval(pg_get_serial_sequence('payments."Wallets"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."Wallets"));
 SELECT setval(pg_get_serial_sequence('payments."TourSales"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."TourSales"));
 SELECT setval(pg_get_serial_sequence('payments."Coupons"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM payments."Coupons"));
+SELECT setval(pg_get_serial_sequence('payments."Bundles"', 'Id'),(SELECT COALESCE(MAX("Id"),0) FROM payments."Bundles")
+);
