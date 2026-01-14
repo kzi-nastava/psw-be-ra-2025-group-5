@@ -5,6 +5,7 @@ using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
+using Explorer.Tours.Core.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Tours.Infrastructure.Database.Repositories.Tours;
@@ -37,6 +38,79 @@ public class TourDbRepository : ITourRepository
         var task = query.GetPagedById(page, pageSize);
         task.Wait();
         return task.Result;
+    }
+
+    public PagedResult<Tour> SearchByLocation(double latitude, double longitude, double distance, TourDifficulty? difficulty, double? minPrice, double? maxPrice, List<string>? tags, string? sortBy, string? sortOrder, int page, int pageSize)
+    {
+        var query = _dbSet
+            .Where(t => t.Status == TourStatus.Published);
+
+        if (difficulty.HasValue)
+        {
+            query = query.Where(t => t.Difficulty == difficulty.Value);
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(t => t.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(t => t.Price <= maxPrice.Value);
+        }
+
+        if (tags != null && tags.Any())
+        {
+            query = query.Where(t => t.Tags.Any(tag => tags.Contains(tag)));
+        }
+
+        var toursWithFilters = query.Include(t => t.KeyPoints).ToList();
+
+        var filteredTours = toursWithFilters
+            .Where(tour => tour.KeyPoints.Any(kp =>
+            {
+                var dist = GeographyHelper.CalculateDistance(
+                    latitude, longitude,
+                    kp.Location.Latitude, kp.Location.Longitude
+                );
+                return dist <= distance;
+            }))
+            .ToList();
+
+        var isAscending = string.IsNullOrWhiteSpace(sortOrder) || sortOrder.ToLower() == "asc";
+        
+        if (!string.IsNullOrWhiteSpace(sortBy))
+        {
+            var sortByLower = sortBy.ToLower();
+            filteredTours = sortByLower switch
+            {
+                "price" => isAscending ? filteredTours.OrderBy(t => t.Price).ToList() : filteredTours.OrderByDescending(t => t.Price).ToList(),
+                "difficulty" => isAscending ? filteredTours.OrderBy(t => t.Difficulty).ToList() : filteredTours.OrderByDescending(t => t.Difficulty).ToList(),
+                "distance" => isAscending 
+                    ? filteredTours.OrderBy(t => t.KeyPoints.Min(kp => GeographyHelper.CalculateDistance(latitude, longitude, kp.Location.Latitude, kp.Location.Longitude))).ToList()
+                    : filteredTours.OrderByDescending(t => t.KeyPoints.Min(kp => GeographyHelper.CalculateDistance(latitude, longitude, kp.Location.Latitude, kp.Location.Longitude))).ToList(),
+                "rating" => isAscending ? filteredTours.OrderBy(t => t.AverageRating ?? 0).ToList() : filteredTours.OrderByDescending(t => t.AverageRating ?? 0).ToList(),
+                "publisheddate" => isAscending ? filteredTours.OrderBy(t => t.PublishedDate ?? DateTime.MinValue).ToList() : filteredTours.OrderByDescending(t => t.PublishedDate ?? DateTime.MinValue).ToList(),
+                _ => isAscending ? filteredTours.OrderBy(t => t.Id).ToList() : filteredTours.OrderByDescending(t => t.Id).ToList()
+            };
+        }
+        else
+        {
+            filteredTours = filteredTours.OrderByDescending(t => t.Id).ToList();
+        }
+
+        var count = filteredTours.Count;
+
+        if (pageSize != 0 && page != 0)
+        {
+            filteredTours = filteredTours
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        return new PagedResult<Tour>(filteredTours, count);
     }
 
     public List<Tour> GetAll()

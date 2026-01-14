@@ -1,6 +1,7 @@
 using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Stakeholders.API.Public.AppRatings;
 using Explorer.Stakeholders.API.Public.Clubs;
+using Explorer.Stakeholders.API.Public.ClubMessages;
 using Explorer.Stakeholders.API.Public.Diaries;
 using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.API.Public.Positions;
@@ -9,6 +10,7 @@ using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.AppRatings;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Clubs;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Diaries;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Notifications;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Positions;
@@ -26,6 +28,7 @@ using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.AppRatings;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.Clubs;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.ClubMessages;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.Notifications;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.Positions;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.TourProblems;
@@ -36,6 +39,11 @@ using Npgsql;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.API.Internal;
+using Explorer.Stakeholders.API.Public.Social;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Social;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.Social;
+using Explorer.Stakeholders.API.Public.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ProfileMessages;
 
 namespace Explorer.Stakeholders.Infrastructure
 {
@@ -57,8 +65,10 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserInfoService, UserService>();
             services.AddScoped<IClubService, ClubService>();
+            services.AddScoped<IClubMessageService, ClubMessageService>();
             services.AddScoped<IAppRatingService, AppRatingService>();
             services.AddScoped<ITourProblemService, TourProblemService>();
+            services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<ITouristStatisticsService, TouristStatisticsService>();
             services.AddScoped<INotificationService, NotificationService>();
@@ -66,7 +76,8 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IClubInviteService, ClubInviteService>();
             services.AddScoped<IClubJoinRequestService, ClubJoinRequestService>();
             services.AddScoped<IPaymentNotificationService, NotificationService>();
-
+            services.AddScoped<IProfileFollowService, ProfileFollowService>();
+            services.AddScoped<IProfileMessageService, ProfileMessageService>();
         }
 
         private static void SetupInfrastructure(IServiceCollection services)
@@ -74,14 +85,17 @@ namespace Explorer.Stakeholders.Infrastructure
             services.AddScoped<IPersonRepository, PersonDbRepository>();
             services.AddScoped<IUserRepository, UserDbRepository>();
             services.AddScoped<IClubRepository, ClubDbRepository>();
+            services.AddScoped<IClubMessageRepository, ClubMessageDbRepository>();
             services.AddScoped<IAppRatingRepository, AppRatingDbRepository>();
             services.AddScoped<ITourProblemRepository, TourProblemDbRepository>();
+            services.AddScoped<ICommentRepository, CommentDbRepository>();
             services.AddScoped<IPositionRepository, PositionDbRepository>();
             services.AddScoped<INotificationRepository, NotificationDbRepository>();
             services.AddScoped<IDiaryRepository, DiaryRepository>();
             services.AddScoped<IClubInviteRepository, ClubInviteDbRepository>();
             services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
-
+            services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
+            services.AddScoped<IProfileMessageRepository, ProfileMessageDbRepository>();
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
             dataSourceBuilder.EnableDynamicJson();

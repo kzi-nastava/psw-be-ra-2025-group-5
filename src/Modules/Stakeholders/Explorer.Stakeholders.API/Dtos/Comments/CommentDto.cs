@@ -15,5 +15,6 @@ namespace Explorer.Stakeholders.API.Dtos.Comments
         public DateTimeOffset? UpdatedAt { get; set; }
         public string Content { get; set; }
         public string AuthorRole { get; set; } = string.Empty;
+        public string AuthorUsername { get; set; } = string.Empty;
     }
 }

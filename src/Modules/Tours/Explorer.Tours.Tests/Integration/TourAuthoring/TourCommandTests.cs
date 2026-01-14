@@ -172,7 +172,9 @@ public class TourCommandTests : BaseToursIntegrationTest
 
     private static TourController CreateController(IServiceScope scope)
     {
-        return new TourController(scope.ServiceProvider.GetRequiredService<ITourService>())
+        return new TourController(
+            scope.ServiceProvider.GetRequiredService<ITourService>(),
+            scope.ServiceProvider.GetRequiredService<ITourSearchHistoryService>())
         {
             ControllerContext = BuildContext("-1")
         };

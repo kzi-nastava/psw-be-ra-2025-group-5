@@ -104,5 +104,16 @@ public class ToursProfile : Profile
             .ForMember(d => d.Images,opt => opt.Ignore());
 
         CreateMap<TourStatisticsItem, TourStatisticsItemDto>().ReverseMap();
+
+        CreateMap<TourSearchHistory, TourSearchHistoryDto>().ReverseMap();
+
+        CreateMap<Tour, TourDto>()
+            .ForMember(d => d.RequiredEquipmentIds,
+                opt => opt.MapFrom(s => s.RequiredEquipment.Select(re => re.EquipmentId)))
+            .ForMember(d => d.ThumbnailPath,
+                opt => opt.MapFrom(s => s.ThumbnailPath))
+            .ReverseMap()
+            .ForMember(d => d.RequiredEquipment, opt => opt.Ignore())
+            .ForMember(d => d.ThumbnailPath, opt => opt.Ignore());
     }
 }

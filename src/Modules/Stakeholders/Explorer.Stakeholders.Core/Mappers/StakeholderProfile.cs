@@ -2,24 +2,27 @@ using AutoMapper;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.AppRatings;
 using Explorer.Stakeholders.API.Dtos.Clubs;
+using Explorer.Stakeholders.API.Dtos.ClubMessages;
 using Explorer.Stakeholders.API.Dtos.Comments;
 using Explorer.Stakeholders.API.Dtos.Diaries;
 using Explorer.Stakeholders.API.Dtos.Locations;
 using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Dtos.Social;
 using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Clubs;
+using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
-using System;
-using System.Linq;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.API.Dtos.ProfileMessages;
 
 namespace Explorer.Stakeholders.Core.Mappers
 {
@@ -106,7 +109,8 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.TourProblemId,
                     dto.TourId,
                     dto.ActionUrl,
-                    dto.ClubId
+                    dto.ClubId,
+                    dto.BlogId
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
@@ -127,6 +131,30 @@ namespace Explorer.Stakeholders.Core.Mappers
             CreateMap<ClubInvite, ClubInviteDto>()
                 .ForMember(dest => dest.TouristUsername, opt => opt.Ignore());
 
+            // ========================= ClubMessage <-> ClubMessageDto =========================
+            CreateMap<ClubMessage, ClubMessageDto>()
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
+
+            CreateMap<ClubMessageDto, ClubMessage>();
+
+            // ========================= ProfileFollow <-> FollowDto =========================
+            CreateMap<ProfileFollow, FollowerDto>()
+                .ForMember(dest => dest.FollowerId, opt => opt.MapFrom(src => src.FollowerId))
+                .ForMember(dest => dest.FollowerName, opt => opt.MapFrom(src => $"{src.Follower.Name} {src.Follower.Surname}"));
+
+            CreateMap<ProfileFollow, FollowingDto>()
+                .ForMember(dest => dest.FollowingId, opt => opt.MapFrom(src => src.FollowingId))
+                .ForMember(dest => dest.FollowingName, opt => opt.MapFrom(src => $"{src.Following.Name} {src.Following.Surname}"));
+
+            CreateMap<ProfileFollowDto, ProfileFollow>().ReverseMap();
+
+            // ========================= ProfileMessage <-> ProfileMessageDto =========================
+            CreateMap<ProfileMessage, ProfileMessageDto>()
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
+
+            CreateMap<ProfileMessageDto, ProfileMessage>();
         }
     }
 }

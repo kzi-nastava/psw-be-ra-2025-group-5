@@ -2,6 +2,8 @@
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Explorer.Tours.API.Dtos;
+using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Tours.API.Public.Tour;
 
@@ -10,6 +12,7 @@ public interface ITourService
     PagedResult<TourDto> GetPaged(int page, int pageSize);
     PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize);
     List<TourDto> GetMultiple(long[] ids);
+    PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize);
     List<string> GetAllTags();
     TourDto Create(CreateTourDto tour);
     TourDto Update(long id, UpdateTourDto tour);
@@ -44,4 +47,10 @@ public interface ITourService
     TourDto RemoveRequiredEquipment(long tourId, long equipmentId);
     void CloseTour(long tourId);
     TourDto Get(long id);
+
+    // thumbnail operacije
+
+    TourDto UploadThumbnail(long tourId, IFormFile file);
+    bool CanEditTour(long tourId, long userId);
+
 }
