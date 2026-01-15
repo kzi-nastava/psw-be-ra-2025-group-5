@@ -5,7 +5,7 @@
 
 INSERT INTO encounters."Challenges"(
     "Id", "Name", "Description", "Latitude", "Longitude", "ExperiencePoints", "Status", "Type", "CreatedByTouristId", "RequiredParticipants", "RadiusInMeters", "ImageUrl")
-VALUES (1, 'Beogradska tvrdjava', 'Posetite Beogradsku tvrdjavu i napravite fotografiju sa pogledom na reku.', 44.823398, 20.450554, 100, 1, 1, null, null, null, null);
+VALUES (1, 'Beogradska tvrdjava', 'Posetite Beogradsku tvrdjavu i napravite fotografiju sa pogledom na reku.', 44.823398, 20.450554, 100, 1, 1, null, null, null, '/images/challenge/slika1.jpg');
 
 INSERT INTO encounters."Challenges"(
     "Id", "Name", "Description", "Latitude", "Longitude", "ExperiencePoints", "Status", "Type", "CreatedByTouristId", "RequiredParticipants", "RadiusInMeters", "ImageUrl")

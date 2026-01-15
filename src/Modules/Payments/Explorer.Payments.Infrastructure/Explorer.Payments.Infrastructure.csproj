@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Explorer.Payments.Core\Explorer.Payments.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Google.GenAI" Version="0.9.0" />
+  </ItemGroup>
+
 </Project>

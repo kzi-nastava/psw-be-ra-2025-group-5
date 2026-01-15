@@ -10,7 +10,10 @@ public enum NotificationType
     TourClosed,
     ProblemStatusChanged,
     ClubInvite,
-    ClubJoin
+    ClubJoin,
+    CreditAdded,
+   TourPurchased,
+    NewMessage,
 }
 
 public class Notification : Entity
@@ -25,6 +28,7 @@ public class Notification : Entity
     public long? TourId { get; private set; }
     public string? ActionUrl { get; private set; }
     public long? ClubId { get; private set; }
+    public long? BlogId { get; private set; }
 
     private Notification() { }
 
@@ -36,7 +40,8 @@ public class Notification : Entity
         long? tourProblemId = null,
         long? tourId = null,
         string? actionUrl = null,
-        long? clubId = null)
+        long? clubId = null,
+        long? blogId = null)
     {
         if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
         if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Title is required.", nameof(title));
@@ -52,6 +57,7 @@ public class Notification : Entity
         TourId = tourId;
         ActionUrl = actionUrl;
         ClubId = clubId;
+        BlogId = blogId;
     }
 
     public void MarkAsRead()

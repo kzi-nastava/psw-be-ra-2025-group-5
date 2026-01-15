@@ -1,5 +1,5 @@
 using Shouldly;
-using Explorer.Stakeholders.Core.Domain.Users.Entities;
+using Explorer.Stakeholders.Core.Domain.Users;
 
 namespace Explorer.Stakeholders.Tests.Unit.Domain;
 

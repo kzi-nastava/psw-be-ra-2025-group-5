@@ -1,4 +1,4 @@
-﻿using Explorer.Payments.API.Dtos;
+﻿using Explorer.Payments.API.Dtos.ShoppingCart;
 using Explorer.Payments.API.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,5 +52,19 @@ public class ShoppingCartController : ControllerBase
     {
         var result = _ShoppingCartService.Checkout(touristId);
         return Ok(result);
+    }
+
+    [HttpPut("{touristId:long}/apply-coupon")]
+    public ActionResult<ShoppingCartDto> ApplyCoupon(long touristId, [FromQuery] string couponCode)
+    {
+        try
+        {
+            var result = _ShoppingCartService.ApplyCouponToCart(touristId, couponCode);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

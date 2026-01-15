@@ -2,13 +2,14 @@ using AutoMapper;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Internal;
 using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.Core.Domain.Notifications;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Notifications;
 
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
 {
-    public class NotificationService : INotificationService
+    public class NotificationService : INotificationService, IPaymentNotificationService
     {
         private readonly INotificationRepository _repository;
         private readonly IMapper _mapper;
@@ -25,6 +26,13 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             var created = _repository.Create(notification);
             return _mapper.Map<NotificationDto>(created);
         }
+
+        //public NotificationDto CreatePaymentNotification(NotificationDto dto)
+        //{
+        //    var notification = _mapper.Map<Notification>(dto);
+        //    var created = _repository.Create(notification);
+        //    return _mapper.Map<NotificationDto>(created);
+        //}
 
         public NotificationDto GetById(long id)
         {

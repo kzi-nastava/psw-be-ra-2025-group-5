@@ -35,6 +35,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Reporting
 
             var user = _userRepository.GetById(authorId);
             dtoResult.AuthorRole = user.Role.ToString();
+            dtoResult.AuthorUsername = user.Username;
 
             return dtoResult;
         }
@@ -50,6 +51,7 @@ namespace Explorer.Stakeholders.Core.UseCases.Reporting
 
             var user = _userRepository.GetById(dto.AuthorId);
             dto.AuthorRole = user.Role.ToString();
+            dto.AuthorUsername = user.Username;
 
             return dto;
         }

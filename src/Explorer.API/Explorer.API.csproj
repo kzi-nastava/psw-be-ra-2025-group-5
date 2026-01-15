@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.GenAI" Version="0.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,6 +38,7 @@
     <Folder Include="UserUploads\" />
     <Folder Include="wwwroot\images\blog\" />
     <Folder Include="wwwroot\images\club\" />
+    <Folder Include="wwwroot\images\challenge\" />
     <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>
 

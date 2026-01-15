@@ -3,12 +3,12 @@
 public class ProfileDto
 {
     public long Id { get; set; }
+    public string Username { get; set; }
     public string Name { get; set; }
     public string Surname { get; set; }
     public string Email { get; set; }
     public string Biography { get; set; }
     public string Motto { get; set; }
-
     public string? ProfileImagePath { get; set; }
 
     public int Level { get; set; }

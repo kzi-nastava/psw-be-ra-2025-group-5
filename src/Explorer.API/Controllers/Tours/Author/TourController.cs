@@ -1,7 +1,9 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +15,12 @@ namespace Explorer.API.Controllers.Tours.Author;
 public class TourController : ControllerBase
 {
     private readonly ITourService _tourService;
+    private readonly ITourSearchHistoryService _searchHistoryService;
 
-    public TourController(ITourService tourService)
+    public TourController(ITourService tourService, ITourSearchHistoryService searchHistoryService)
     {
         _tourService = tourService;
+        _searchHistoryService = searchHistoryService;
     }
 
     [HttpGet]
@@ -38,6 +42,43 @@ public class TourController : ControllerBase
     public ActionResult<List<string>> GetAllTags()
     {
         return Ok(_tourService.GetAllTags());
+    }
+
+    [HttpGet("search")]
+    [AllowAnonymous]
+    public ActionResult<PagedResult<TourDto>> Search([FromQuery] double latitude, [FromQuery] double longitude, [FromQuery] double distance, [FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string? difficulty, [FromQuery] double? minPrice, [FromQuery] double? maxPrice, [FromQuery] List<string>? tags, [FromQuery] string? sortBy, [FromQuery] string? sortOrder)
+    {
+        var searchDto = new TourSearchDto
+        {
+            Latitude = latitude,
+            Longitude = longitude,
+            Distance = distance,
+            Difficulty = difficulty,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice,
+            Tags = tags,
+            SortBy = sortBy,
+            SortOrder = sortOrder
+        };
+
+        var result = _tourService.SearchByLocation(searchDto, page, pageSize);
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userId = long.Parse(User.FindFirst("id")?.Value ?? "0");
+            if (userId > 0)
+            {
+                try
+                {
+                    _searchHistoryService.SaveSearch(userId, searchDto);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        return Ok(result);
     }
 
     [HttpPost]
@@ -126,6 +167,48 @@ public class TourController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize(Roles = "author")]
+    [HttpPost("{tourId:long}/thumbnail")]
+    [Consumes("multipart/form-data")]
+    public ActionResult<TourDto> UploadThumbnail(
+     long tourId,
+     [FromForm] UploadTourThumbnailDto dto)
+    {
+        var userId = User.PersonId();
+
+        if (!_tourService.CanEditTour(tourId, userId))
+            return Forbid();
+
+        var result = _tourService.UploadThumbnail(tourId, dto.Thumbnail);
+        return Ok(result);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{tourId:long}/thumbnail/{*fileName}")]
+    public IActionResult GetThumbnail(long tourId, string fileName)
+    {
+        var filePath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "UserUploads",
+            "tours",
+            tourId.ToString(),
+            fileName);
+
+        if (!System.IO.File.Exists(filePath))
+            return NotFound();
+
+        var ext = Path.GetExtension(fileName).ToLower();
+        var mime = ext switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream"
+        };
+
+        return PhysicalFile(filePath, mime);
+    }
+    
     [AllowAnonymous]
     [HttpGet("{keyPointId:long}/keypoints/images/{*fileName}")]
     public IActionResult GetImage(long keyPointId, string fileName)
@@ -143,6 +226,7 @@ public class TourController : ControllerBase
             ".jpeg" => "image/jpeg",
             _ => "application/octet-stream"
         };
+
         return PhysicalFile(filePath, mime);
     }
 }

@@ -27,6 +27,9 @@ public class Tour : AggregateRoot
     public List<RequiredEquipment> RequiredEquipment { get; private set; }
     public double TourLength { get; set; }
 
+    public string? ThumbnailPath { get; private set; }
+
+
     private Tour() 
     {
         Tags = new List<string>();
@@ -250,5 +253,12 @@ public class Tour : AggregateRoot
         if (existing == null) return;
 
         RequiredEquipment.Remove(existing);
+    }
+    public void SetThumbnail(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Thumbnail path is required");
+
+        ThumbnailPath = path;
     }
 }

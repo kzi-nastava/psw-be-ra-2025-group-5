@@ -1,4 +1,6 @@
-﻿using Explorer.Stakeholders.API.Dtos;
+﻿using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Infrastructure.Authentication;
@@ -35,6 +37,10 @@ public class ProfileController : ControllerBase
         {
             var profile = _profileService.GetByUserId(userId);
             return Ok(profile);
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
         }
         catch (KeyNotFoundException ex)
         {
@@ -80,10 +86,15 @@ public class ProfileController : ControllerBase
     }
 
     [AllowAnonymous]
-    [HttpGet("{clubId:long}/images/{*fileName}")]
-    public IActionResult GetImage(long clubId, string fileName)
+    [HttpGet("{tourId:long}/thumbnail/{*fileName}")]
+    public IActionResult GetThumbnail(long tourId, string fileName)
     {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads", "profiles", clubId.ToString(), fileName);
+        var filePath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "UserUploads",
+            "tours",
+            tourId.ToString(),
+            fileName);
 
         if (!System.IO.File.Exists(filePath))
             return NotFound();
@@ -96,7 +107,35 @@ public class ProfileController : ControllerBase
             ".jpeg" => "image/jpeg",
             _ => "application/octet-stream"
         };
+
         return PhysicalFile(filePath, mime);
+    }
+
+    [Authorize]
+    [HttpGet("public/profile/{userId}")]
+    public ActionResult<ProfileDto> GetPublicProfile(long userId)
+    {
+        try
+        {
+            var profile = _profileService.GetPublicProfile(userId); 
+            return Ok(profile);
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("all-profiles")]
+    public ActionResult<PagedResult<ProfileDto>> GetAllProfiles([FromQuery] int page, [FromQuery] int pageSize)
+    {
+        var result = _profileService.GetPaged(page, pageSize);
+        return Ok(result);
     }
 
 }
