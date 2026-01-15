@@ -30,4 +30,32 @@ public class TourStatisticsDbRepository : ITourStatisticsDbRepository
             select new TourStatisticsItem(tour.Difficulty, tour.Tags.ToList())
         ).ToList();
     }
+
+    public IReadOnlyCollection<ToursByPrice> GetToursCountByPrice(long userId)
+    {
+        var tours = _dbContext.Tours
+            .Where(t => t.AuthorId == userId);
+
+        var result = new List<ToursByPrice>
+        {
+            new ToursByPrice(
+                tours.Count(t => t.Price >= 0 && t.Price <= 20),
+                "0–20"
+            ),
+            new ToursByPrice(
+                tours.Count(t => t.Price > 20 && t.Price <= 50),
+                "20–50"
+            ),
+            new ToursByPrice(
+                tours.Count(t => t.Price > 50 && t.Price <= 100),
+                "50–100"
+            ),
+            new ToursByPrice(
+                tours.Count(t => t.Price > 100),
+                "100+"
+            )
+        };
+
+        return result;
+    }
 }
