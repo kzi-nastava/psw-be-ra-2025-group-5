@@ -11,5 +11,11 @@ public class ProfileDto
     public string Motto { get; set; }
     public string? ProfileImagePath { get; set; }
 
+    public int Level { get; set; }
+    public int ExperiencePoints { get; set; }
+    public int XPForNextLevel { get; set; }
+    public bool CanCreateChallenges { get; set; }
+
     public TouristStatisticsDto Statistics { get; set; }
 }
+

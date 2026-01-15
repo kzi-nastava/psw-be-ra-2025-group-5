@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Explorer.Stakeholders.Infrastructure.Database.Repositories
+namespace Explorer.Stakeholders.Infrastructure.Database.Repositories.ProfileMessages
 {
     public class ProfileMessageDbRepository : IProfileMessageRepository
     {

@@ -36,8 +36,7 @@ INSERT INTO tours."KeyPoints"
 ("Id", "Name", "Description", "Location", "ImagePath", "Secret", "Position", "TourId")
 VALUES 
 (1, 'Uvac Viewpoint', 'Best viewpoint over Uvac meanders.', '{"Latitude":43.123,"Longitude":19.456}', '/images/keypoints/uvac.jpg', false, 1, 1),
-(2, 'Bubanj Memorial', 'WWII memorial site in Niš.', '{"Latitude":43.312,"Longitude":21.899}', '/images/keypoints/bubanj.jpg', false, 2, 2),
-(3, 'Belgrade Fortress', 'Historic Kalemegdan Fortress.', '{"Latitude":44.820,"Longitude":20.456}', '/images/keypoints/kalemegdan.jpg', false, 1, 5);
+(2, 'Belgrade Fortress', 'Historic Kalemegdan Fortress.', '{"Latitude":44.820,"Longitude":20.456}', '/images/keypoints/kalemegdan.jpg', false, 2, 1);
 
 INSERT INTO tours."Monument" ("Id", "Name", "Description", "Year", "Status", "Location_Latitude", "Location_Longitude")
 VALUES
