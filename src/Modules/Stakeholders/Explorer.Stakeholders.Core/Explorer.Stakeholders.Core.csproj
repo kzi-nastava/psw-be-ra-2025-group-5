@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.GenAI" Version="0.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Blog\Explorer.Blog.API\Explorer.Blog.API.csproj" />
     <ProjectReference Include="..\..\Tours\Explorer.Tours.Core\Explorer.Tours.Core.csproj" />
+    <ProjectReference Include="..\..\Encounters\Explorer.Encounters.API\Explorer.Encounters.API.csproj" />
     <ProjectReference Include="..\Explorer.Stakeholders.API\Explorer.Stakeholders.API.csproj" />
   </ItemGroup>
 

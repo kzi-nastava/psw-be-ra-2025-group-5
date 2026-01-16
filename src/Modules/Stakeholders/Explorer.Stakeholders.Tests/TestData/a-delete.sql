@@ -6,3 +6,6 @@ DELETE FROM stakeholders."Clubs";
 DELETE FROM stakeholders."Positions";
 DELETE FROM stakeholders."Notifications";
 DELETE FROM stakeholders."Diaries";
+DELETE FROM stakeholders."ClubMessages";
+DELETE FROM stakeholders."ClubMembers";
+DELETE FROM stakeholders."ProfileFollows";

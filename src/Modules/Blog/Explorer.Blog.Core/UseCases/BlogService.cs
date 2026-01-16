@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Explorer.Blog.API.Public;
-using Explorer.Blog.API.Dtos;
-using Explorer.Blog.Core.Domain;
 using Explorer.Blog.Core.Domain.RepositoryInterfaces;
-using static Explorer.Blog.Core.Domain.BlogPost;
+using Explorer.Blog.Core.Domain.BlogPosts;
+using Explorer.Blog.Core.Domain.BlogPosts.Entities;
+using Explorer.Blog.API.Dtos.Posts;
+using Explorer.Blog.API.Dtos.Images;
+using Explorer.BuildingBlocks.Core.FileStorage;
 
 namespace Explorer.Blog.Core.UseCases
 {
@@ -17,23 +14,25 @@ namespace Explorer.Blog.Core.UseCases
         private readonly IBlogRepository _blogRepository;
         private readonly IMapper _mapper;
         private readonly BlogDomainService _domainService;
-        public BlogService(IBlogRepository blogRepository, IMapper mapper, BlogDomainService domainService)
+        private readonly IImageStorage _imageStorage;
+        public BlogService(IBlogRepository blogRepository, IMapper mapper, BlogDomainService domainService, IImageStorage imageStorage)
         {
             _blogRepository = blogRepository;
-            _mapper = mapper;
+            _mapper = mapper; 
             _domainService = domainService;
+            _imageStorage = imageStorage;   
         }
         public List<BlogPostDto> GetAll(long userId)
         {
             var result = _blogRepository.GetAll();
 
             var filtered = result.Where(post =>
-                post.Status == BlogPost.BlogStatus.Published ||
-                post.Status == BlogPost.BlogStatus.Archived ||
-                post.Status == BlogPost.BlogStatus.Active ||
-                post.Status == BlogPost.BlogStatus.Famous ||
-                post.Status == BlogPost.BlogStatus.ReadOnly ||
-                (post.Status == BlogPost.BlogStatus.Draft && post.AuthorId == userId)
+                post.Status == BlogStatus.Published ||
+                post.Status == BlogStatus.Archived ||
+                post.Status == BlogStatus.Active ||
+                post.Status == BlogStatus.Famous ||
+                post.Status == BlogStatus.ReadOnly ||
+                (post.Status == BlogStatus.Draft && post.AuthorId == userId)
             ).ToList();
 
             return _mapper.Map<List<BlogPostDto>>(filtered);
@@ -62,7 +61,7 @@ namespace Explorer.Blog.Core.UseCases
         {
             var result = _blogRepository.GetAll();
 
-            if (Enum.TryParse<BlogPost.BlogStatus>(status, true, out var parsedStatus))
+            if (Enum.TryParse<BlogStatus>(status, true, out var parsedStatus))
             {
                 var filtered = result.Where(post => post.Status == parsedStatus).ToList();
                 return _mapper.Map<List<BlogPostDto>>(filtered);
@@ -142,85 +141,68 @@ namespace Explorer.Blog.Core.UseCases
         public BlogImageDto AddImage(long postId, BlogImageDto dto)
         {
             var post = _blogRepository.GetById(postId);
-            if (post == null) throw new Exception("Post not found");
+            if (post == null)
+                throw new KeyNotFoundException("Post not found");
 
-            try
-            {
-                byte[] bytes = null;
+            if (post.Status != BlogStatus.Draft)
+                throw new InvalidOperationException("Images can be added only to draft blogs");
 
-                if (!string.IsNullOrWhiteSpace(dto.Base64))
-                {
-                    var base64 = dto.Base64.Contains(",")
-                        ? dto.Base64.Split(',')[1]
-                        : dto.Base64;
+            var bytes = Convert.FromBase64String(
+                dto.Url.Contains(",")
+                    ? dto.Url.Split(',')[1]
+                    : dto.Url
+            );
 
-                    bytes = Convert.FromBase64String(base64);
-                }
-                else
-                {
-                    throw new Exception("Base64 data missing");
-                }
+            var path = _imageStorage.SaveImage("blog", post.AuthorId, bytes, dto.ContentType);
 
-                var image = new BlogImage(
-                    blogPostId: postId,
-                    data: bytes,
-                    contentType: dto.ContentType,
-                    order: dto.Order
-                );
+            var image = new BlogImage(
+                postId,
+                path,
+                dto.ContentType,
+                dto.Order
+            );
 
-                _blogRepository.AddImage(image);
-
-                return _mapper.Map<BlogImageDto>(image);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("AddImage FAILED: " + ex.Message);
-            }
+            _blogRepository.AddImage(image);
+            return _mapper.Map<BlogImageDto>(image);
         }
-        public BlogImageDto UpdateImage(BlogImageDto dto)
+
+        public BlogImageDto UpdateImage(long imageId, byte[] imageData, string contentType, int order)
         {
-            var image = _blogRepository.GetImage(dto.Id);
+            var image = _blogRepository.GetImage(imageId);
             if (image == null) return null;
 
             var post = _blogRepository.GetById(image.BlogPostId);
-
             if (post.Status != BlogStatus.Draft)
-                throw new InvalidOperationException("Cannot update images unless post is in Draft");
+                throw new InvalidOperationException("Only draft blogs allow image update");
 
-            var domain = _mapper.Map<BlogImage>(dto);
-            var updated = _blogRepository.UpdateImage(domain);
+            var newPath = _imageStorage.SaveImage("blog", post.AuthorId, imageData, contentType);
 
-            return _mapper.Map<BlogImageDto>(updated);
+            image.UpdateImage(newPath, contentType);
+            image.ChangeOrder(order);
+
+            _blogRepository.UpdateImage(image);
+
+            return _mapper.Map<BlogImageDto>(image);
         }
-
-
         public BlogImageDto GetImage(long id)
         {
-            var img = _blogRepository.GetImage(id);
-            if (img == null) return null;
+            var image = _blogRepository.GetImage(id);
+            if (image == null) return null;
 
             return new BlogImageDto
             {
-                Id = img.Id,
-                Base64 = Convert.ToBase64String(img.Data),
-                ContentType = img.ContentType,
-                Order = img.Order
+                Id = image.Id,
+                ContentType = image.ContentType,
+                Order = image.Order,
+                Url = image.ImagePath
             };
         }
 
         public List<BlogImageDto> GetImagesByPostId(long postId)
         {
-            var result = _blogRepository.GetImagesByPostId(postId);
-
-            return result
-                .Select(img => new BlogImageDto
-                {
-                    Id = img.Id,
-                    Base64 = Convert.ToBase64String(img.Data),
-                    ContentType = img.ContentType,
-                    Order = img.Order
-                })
-                .ToList();
+            return _mapper.Map<List<BlogImageDto>>(
+                _blogRepository.GetImagesByPostId(postId)
+            );
         }
 
         public bool DeleteImage(long imageId)
@@ -229,11 +211,12 @@ namespace Explorer.Blog.Core.UseCases
             if (image == null) return false;
 
             var post = _blogRepository.GetById(image.BlogPostId);
-
             if (post.Status != BlogStatus.Draft)
-                throw new InvalidOperationException("Cannot delete images unless post is in Draft");
+                throw new InvalidOperationException("Only draft blogs allow image delete");
 
+            _imageStorage.Delete(image.ImagePath);
             _blogRepository.DeleteImage(image);
+
             return true;
         }
 
@@ -280,48 +263,20 @@ namespace Explorer.Blog.Core.UseCases
         public BlogPostDto CreateAndPublish(CreateAndPublishBlogPostDto dto, long authorId)
         {
             var post = new BlogPost(
-                authorId: authorId,
-                title: dto.Title,
-                description: dto.Description,
-                createdAt: DateTime.UtcNow
+                authorId,
+                dto.Title,
+                dto.Description,
+                DateTime.UtcNow
             );
 
             _blogRepository.Create(post);
 
-            foreach (var imgDto in dto.Images)
-            {
-                byte[] bytes = null;
-
-                if (!string.IsNullOrWhiteSpace(imgDto.Base64))
-                {
-                    var base64 = imgDto.Base64.Contains(",")
-                        ? imgDto.Base64.Split(',')[1]
-                        : imgDto.Base64;
-
-                    bytes = Convert.FromBase64String(base64);
-                }
-                else
-                {
-                    throw new Exception("Base64 data missing for one of the images");
-                }
-
-                var image = new BlogImage(
-                    blogPostId: post.Id,
-                    data: bytes,
-                    contentType: imgDto.ContentType,
-                    order: imgDto.Order
-                );
-
-                _blogRepository.AddImage(image);
-            }
-
             _domainService.Publish(post);
             _blogRepository.Update(post);
 
-            var result = _mapper.Map<BlogPostDto>(post);
-            result.Images = GetImagesByPostId(post.Id);
-            return result;
+            return _mapper.Map<BlogPostDto>(post);
         }
+
 
     }
 

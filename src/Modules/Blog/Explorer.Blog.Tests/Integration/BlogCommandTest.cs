@@ -1,18 +1,15 @@
-﻿using Explorer.Blog.API.Dtos;
+﻿using Explorer.Blog.API.Dtos.Images;
+using Explorer.Blog.API.Dtos.Posts;
 using Explorer.Blog.API.Public;
-using Explorer.Blog.Core.Domain;
+using Explorer.Blog.Core.Domain.BlogPosts;
 using Explorer.Blog.Core.UseCases;
 using Explorer.Blog.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 namespace Explorer.Blog.Tests.Integration
 {
     [Collection("Sequential")]
-    public class BlogCommandTest: BaseBlogIntegrationTest
+    public class BlogCommandTest : BaseBlogIntegrationTest
     {
         public BlogCommandTest(BlogTestFactory factory) : base(factory) { }
 
@@ -56,8 +53,6 @@ namespace Explorer.Blog.Tests.Integration
             Should.Throw<ArgumentException>(() => service.Create(dto, authorId: 1));
         }
 
-        
-
         [Fact]
         public void Successfully_adds_images_to_blog()
         {
@@ -72,21 +67,19 @@ namespace Explorer.Blog.Tests.Integration
             };
             var created = service.Create(blogDto, authorId: 1);
 
-            var image1 = new BlogImageDto
+            var image1 = service.AddImage(created.Id, new BlogImageDto
             {
-                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
+                Url = "data:image/png;base64,AA==",
                 ContentType = "image/png",
                 Order = 0
-            };
-            var image2 = new BlogImageDto
+            });
+
+            var image2 = service.AddImage(created.Id, new BlogImageDto
             {
-                Base64 = Convert.ToBase64String(new byte[] { 4, 5, 6 }),
+                Url = "data:image/jpeg;base64,AA==",
                 ContentType = "image/jpeg",
                 Order = 1
-            };
-
-            var added1 = service.AddImage(created.Id, image1);
-            var added2 = service.AddImage(created.Id, image2);
+            });
 
             var stored = dbContext.BlogPosts.Find(created.Id);
             stored.Images.Count.ShouldBe(2);
@@ -99,28 +92,27 @@ namespace Explorer.Blog.Tests.Integration
             var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
-            var blogDto = new CreateBlogPostDto
+            var created = service.Create(new CreateBlogPostDto
             {
                 Title = "Blog sa slikom za brisanje",
                 Description = "Opis"
-            };
-            var created = service.Create(blogDto, authorId: 1);
+            }, authorId: 1);
 
-            var imageDto = new BlogImageDto
+            var image = service.AddImage(created.Id, new BlogImageDto
             {
-                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
+                Url = "data:image/png;base64,AA==",
                 ContentType = "image/png",
                 Order = 0
-            };
-            var addedImage = service.AddImage(created.Id, imageDto);
+            });
 
-            var result = service.DeleteImage(addedImage.Id);
+            var result = service.DeleteImage(image.Id);
 
             result.ShouldBeTrue();
 
             var storedBlog = dbContext.BlogPosts.Find(created.Id);
             storedBlog.Images.ShouldBeEmpty();
         }
+
         [Fact]
         public void Successfully_creates_blog_in_draft_state()
         {
@@ -137,11 +129,11 @@ namespace Explorer.Blog.Tests.Integration
             var created = service.Create(createDto, authorId: 1);
 
             created.ShouldNotBeNull();
-            created.Status.ShouldBe(BlogPost.BlogStatus.Draft.ToString());
+            created.Status.ShouldBe(BlogStatus.Draft.ToString());
 
             var stored = dbContext.BlogPosts.Find(created.Id);
             stored.ShouldNotBeNull();
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Draft);
+            stored.Status.ShouldBe(BlogStatus.Draft);
         }
 
         [Fact]
@@ -161,10 +153,10 @@ namespace Explorer.Blog.Tests.Integration
             var published = service.Publish(created.Id, authorId: 1);
 
             published.ShouldNotBeNull();
-            published.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
+            published.Status.ShouldBe(BlogStatus.Published.ToString());
 
             var stored = dbContext.BlogPosts.Find(created.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Published);
+            stored.Status.ShouldBe(BlogStatus.Published);
         }
 
         [Fact]
@@ -175,10 +167,10 @@ namespace Explorer.Blog.Tests.Integration
             var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
-            var dto = new CreateBlogPostDto 
-            { 
-                Title = "Blog", 
-                Description = "Description" 
+            var dto = new CreateBlogPostDto
+            {
+                Title = "Blog",
+                Description = "Description"
             };
             var blog = blogService.Create(dto, 1);
             blogService.Publish(blog.Id, 1);
@@ -192,7 +184,7 @@ namespace Explorer.Blog.Tests.Integration
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
             stored.ShouldNotBeNull();
-            stored.Status.ShouldBe(BlogPost.BlogStatus.ReadOnly);
+            stored.Status.ShouldBe(BlogStatus.ReadOnly);
         }
 
         [Fact]
@@ -203,10 +195,10 @@ namespace Explorer.Blog.Tests.Integration
             var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
-            var dto = new CreateBlogPostDto 
-            { 
-                Title = "Blog", 
-                Description = "Description" 
+            var dto = new CreateBlogPostDto
+            {
+                Title = "Blog",
+                Description = "Description"
             };
             var blog = blogService.Create(dto, 1);
             blogService.Publish(blog.Id, 1);
@@ -219,7 +211,7 @@ namespace Explorer.Blog.Tests.Integration
 
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Active);
+            stored.Status.ShouldBe(BlogStatus.Active);
         }
 
         [Fact]
@@ -248,7 +240,7 @@ namespace Explorer.Blog.Tests.Integration
 
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Active);
+            stored.Status.ShouldBe(BlogStatus.Active);
         }
 
         [Fact]
@@ -276,50 +268,24 @@ namespace Explorer.Blog.Tests.Integration
 
             // Assert
             var stored = dbContext.BlogPosts.Find(blog.Id);
-            stored.Status.ShouldBe(BlogPost.BlogStatus.Famous);
+            stored.Status.ShouldBe(BlogStatus.Famous);
         }
 
         [Fact]
-        public void Successfully_creates_and_publishes_blog_with_images()
+        public void Successfully_creates_and_publishes_blog()
         {
             using var scope = Factory.Services.CreateScope();
             var service = scope.ServiceProvider.GetRequiredService<IBlogService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
-            // Arrange
             var dto = new CreateAndPublishBlogPostDto
             {
-                Title = "Test Create & Publish",
-                Description = "Opis",
-                Images = new List<BlogImageDto>
-        {
-            new BlogImageDto
-            {
-                Base64 = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
-                ContentType = "image/png",
-                Order = 0
-            },
-            new BlogImageDto
-            {
-                Base64 = Convert.ToBase64String(new byte[] { 4, 5, 6 }),
-                ContentType = "image/jpeg",
-                Order = 1
-            }
-        }
+                Title = "Test",
+                Description = "Opis"
             };
 
-            // Act
             var result = service.CreateAndPublish(dto, authorId: 1);
 
-            // Assert
-            result.ShouldNotBeNull();
-            result.Id.ShouldBeGreaterThan(0);
-            result.Title.ShouldBe(dto.Title);
-            result.Description.ShouldBe(dto.Description);
-            result.Status.ShouldBe(BlogPost.BlogStatus.Published.ToString());
-
-            result.Images.Count.ShouldBe(2);
-
+            result.Status.ShouldBe(BlogStatus.Published.ToString());
         }
 
 

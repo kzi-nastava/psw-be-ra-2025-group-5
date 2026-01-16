@@ -1,10 +1,17 @@
-using Explorer.Tours.API.Dtos;
-using Explorer.Tours.Core.Domain;
+using Explorer.Tours.Core.Domain.Equipments;
+using Explorer.Tours.Core.Domain.Equipments.Entities;
+using Explorer.Tours.Core.Domain.Facilities;
+using Explorer.Tours.Core.Domain.Monuments;
+using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.Tours.Core.Domain.Preferences;
+using Explorer.Tours.Core.Domain.Tours;
+using Explorer.Tours.Core.Domain.Tours.Entities;
+using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
-using TransportationType = Explorer.Tours.Core.Domain.TransportationType;
+using TransportationType = Explorer.Tours.Core.Domain.Preferences.TransportationType;
+using Explorer.Tours.API.Dtos.Locations;
 
 namespace Explorer.Tours.Infrastructure.Database;
 
@@ -16,12 +23,12 @@ public class ToursContext : DbContext
     public DbSet<TouristEquipment> TouristEquipment { get; set; }
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<TouristPreferences> TouristPreferences { get; set; }
-    public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     public DbSet<TourExecution> TourExecutions { get; set; }
     public DbSet<TourReview> TourReviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
-    public DbSet<TourPurchaseToken> TourPurchaseTokens { get; set; }
     public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
+    public DbSet<TourManualProgress> TourManualProgress { get; set; }
+    public DbSet<TourSearchHistory> TourSearchHistory { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -33,9 +40,10 @@ public class ToursContext : DbContext
         
         ConfigureTour(modelBuilder);
         ConfigureTouristPreferences(modelBuilder);
-        ConfigureShoppingCart(modelBuilder);
         ConfigureTourExecution(modelBuilder);
         ConfigureReview(modelBuilder);
+        ConfigureTourManual(modelBuilder);
+        ConfigureSearchHistory(modelBuilder); 
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -51,7 +59,7 @@ public class ToursContext : DbContext
             .WithOne()
             .HasForeignKey("TourId")
             .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false); // TourId može biti null privremeno
+            .IsRequired(false); // TourId moï¿½e biti null privremeno
 
         modelBuilder.Entity<Tour>()
             .Property(t => t.Tags)
@@ -78,10 +86,11 @@ public class ToursContext : DbContext
                 l => new Location(l.Latitude, l.Longitude)
             ));
 
-        // Konfiguracija Image kao bytea
         modelBuilder.Entity<KeyPoint>()
-            .Property(kp => kp.Image)
-            .HasColumnType("bytea");
+            .Property(kp => kp.ImagePath)
+            .HasColumnType("text");
+
+
 
         modelBuilder.Entity<Tour>()
         .HasMany(t => t.RequiredEquipment)
@@ -139,9 +148,6 @@ public class ToursContext : DbContext
             });
     }
 
-
-
-
     private static void ConfigureReview(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ReviewImage>(b =>
@@ -198,24 +204,44 @@ public class ToursContext : DbContext
         });
     }
 
-    // Helper klasa za deserijalizaciju Location-a
-    private class LocationDtopublic{
-        double Latitude { get; set; }
-        public double Longitude { get; set; }
-    }
-    private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
+    private static void ConfigureTourManual(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ShoppingCart>()
-        .Property(s => s.Items)
-        .HasColumnType("jsonb")
-        .HasConversion(
-            items => JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false }),
-            json => JsonSerializer.Deserialize<List<OrderItem>>(json, new JsonSerializerOptions()) ?? new List<OrderItem>(),
-            new ValueComparer<List<OrderItem>>(
-                (c1, c2) => c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList()
-            )
-        );
+        modelBuilder.Entity<TourManualProgress>(b =>
+        {
+            b.ToTable("TourManualProgress");
+
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.PageKey)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            b.HasIndex(x => new { x.UserId, x.PageKey })
+                .IsUnique();
+        });
+
+    }
+
+    private static void ConfigureSearchHistory(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourSearchHistory>(b =>
+        {
+            b.ToTable("TourSearchHistory");
+
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.Tags)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = false }),
+                    v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>()
+                )
+                .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
+
+            b.Property(x => x.CreatedAt)
+                .IsRequired();
+
+            b.HasIndex(x => x.UserId);
+        });
     }
 }

@@ -1,6 +1,9 @@
-﻿using Explorer.API.Controllers.Tourist;
+﻿using Explorer.API.Controllers.Tours.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Tours.Core.Domain.TourExecutions;
+using Explorer.Payments.Core.Domain;
+using Explorer.Payments.Infrastructure.Database;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain;
@@ -9,9 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+using Explorer.Tours.API.Dtos.Tours.Reviews;
+using Explorer.Tours.API.Public.Tour;
 
 namespace Explorer.Tours.Tests.Integration.TouristPreferences
 {
@@ -24,10 +26,11 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
         public void Gets_by_tour_with_pagination()
         {
             using var scope = Factory.Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ToursContext>();
+            var tourDbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
+            var paymentDbContext = scope.ServiceProvider.GetRequiredService<PaymentsContext>();
 
             // Koristite prvu turu koja postoji
-            var tour = db.Tours
+            var tour = tourDbContext.Tours
                 .Include(t => t.Reviews)
                 .FirstOrDefault();
 
@@ -38,25 +41,25 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             // Obezbedite purchase token i tour execution
             long userId = -2; // Turista koji postoji u seed-u
 
-            var token = db.TourPurchaseTokens
+            var token = paymentDbContext.TourPurchaseTokens
                 .FirstOrDefault(t => t.TourId == tourId && t.TouristId == userId);
 
             if (token == null)
             {
                 token = new TourPurchaseToken(tourId, userId);
-                db.TourPurchaseTokens.Add(token);
+                paymentDbContext.TourPurchaseTokens.Add(token);
             }
 
-            var execution = db.TourExecutions
+            var execution = tourDbContext.TourExecutions
                 .FirstOrDefault(e => e.UserId == userId && e.TourId == tourId);
 
             if (execution == null)
             {
                 execution = TourExecution.StartNew(userId, tourId);
-                db.TourExecutions.Add(execution);
+                tourDbContext.TourExecutions.Add(execution);
             }
 
-            db.SaveChanges();
+            tourDbContext.SaveChanges();
 
             var controller = CreateController(scope);
 
@@ -96,11 +99,11 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
             var emptyTour = db.Tours.Include(t => t.Reviews).FirstOrDefault(t => !t.Reviews.Any());
             if (emptyTour is null)
             {
-                emptyTour = new Explorer.Tours.Core.Domain.Tour(
+                emptyTour = new Core.Domain.Tours.Tour(
                     authorId: 1,
                     name: "Empty test tour",
                     description: "desc",
-                    difficulty: Explorer.Tours.Core.Domain.TourDifficulty.Easy,
+                    difficulty: Core.Domain.Tours.TourDifficulty.Easy,
                     tags: new List<string>(),
                     price: 0
                 );
@@ -135,9 +138,7 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
 
         private static TourReviewController CreateController(IServiceScope scope)
         {
-            return new TourReviewController(
-                scope.ServiceProvider.GetRequiredService<ITourService>()
-            )
+            return new TourReviewController(scope.ServiceProvider.GetRequiredService<ITourService>())
             {
                 ControllerContext = BuildContext("1") 
             };

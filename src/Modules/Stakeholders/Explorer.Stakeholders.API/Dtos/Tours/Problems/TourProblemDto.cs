@@ -1,0 +1,33 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Explorer.Stakeholders.API.Dtos.Comments;
+
+namespace Explorer.Stakeholders.API.Dtos.Tours.Problems;
+
+public class TourProblemDto
+{
+    public long Id { get; set; }
+
+    [NotDefault]
+    public long TourId { get; set; }
+    public string TourName { get; set; } = string.Empty;
+
+    [NotDefault]
+    public long ReporterId { get; set; }
+    public string ReporterName { get; set; } = string.Empty;
+
+    public ProblemCategory Category { get; set; }
+
+    public ProblemPriority Priority { get; set; }
+
+    [Required]
+    [StringLength(2000)]
+    public string Description { get; set; } = string.Empty;
+
+    public DateTimeOffset OccurredAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public List<CommentDto> Comments { get; set; } = new();
+    public bool IsResolved { get; set; }
+    public DateTimeOffset? Deadline { get; set; }
+    public string TourStatus { get; set; } = string.Empty;
+
+}

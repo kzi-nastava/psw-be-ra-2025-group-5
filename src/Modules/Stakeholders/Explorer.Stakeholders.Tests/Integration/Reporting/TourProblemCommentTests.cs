@@ -1,9 +1,7 @@
-﻿using Explorer.API.Controllers;
-using Explorer.Stakeholders.API.Dtos;
-using Explorer.Stakeholders.API.Public;
-using Explorer.Stakeholders.Core.UseCases;
+﻿using Explorer.Stakeholders.Core.UseCases.Reporting;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.Users;
 using Explorer.Stakeholders.Infrastructure.Database;
-using Explorer.Stakeholders.Infrastructure.Database.Repositories;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.TourProblems;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -12,6 +10,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using AutoMapper;
+using Explorer.API.Controllers.Shared;
+using Explorer.Stakeholders.API.Dtos.Comments;
 
 namespace Explorer.Stakeholders.Tests.Integration.Reporting
 {

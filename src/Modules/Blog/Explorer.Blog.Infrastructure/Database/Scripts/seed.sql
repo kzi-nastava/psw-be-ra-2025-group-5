@@ -1,14 +1,24 @@
 DELETE FROM blog."BlogPosts";
 DELETE FROM blog."Comments";
 DELETE FROM blog."BlogVotes";
+DELETE FROM blog."BlogImages";
 
 INSERT INTO blog."BlogPosts" ("Id", "AuthorId", "Title", "Description", "CreatedAt", "LastUpdatedAt", "Status") VALUES
 (1, 1, 'Journey Through the Alps', 'A fantastic description of the trip with beautiful photos and tips.', '2023-10-01 10:00:00', '2023-11-01 12:00:00', 'Famous'),
 (2, 2, 'Top 10 Cities in Europe', 'A list of must-see places for every tourist.', '2023-10-15 09:00:00', '2023-11-05 10:00:00', 'Active'),
 (3, 3, 'Packing Tips', 'How to pack everything you need for 7 days into a small backpack.', '2023-10-20 14:00:00', NULL, 'Published'),
 (4, 1, 'Hidden Beaches of the Adriatic', 'Places you must not miss if you love peace and quiet.', '2023-11-01 16:00:00', NULL, 'Published'),
-(5, 2, 'Himalayan Diary (Draft)', 'The first part of the ascent adventure (still under construction).', '2023-11-10 11:00:00', NULL, 'Draft'),
+(5, 4, 'Himalayan Diary (Draft)', 'The first part of the ascent adventure (still under construction).', '2023-11-10 11:00:00', NULL, 'Draft'),
 (6, 3, 'Camping Equipment - Review', 'Review of new equipment and price comparison.', '2023-11-15 13:00:00', '2023-11-16 13:00:00', 'ReadOnly');
+
+INSERT INTO blog."BlogImages" ("Id", "BlogPostId", "ImagePath", "ContentType", "Order") VALUES
+(1, 1, '/images/blog/alps1.jpg', 'image/jpeg', 0),
+(2, 1, '/images/blog/alps2.jpg', 'image/jpeg', 1),
+(3, 2, '/images/blog/europe1.jpg', 'image/jpeg', 0),
+(4, 3, '/images/blog/packing1.jpg', 'image/jpeg', 0),
+(5, 4, '/images/blog/adriatic1.jpg', 'image/jpeg', 0),
+(6, 6, '/images/blog/camping1.jpg', 'image/jpeg', 0),
+(7, 6, '/images/blog/camping2.jpg', 'image/jpeg', 1);
 
 INSERT INTO blog."Comments" ("CommentId", "AuthorId", "CreatedAt", "UpdatedAt", "Content", "BlogPostId") VALUES
 (1, 4, '2023-11-01 15:00:00', NULL, 'Excellent blog! I tried the route, I recommend it!', 1),

@@ -1,8 +1,28 @@
 using AutoMapper;
 using Explorer.Stakeholders.API.Dtos;
+using Explorer.Stakeholders.API.Dtos.AppRatings;
+using Explorer.Stakeholders.API.Dtos.Clubs;
+using Explorer.Stakeholders.API.Dtos.ClubMessages;
+using Explorer.Stakeholders.API.Dtos.Comments;
+using Explorer.Stakeholders.API.Dtos.Diaries;
+using Explorer.Stakeholders.API.Dtos.Locations;
+using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Dtos.Social;
+using Explorer.Stakeholders.API.Dtos.Tours.Problems;
+using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain;
-using System;
-using System.Linq;
+using Explorer.Stakeholders.Core.Domain.AppRatings;
+using Explorer.Stakeholders.Core.Domain.Clubs;
+using Explorer.Stakeholders.Core.Domain.ClubMessages;
+using Explorer.Stakeholders.Core.Domain.Comments;
+using Explorer.Stakeholders.Core.Domain.Diaries;
+using Explorer.Stakeholders.Core.Domain.Notifications;
+using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.Social;
+using Explorer.Stakeholders.Core.Domain.TourProblems;
+using Explorer.Stakeholders.Core.Domain.Users;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.API.Dtos.ProfileMessages;
 
 namespace Explorer.Stakeholders.Core.Mappers
 {
@@ -10,15 +30,15 @@ namespace Explorer.Stakeholders.Core.Mappers
     {
         public StakeholderProfile()
         {
-            // ========================= Person <-> ProfileDto =========================
             CreateMap<Person, ProfileDto>()
-                .ForMember(
-                    dest => dest.ProfileImageBase64,
-                    opt => opt.MapFrom(src => src.ProfileImage != null
-                        ? Convert.ToBase64String(src.ProfileImage)
-                        : string.Empty)
-                )
-                .ReverseMap();
+                .ForMember(dest => dest.Statistics, opt => opt.Ignore())
+                .ForMember(dest => dest.XPForNextLevel, opt => opt.MapFrom(src => src.GetXPForNextLevel()))
+                .ForMember(dest => dest.CanCreateChallenges, opt => opt.MapFrom(src => src.CanCreateChallenges())); 
+
+            CreateMap<ProfileDto, Person>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Level, opt => opt.Ignore())
+                .ForMember(dest => dest.ExperiencePoints, opt => opt.Ignore()); 
 
             // ========================= AppRating <-> AppRatingDto =========================
             CreateMap<AppRating, AppRatingDto>();
@@ -41,21 +61,14 @@ namespace Explorer.Stakeholders.Core.Mappers
             // ========================= Club <-> ClubDto =========================
             CreateMap<Club, ClubDto>()
                 .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.ToBase64String(img)).ToList()
-                            : new List<string>())
+                    dest => dest.ImagePaths,
+                    opt => opt.MapFrom(src => src.ImagePaths)
                 );
 
             CreateMap<ClubDto, Club>()
-                .ForMember(
-                    dest => dest.Images,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(img => Convert.FromBase64String(img)).ToList()
-                            : new List<byte[]>())
-                );
+                .ForMember(dest => dest.ImagePaths, opt => opt.Ignore()); 
+                                                                       
+
 
             CreateMap<TourProblem, TourProblemDto>()
                 .ForMember(dest => dest.Comments, opt => opt.Ignore())
@@ -64,15 +77,18 @@ namespace Explorer.Stakeholders.Core.Mappers
                     Id = src.Id,
                     TourId = src.TourId,
                     ReporterId = src.ReporterId,
-                    Category = (API.Dtos.ProblemCategory)src.Category,
-                    Priority = (API.Dtos.ProblemPriority)src.Priority,
+                    Category = (API.Dtos.Tours.Problems.ProblemCategory)src.Category,
+                    Priority = (API.Dtos.Tours.Problems.ProblemPriority)src.Priority,
                     Description = src.Description,
                     OccurredAt = src.OccurredAt,
                     CreatedAt = src.CreatedAt,
                     IsResolved = src.IsResolved,
                     Deadline = src.Deadline,
-                    Comments = new List<CommentDto>()
+                    Comments = new List<CommentDto>(),
+                    TourName = "",
+                    ReporterName = ""
                 });
+
 
             CreateMap<TourProblemDto, TourProblem>();
 
@@ -96,7 +112,9 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.Message,
                     dto.TourProblemId,
                     dto.TourId,
-                    dto.ActionUrl
+                    dto.ActionUrl,
+                    dto.ClubId,
+                    dto.BlogId
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
@@ -114,6 +132,33 @@ namespace Explorer.Stakeholders.Core.Mappers
                 ))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
+            CreateMap<ClubInvite, ClubInviteDto>()
+                .ForMember(dest => dest.TouristUsername, opt => opt.Ignore());
+
+            // ========================= ClubMessage <-> ClubMessageDto =========================
+            CreateMap<ClubMessage, ClubMessageDto>()
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
+
+            CreateMap<ClubMessageDto, ClubMessage>();
+
+            // ========================= ProfileFollow <-> FollowDto =========================
+            CreateMap<ProfileFollow, FollowerDto>()
+                .ForMember(dest => dest.FollowerId, opt => opt.MapFrom(src => src.FollowerId))
+                .ForMember(dest => dest.FollowerName, opt => opt.MapFrom(src => $"{src.Follower.Name} {src.Follower.Surname}"));
+
+            CreateMap<ProfileFollow, FollowingDto>()
+                .ForMember(dest => dest.FollowingId, opt => opt.MapFrom(src => src.FollowingId))
+                .ForMember(dest => dest.FollowingName, opt => opt.MapFrom(src => $"{src.Following.Name} {src.Following.Surname}"));
+
+            CreateMap<ProfileFollowDto, ProfileFollow>().ReverseMap();
+
+            // ========================= ProfileMessage <-> ProfileMessageDto =========================
+            CreateMap<ProfileMessage, ProfileMessageDto>()
+                .ForMember(dest => dest.AttachedResourceType, opt => opt.MapFrom(src => (int)src.AttachedResourceType))
+                .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
+
+            CreateMap<ProfileMessageDto, ProfileMessage>();
         }
     }
 }

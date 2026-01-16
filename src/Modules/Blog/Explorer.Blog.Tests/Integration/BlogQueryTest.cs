@@ -1,17 +1,13 @@
 ﻿using Explorer.API.Controllers.Blog;
-using Explorer.Blog.API.Dtos;
+using Explorer.Blog.API.Dtos.Posts;
 using Explorer.Blog.API.Public;
-using Explorer.Blog.Core.Domain;
-using Explorer.Blog.Core.Domain.RepositoryInterfaces;
+using Explorer.Blog.Core.Domain.BlogPosts;
 using Explorer.Blog.Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using Xunit;
 
 namespace Explorer.Blog.Tests.Integration
 {
