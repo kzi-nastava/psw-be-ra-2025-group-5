@@ -15,6 +15,7 @@ using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
+using Explorer.Tours.API.Dtos.Equipments;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -26,7 +27,7 @@ public class TourService : ITourService, ITourSharedService
     private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
-
+    private readonly IEquipmentRepository _equipmentRepository;
 
     public TourService(
      ITourRepository repository,
@@ -34,13 +35,29 @@ public class TourService : ITourService, ITourSharedService
      ITourExecutionRepository execution,
      ITourPurchaseTokenSharedService purchaseToken,
      IEquipmentRepository equipmentRepository,
-     IImageStorage imageStorage)
+     IImageStorage imageStorage,
+     IEquipmentRepository equipmentRepo)
     {
         _tourRepository = repository;
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenService = purchaseToken;
         _imageStorage = imageStorage;
+        _equipmentRepository = equipmentRepo;
+    }
+
+    public List<RequiredEquipmentDto> GetRequiredEquipment(long tourId)
+    {
+        var tour = _tourRepository.Get(tourId);
+        var equipmentIds = tour.RequiredEquipment.Select(re => re.EquipmentId).ToList();
+        var equipmentList = _equipmentRepository.GetByIds(equipmentIds);
+
+        return equipmentList.Select(e => new RequiredEquipmentDto
+        {
+            EquipmentId = e.Id,
+            Name = e.Name,
+            Description = e.Description
+        }).ToList();
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
