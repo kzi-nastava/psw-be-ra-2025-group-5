@@ -21,10 +21,19 @@ public class ShoppingCartService : IShoppingCartService
     private readonly IPaymentNotificationService _notificationService;
     private readonly ITourSaleService _TourSaleService;
     private readonly ICouponRepository _couponRepository;
+    private readonly IInternalBadgeService _badgeService;
 
-    public ShoppingCartService(IShoppingCartRepository repository, ITourSharedService tourService, IMapper mapper, ITourPurchaseTokenService tokenService, 
-        IWalletRepository walletRepository, IPaymentRepository paymentRepository, IPaymentNotificationService notificationService, ITourSaleService tourSaleService, 
-        ICouponRepository couponRepository)
+    public ShoppingCartService(
+        IShoppingCartRepository repository, 
+        ITourSharedService tourService, 
+        IMapper mapper, 
+        ITourPurchaseTokenService tokenService, 
+        IWalletRepository walletRepository, 
+        IPaymentRepository paymentRepository, 
+        IPaymentNotificationService notificationService, 
+        ITourSaleService tourSaleService, 
+        ICouponRepository couponRepository,
+        IInternalBadgeService badgeService)
     {
         _ShoppingCartRepository = repository;
         _TourService = tourService;
@@ -35,6 +44,7 @@ public class ShoppingCartService : IShoppingCartService
         _notificationService = notificationService;
         _TourSaleService = tourSaleService;
         _couponRepository = couponRepository;
+        _badgeService = badgeService;
     }
 
     private ShoppingCartDto ValidateCart(ShoppingCartDto cart)
@@ -145,6 +155,10 @@ public class ShoppingCartService : IShoppingCartService
         {
             _paymentRepository.Create(new Payment(touristId, item.TourId, item.ItemPrice.FinalPrice));
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
+            
+            // Dodaj bedž vlasniku ture
+            var tour = tours[item.TourId];
+            _badgeService.OnTourSold(tour.AuthorId);
         }
 
         cart.ClearShoppingCart();

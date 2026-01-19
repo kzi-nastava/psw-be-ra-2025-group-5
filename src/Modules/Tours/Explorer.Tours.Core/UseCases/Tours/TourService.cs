@@ -15,6 +15,7 @@ using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
+using Explorer.Stakeholders.API.Internal;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -26,6 +27,7 @@ public class TourService : ITourService, ITourSharedService
     private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
+    private readonly IInternalBadgeService _badgeService;
 
 
     public TourService(
@@ -34,13 +36,15 @@ public class TourService : ITourService, ITourSharedService
      ITourExecutionRepository execution,
      ITourPurchaseTokenSharedService purchaseToken,
      IEquipmentRepository equipmentRepository,
-     IImageStorage imageStorage)
+     IImageStorage imageStorage,
+     IInternalBadgeService badgeService)
     {
         _tourRepository = repository;
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenService = purchaseToken;
         _imageStorage = imageStorage;
+        _badgeService = badgeService;
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
@@ -260,6 +264,9 @@ public class TourService : ITourService, ITourSharedService
         tour.Publish();
 
         var result = _tourRepository.Update(tour);
+        
+        _badgeService.OnTourPublished(tour.AuthorId);
+        
         return _mapper.Map<TourDto>(result);
     }
 
