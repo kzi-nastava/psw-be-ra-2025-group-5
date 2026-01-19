@@ -75,5 +75,16 @@ namespace Explorer.API.Controllers.Shopping
             }
         }
 
+        [Authorize(Policy = "touristPolicy")]
+        [HttpGet("{touristId:long}/payments")]
+        public ActionResult<List<PaymentDto>> GetPayments(long touristId)
+        {
+            var loggedInUserId = User.PersonId();
+            if (loggedInUserId != touristId) return Forbid();
+
+            var payments = _walletService.GetPaymentsForTourist(touristId);
+            return Ok(payments);
+        }
+
     }
 }

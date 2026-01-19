@@ -13,6 +13,6 @@ namespace Explorer.Payments.API.Public
         void CreditToTourist(long touristId, double amount);
         List<WalletUserDto> GetAllTourist();
 
-
+        IEnumerable<PaymentDto> GetPaymentsForTourist(long touristId);
     }
 }
