@@ -64,11 +64,12 @@ public class PlannerController : ControllerBase
     }
 
     [HttpDelete("{touristId:long}/{date:datetime}/timeblocks/{blockId:long}")]
-    public ActionResult<PlannerDayDto> RemoveBlock(long touristId, DateOnly date, long blockId)
+    public ActionResult RemoveBlock(long touristId, DateOnly date, long blockId)
     {
         try
         {
-            return Ok(_plannerService.RemoveBlock(touristId, date, blockId));
+            _plannerService.RemoveBlock(touristId, date, blockId);
+            return Ok();
         }
         catch (Exception ex)
         {
