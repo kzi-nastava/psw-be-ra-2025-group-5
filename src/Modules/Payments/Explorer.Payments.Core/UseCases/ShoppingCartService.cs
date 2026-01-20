@@ -169,10 +169,11 @@ public class ShoppingCartService : IShoppingCartService
     private void CreditAuthorWallet(long authorId, double amount)
     {
         var authorWallet = _walletRepository.GetByUserId(authorId);
+
         if (authorWallet == null)
         {
-            Wallet wallet = new Wallet(authorId);
-            _walletRepository.Create(wallet);
+            authorWallet = new Wallet(authorId);
+            _walletRepository.Create(authorWallet);
         }
 
         authorWallet.Credit(amount);
