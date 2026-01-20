@@ -12,6 +12,7 @@ using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.TouristPlanner;
 
 
 namespace Explorer.Stakeholders.Infrastructure.Database
@@ -33,6 +34,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
         public DbSet<ProfileFollow> ProfileFollows { get; set; }
         public DbSet<ProfileMessage> ProfileMessages { get; set; }
+        public DbSet<Planner> Planners { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -57,6 +59,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClubJoinRequest(modelBuilder);
             ConfigureFollow(modelBuilder);
             ConfigureProfileMessage(modelBuilder);
+            ConfigurePlanner(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -455,6 +458,26 @@ namespace Explorer.Stakeholders.Infrastructure.Database
 
                 builder.ToTable("ProfileMessages");
             });
+        }
+
+        private static void ConfigurePlanner(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Planner>()
+                .HasMany(e => e.Days)
+                .WithOne()
+                .HasForeignKey("PlannerId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PlannerDay>()
+                .HasMany(e => e.TimeBlocks)
+                .WithOne()
+                .HasForeignKey(b => b.PlannerDayId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<PlannerTimeBlock>()
+                .Property(s => s.TimeRange)
+                .HasColumnType("jsonb");
         }
     }
 }
