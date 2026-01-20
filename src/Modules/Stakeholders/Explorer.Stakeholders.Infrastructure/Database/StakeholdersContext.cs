@@ -1,18 +1,19 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
-using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
+using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.Social;
+using Explorer.Stakeholders.Core.Domain.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Explorer.Stakeholders.Core.Domain.ProfileMessages;
-using Explorer.Stakeholders.Core.Domain.TouristPlanner;
+using System.Text.Json;
 
 
 namespace Explorer.Stakeholders.Infrastructure.Database
@@ -477,7 +478,11 @@ namespace Explorer.Stakeholders.Infrastructure.Database
 
             modelBuilder.Entity<PlannerTimeBlock>()
                 .Property(s => s.TimeRange)
-                .HasColumnType("jsonb");
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<TimeRange>(v, (JsonSerializerOptions)null)
+                );
         }
     }
 }
