@@ -162,7 +162,6 @@ public class ShoppingCartService : IShoppingCartService
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
             
             // Dodaj bedž vlasniku ture
-            var tour = tours[item.TourId];
             _badgeService.OnTourSold(tour.AuthorId);
         }
 
