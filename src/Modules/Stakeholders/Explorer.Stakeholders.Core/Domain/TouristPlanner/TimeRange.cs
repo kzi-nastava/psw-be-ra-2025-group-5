@@ -1,17 +1,17 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
+using System.Text.Json.Serialization;
 
-namespace Explorer.Stakeholders.Core.Domain.Planner;
+namespace Explorer.Stakeholders.Core.Domain.TouristPlanner;
 
 public class TimeRange : ValueObject
 {
-    public TimeOnly Start { get; private set; }
-    public TimeOnly End { get; private set; }
+    public TimeOnly Start { get; }
+    public TimeOnly End { get; }
 
-    private TimeRange() { }
-
+    [JsonConstructor]
     public TimeRange(TimeOnly start, TimeOnly end)
     {
-        if (end <= start) throw new ArgumentException("End time must be after start time.");
+        if (end != TimeOnly.MinValue && end <= start) throw new ArgumentException("End time must be after start time.");
 
         Start = start;
         End = end;

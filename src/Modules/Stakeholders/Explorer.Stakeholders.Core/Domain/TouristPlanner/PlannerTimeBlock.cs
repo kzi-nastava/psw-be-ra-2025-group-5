@@ -1,23 +1,23 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.Shared;
 
-namespace Explorer.Stakeholders.Core.Domain.Planner;
+namespace Explorer.Stakeholders.Core.Domain.TouristPlanner;
 
 public class PlannerTimeBlock : Entity
 {
     public long TourId { get; private set; }
-    public TimeRange TimeRange { get; private set; }
-    public int Order { get; private set; }  // drag and drop sorting fallback
+    public TimeRange TimeRange { get; internal set; }
+
+    public long PlannerDayId { get; set; }
 
     private PlannerTimeBlock() { }
 
-    public PlannerTimeBlock(long tourId, TimeOnly startTime, TimeOnly endTime, int order)
+    public PlannerTimeBlock(long tourId, TimeOnly startTime, TimeOnly endTime)
     {
         Guard.AgainstNull(tourId, nameof(tourId));
 
         TourId = tourId;
         TimeRange = new TimeRange(startTime, endTime);
-        Order = order;
     }
 
     public void Reschedule(TimeRange newRange)

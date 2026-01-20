@@ -1,5 +1,5 @@
 ﻿
-namespace Explorer.Stakeholders.API.Dtos.Planner;
+namespace Explorer.Stakeholders.API.Dtos.TouristPlanner;
 
 public class PlannerDayDto
 {

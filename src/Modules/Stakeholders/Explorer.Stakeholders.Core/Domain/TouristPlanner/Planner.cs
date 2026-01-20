@@ -1,13 +1,12 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.Shared;
 
-namespace Explorer.Stakeholders.Core.Domain.Planner;
+namespace Explorer.Stakeholders.Core.Domain.TouristPlanner;
 
 public class Planner : AggregateRoot
 {
     public long TouristId { get; private set; }
-    private readonly List<PlannerDay> _days = [];
-    public IReadOnlyCollection<PlannerDay> Days => _days;
+    public List<PlannerDay> Days = [];
 
     private Planner() { }
 
@@ -20,7 +19,7 @@ public class Planner : AggregateRoot
 
     public void AddDay(PlannerDay day)
     {
-        if (_days.Any(d => d.Date == day.Date)) throw new InvalidDataException("A planner day for this date already exists.");
-        _days.Add(day);
+        if (Days.Any(d => d.Date == day.Date)) throw new InvalidDataException("A planner day for this date already exists.");
+        Days.Add(day);
     }
 }
