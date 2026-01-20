@@ -23,6 +23,8 @@ using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.API.Dtos.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.Streaks;
+using Explorer.Stakeholders.API.Dtos.Streaks;
 
 namespace Explorer.Stakeholders.Core.Mappers
 {
@@ -159,6 +161,12 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
 
             CreateMap<ProfileMessageDto, ProfileMessage>();
+
+            // ========================= Streak <-> StreakDto =========================
+            CreateMap<Streak, StreakDto>()
+                .ForMember(dest => dest.CurrentStreak, opt => opt.MapFrom(src => src.GetCurrentStreak()));
+
+            CreateMap<StreakDto, Streak>();
         }
     }
 }

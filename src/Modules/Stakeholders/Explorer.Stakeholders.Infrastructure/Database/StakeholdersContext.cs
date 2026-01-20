@@ -12,6 +12,7 @@ using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.Streaks;
 
 
 namespace Explorer.Stakeholders.Infrastructure.Database
@@ -33,6 +34,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
         public DbSet<ProfileFollow> ProfileFollows { get; set; }
         public DbSet<ProfileMessage> ProfileMessages { get; set; }
+        public DbSet<Streak> Streaks { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -57,6 +59,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClubJoinRequest(modelBuilder);
             ConfigureFollow(modelBuilder);
             ConfigureProfileMessage(modelBuilder);
+            ConfigureStreak(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -454,6 +457,24 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.HasIndex(cm => cm.ReceiverId);
 
                 builder.ToTable("ProfileMessages");
+            });
+        }
+
+        private static void ConfigureStreak(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Streak>(builder =>
+            {
+                builder.HasKey(s => s.Id);
+                builder.Property(s => s.UserId)
+                    .IsRequired();
+                builder.Property(s => s.StartDate)
+                    .IsRequired();
+                builder.Property(s => s.LastActivity)
+                    .IsRequired();
+                builder.Property(s => s.LongestStreak)
+                    .IsRequired();
+                builder.HasIndex(s => s.UserId)
+                    .IsUnique();
             });
         }
     }

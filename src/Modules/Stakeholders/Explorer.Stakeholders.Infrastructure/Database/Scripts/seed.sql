@@ -71,6 +71,10 @@ INSERT INTO stakeholders."TourProblems"(
 	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
 VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z', ARRAY[]::bigint[], true, null);
 
+INSERT INTO stakeholders."Streaks"(
+    "Id", "UserId", "StartDate", "LastActivity", "LongestStreak")
+VALUES (1, 21, '2026-01-18', '2026-01-19', 2);
+
 
 SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."TourProblems"));
 SELECT setval(pg_get_serial_sequence('stakeholders."People"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."People"));
