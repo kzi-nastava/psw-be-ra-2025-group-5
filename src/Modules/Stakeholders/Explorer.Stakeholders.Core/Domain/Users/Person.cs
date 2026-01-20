@@ -22,6 +22,7 @@ public class Person : Entity
     // Gamification
     public int Level { get; private set; }
     public int ExperiencePoints { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     private Person() { }
 
@@ -34,6 +35,7 @@ public class Person : Entity
 
         Level = 0;
         ExperiencePoints = 0;
+        CreatedAt = DateTime.UtcNow;
 
         Validate();
     }
