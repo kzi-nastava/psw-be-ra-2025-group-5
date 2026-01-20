@@ -21,16 +21,15 @@ namespace Explorer.API.Controllers.Shopping
         }
 
         [Authorize(Policy = "touristPolicy")]
-
-        [HttpGet("{touristId:long}")]
-        public ActionResult<WalletDto> GetWallet(long touristId)
+        [HttpGet("{userId:long}")]
+        public ActionResult<WalletDto> GetWallet(long userId)
         {
             var loggedInUserId = User.PersonId();
 
-            if (loggedInUserId != touristId)
+            if (loggedInUserId != userId)
                 return Forbid();
 
-            var result = _walletService.GetWalletForTourist(touristId);
+            var result = _walletService.GetWalletForUser(userId);
             return result is not null ? Ok(result) : NotFound();
         }
 
@@ -40,7 +39,7 @@ namespace Explorer.API.Controllers.Shopping
         {
             try
             {
-                _walletService.CreditToTourist(request.TouristId, request.Balance);
+                _walletService.CreditToTourist(request.UserId, request.Balance);
                 return Ok(new { message = "Deposit successful" });
             }
             catch (KeyNotFoundException ex)
@@ -74,6 +73,20 @@ namespace Explorer.API.Controllers.Shopping
                 });
             }
         }
+
+        [Authorize(Policy = "authorPolicy")]
+        [HttpGet("author/{userId:long}")]
+        public ActionResult<WalletDto> GetAuthorWallet(long userId)
+        {
+            var loggedInUserId = User.PersonId();
+
+            if (loggedInUserId != userId)
+                return Forbid();
+
+            var result = _walletService.GetWalletForUser(userId);
+            return result is not null ? Ok(result) : NotFound();
+        }
+
 
     }
 }
