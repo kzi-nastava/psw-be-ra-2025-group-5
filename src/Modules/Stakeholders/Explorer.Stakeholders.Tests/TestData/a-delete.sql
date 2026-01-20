@@ -9,3 +9,6 @@ DELETE FROM stakeholders."Diaries";
 DELETE FROM stakeholders."ClubMessages";
 DELETE FROM stakeholders."ClubMembers";
 DELETE FROM stakeholders."ProfileFollows";
+DELETE FROM stakeholders."Planners";
+DELETE FROM stakeholders."PlannerDay";
+DELETE FROM stakeholders."PlannerTimeBlock";
