@@ -72,13 +72,23 @@ INSERT INTO stakeholders."TourProblems"(
 VALUES (2, 2, 5, 2, 1, 'Problem sa planom puta', '2024-10-26T11:00:00Z', '2024-10-26T11:05:00Z', ARRAY[]::bigint[], false, null);
 INSERT INTO stakeholders."TourProblems"(
 	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
-VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2024-10-27T12:00:00Z', '2024-10-27T12:05:00Z', ARRAY[]::bigint[], true, null);
+VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z', ARRAY[]::bigint[], true, null);
+
+INSERT INTO stakeholders."Streaks"(
+    "Id", "UserId", "StartDate", "LastActivity", "LongestStreak")
+VALUES (1, 21, '2026-01-18', '2026-01-19', 2);
+
+
+
+
 
 SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."TourProblems"));
 SELECT setval(pg_get_serial_sequence('stakeholders."People"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."People"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Users"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Users"));
 SELECT setval(pg_get_serial_sequence('stakeholders."AppRatings"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."AppRatings"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Clubs"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Clubs"));
+
+SELECT setval(pg_get_serial_sequence('stakeholders."ProfileMessages"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."ProfileMessages"));
 SELECT setval(pg_get_serial_sequence('stakeholders."ProfileMessages"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."ProfileMessages"));
 
 
@@ -184,3 +194,4 @@ INSERT INTO stakeholders."UserBadges"(
 SELECT setval(pg_get_serial_sequence('stakeholders."Badges"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Badges"));
 SELECT setval(pg_get_serial_sequence('stakeholders."UserStatistics"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."UserStatistics"));
 SELECT setval(pg_get_serial_sequence('stakeholders."UserBadges"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."UserBadges"));
+
