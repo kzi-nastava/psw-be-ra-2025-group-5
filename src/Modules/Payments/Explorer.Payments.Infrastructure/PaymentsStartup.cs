@@ -32,6 +32,7 @@ public static class PaymentsStartup
         services.AddScoped<ITourSaleService, TourSaleService>();
         services.AddScoped<ICouponService, CouponService>();
         services.AddScoped<IBundleService, BundleService>();
+        services.AddScoped<IPremiumPaymentService, PremiumPaymentService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)

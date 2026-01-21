@@ -88,6 +88,7 @@ public static class StakeholdersStartup
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
 
         services.AddScoped<IPremiumService, PremiumService>();
+        services.AddScoped<IPremiumSharedService, PremiumSharedService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)

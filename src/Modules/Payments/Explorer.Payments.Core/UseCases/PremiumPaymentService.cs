@@ -1,6 +1,6 @@
 ﻿using Explorer.Payments.API.Public;
 using Explorer.Payments.Core.Domain.RepositoryInterfaces;
-using Explorer.Stakeholders.API.Public.Users;
+using Explorer.Stakeholders.API.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +12,14 @@ namespace Explorer.Payments.Core.UseCases
     public class PremiumPaymentService: IPremiumPaymentService
     {
         private readonly IWalletRepository _walletRepository;
-        private readonly IPremiumService _premiumService;
+        private readonly IPremiumSharedService _premiumService;
 
         private const int PremiumDays = 30;
         private const double Price = 50;
 
         public PremiumPaymentService(
             IWalletRepository walletRepository,
-            IPremiumService premiumService)
+            IPremiumSharedService premiumService)
         {
             _walletRepository = walletRepository;
             _premiumService = premiumService;

@@ -14,6 +14,16 @@ public class UserPremiumCommandTests : BaseStakeholdersIntegrationTest
 {
     public UserPremiumCommandTests(StakeholdersTestFactory factory) : base(factory) { }
 
+    private void CleanupPremium(long userId, StakeholdersContext dbContext)
+    {
+        var existing = dbContext.UserPremiums.Where(p => p.UserId == userId).ToList();
+        if (existing.Any())
+        {
+            dbContext.UserPremiums.RemoveRange(existing);
+            dbContext.SaveChanges();
+        }
+    }
+
     [Fact]
     public void Is_premium_returns_true_for_active_premium()
     {
@@ -21,18 +31,15 @@ public class UserPremiumCommandTests : BaseStakeholdersIntegrationTest
         var premiumService = scope.ServiceProvider.GetRequiredService<IPremiumService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
-        var userId = -1L;
+        var userId = -21L; // turista1
+        CleanupPremium(userId, dbContext);
+
         var validUntil = DateTime.UtcNow.AddDays(10);
-
-        // Act
         premiumService.GrantPremium(userId, validUntil);
-        var isPremium = premiumService.IsPremium(userId);
 
-        // Assert
-        isPremium.ShouldBeTrue();
+        premiumService.IsPremium(userId).ShouldBeTrue();
 
         var stored = dbContext.UserPremiums.Single(p => p.UserId == userId);
-        stored.ValidUntil.ShouldNotBeNull();
         stored.ValidUntil.Value.ShouldBeGreaterThan(DateTime.UtcNow);
     }
 
@@ -41,14 +48,12 @@ public class UserPremiumCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var premiumService = scope.ServiceProvider.GetRequiredService<IPremiumService>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
-        var userId = -999L;
+        var userId = -24L; // turista4
+        CleanupPremium(userId, dbContext);
 
-        // Act
-        var isPremium = premiumService.IsPremium(userId);
-
-        // Assert
-        isPremium.ShouldBeFalse();
+        premiumService.IsPremium(userId).ShouldBeFalse();
     }
 
     [Fact]
@@ -58,15 +63,12 @@ public class UserPremiumCommandTests : BaseStakeholdersIntegrationTest
         var premiumService = scope.ServiceProvider.GetRequiredService<IPremiumService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
-        var userId = -2L;
+        var userId = -23L; // turista3
+        CleanupPremium(userId, dbContext);
 
-        // Arrange
         premiumService.GrantPremium(userId, DateTime.UtcNow.AddDays(30));
-
-        // Act
         premiumService.RemovePremium(userId);
 
-        // Assert
         premiumService.IsPremium(userId).ShouldBeFalse();
         dbContext.UserPremiums.FirstOrDefault(p => p.UserId == userId).ShouldBeNull();
     }
@@ -76,16 +78,15 @@ public class UserPremiumCommandTests : BaseStakeholdersIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var premiumService = scope.ServiceProvider.GetRequiredService<IPremiumService>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<StakeholdersContext>();
 
-        var userId = -3L;
+        var userId = -21L; // turista1
+        CleanupPremium(userId, dbContext);
 
-        // Arrange
-        premiumService.GrantPremium(userId, DateTime.UtcNow.AddDays(-1));
+        // Kreiraj premium koji je već istekao
+        premiumService.GrantPremium(userId, DateTime.UtcNow.AddDays(-51));
 
-        // Act
-        var isPremium = premiumService.IsPremium(userId);
+        premiumService.IsPremium(userId).ShouldBeFalse();
 
-        // Assert
-        isPremium.ShouldBeFalse();
     }
 }

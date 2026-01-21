@@ -7,7 +7,8 @@ namespace Explorer.API.Controllers.Users
 {
     [Route("api/premium")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "authorPolicy")] 
+    [Authorize(Policy = "touristPolicy")]
     public class PremiumController : ControllerBase
     {
         private readonly IPremiumPaymentService _paymentService;

@@ -20,7 +20,7 @@ namespace Explorer.Stakeholders.Core.Domain.Users
 
         public bool IsActive()
         {
-            if (ValidUntil == null) return true;
+            if (ValidUntil == null) return false;
             return ValidUntil > DateTime.UtcNow;
         }
 
