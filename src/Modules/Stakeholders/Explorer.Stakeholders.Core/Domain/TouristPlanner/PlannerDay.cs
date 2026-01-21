@@ -18,7 +18,7 @@ public class PlannerDay : Entity
     public void AddBlock(PlannerTimeBlock block, int duration = 0)
     {
         var nullTime = new TimeOnly(0, 0);
-        if (block.TimeRange.Start == nullTime || block.TimeRange.End == nullTime)
+        if (block.TimeRange.End == nullTime)
         {
             var dayEnd = nullTime.AddMinutes(duration);
             block.TimeRange = FindFirstAvailableSlot(dayEnd - nullTime);
@@ -40,7 +40,7 @@ public class PlannerDay : Entity
         TimeRange candidate;
         var nullTime = new TimeOnly(0, 0);
 
-        if (start == nullTime || end == nullTime)
+        if (end == nullTime)
             candidate = FindFirstAvailableSlot(block.TimeRange.End - block.TimeRange.Start);
         else
         {
