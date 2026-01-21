@@ -86,6 +86,8 @@ public static class StakeholdersStartup
         services.AddScoped<IPaymentNotificationService, NotificationService>();
         // NEW – experience / gamification
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
+
+        services.AddScoped<IPremiumService, PremiumService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -103,6 +105,7 @@ public static class StakeholdersStartup
         services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
         services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
         services.AddScoped<IProfileMessageRepository, ProfileMessageDbRepository>();
+        services.AddScoped<IUserPremiumRepository, UserPremiumDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
         dataSourceBuilder.EnableDynamicJson();

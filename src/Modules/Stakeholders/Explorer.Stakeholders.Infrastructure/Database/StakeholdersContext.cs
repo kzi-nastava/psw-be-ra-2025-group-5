@@ -33,6 +33,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
         public DbSet<ProfileFollow> ProfileFollows { get; set; }
         public DbSet<ProfileMessage> ProfileMessages { get; set; }
+        public DbSet<UserPremium> UserPremiums { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -57,6 +58,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClubJoinRequest(modelBuilder);
             ConfigureFollow(modelBuilder);
             ConfigureProfileMessage(modelBuilder);
+            ConfigureUserPremium(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -454,6 +456,31 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.HasIndex(cm => cm.ReceiverId);
 
                 builder.ToTable("ProfileMessages");
+            });
+        }
+
+        private static void ConfigureUserPremium(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserPremium>(builder =>
+            {
+                builder.HasKey(up => up.Id);
+
+                builder.Property(up => up.UserId)
+                       .IsRequired();
+
+                builder.Property(up => up.ValidUntil)
+                       .IsRequired(false);
+
+                builder.HasIndex(up => up.UserId)
+                       .IsUnique();
+
+                // Foreign key ka User entitetu
+                builder.HasOne<User>()
+                       .WithMany()
+                       .HasForeignKey(up => up.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.ToTable("UserPremiums");
             });
         }
     }
