@@ -59,4 +59,9 @@ public class EquipmentDbRepository : IEquipmentRepository
         _dbSet.Remove(entity);
         DbContext.SaveChanges();
     }
+    public List<Equipment> GetByIds(List<long> ids)
+    {
+        return _dbSet.Where(e => ids.Contains(e.Id)).ToList();
+    }
+
 }
