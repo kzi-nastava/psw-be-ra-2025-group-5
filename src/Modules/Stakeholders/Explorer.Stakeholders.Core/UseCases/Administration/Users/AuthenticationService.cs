@@ -14,7 +14,11 @@ public class AuthenticationService : IAuthenticationService
     private readonly IPersonRepository _personRepository;
     private readonly IInternalWalletService _walletService;
 
-    public AuthenticationService(IUserRepository userRepository, IPersonRepository personRepository, ITokenGenerator tokenGenerator, IInternalWalletService walletService)
+    public AuthenticationService(
+        IUserRepository userRepository, 
+        IPersonRepository personRepository, 
+        ITokenGenerator tokenGenerator, 
+        IInternalWalletService walletService)
     {
         _tokenGenerator = tokenGenerator;
         _userRepository = userRepository;

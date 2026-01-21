@@ -2,6 +2,7 @@ using Explorer.API.FileStorage;
 using Explorer.API.Middleware;
 using Explorer.API.Startup;
 using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.API.BackgroundJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpClient();
 
 builder.Services.AddHostedService<TourExpirationWorker>();
+builder.Services.AddHostedService<DailyBadgeCheckBackgroundService>();
 builder.Services.AddScoped<IImageStorage, FileSystemImageStorage>();
 
 var app = builder.Build();
