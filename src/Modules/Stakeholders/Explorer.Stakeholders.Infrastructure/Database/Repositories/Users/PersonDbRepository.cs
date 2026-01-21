@@ -47,4 +47,9 @@ public class PersonDbRepository : IPersonRepository
         task.Wait();
         return task.Result;
     }
+
+    public List<Person> GetAll()
+    {
+        return _dbSet.ToList();
+    }
 }

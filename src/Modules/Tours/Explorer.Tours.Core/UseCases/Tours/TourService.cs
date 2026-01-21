@@ -16,6 +16,7 @@ using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 using Explorer.Tours.API.Dtos.Equipments;
+using Explorer.Stakeholders.API.Internal;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -28,23 +29,26 @@ public class TourService : ITourService, ITourSharedService
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
     private readonly IEquipmentRepository _equipmentRepository;
+    private readonly IInternalBadgeService _badgeService;
 
-    public TourService(
-     ITourRepository repository,
-     IMapper mapper,
-     ITourExecutionRepository execution,
-     ITourPurchaseTokenSharedService purchaseToken,
-     IEquipmentRepository equipmentRepository,
-     IImageStorage imageStorage,
-     IEquipmentRepository equipmentRepo)
-    {
-        _tourRepository = repository;
-        _mapper = mapper;
-        _tourExecutionRepository = execution;
-        _purchaseTokenService = purchaseToken;
-        _imageStorage = imageStorage;
-        _equipmentRepository = equipmentRepo;
-    }
+
+   public TourService(
+    ITourRepository repository,
+    IMapper mapper,
+    ITourExecutionRepository execution,
+    ITourPurchaseTokenSharedService purchaseToken,
+    IEquipmentRepository equipmentRepository,
+    IImageStorage imageStorage,
+    IInternalBadgeService badgeService)
+{
+    _tourRepository = repository;
+    _mapper = mapper;
+    _tourExecutionRepository = execution;
+    _purchaseTokenService = purchaseToken;
+    _equipmentRepository = equipmentRepository;
+    _imageStorage = imageStorage;
+    _badgeService = badgeService;
+}
 
     public List<RequiredEquipmentDto> GetRequiredEquipment(long tourId)
     {
@@ -58,6 +62,7 @@ public class TourService : ITourService, ITourSharedService
             Name = e.Name,
             Description = e.Description
         }).ToList();
+        _badgeService = badgeService;
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
@@ -277,6 +282,9 @@ public class TourService : ITourService, ITourSharedService
         tour.Publish();
 
         var result = _tourRepository.Update(tour);
+        
+        _badgeService.OnTourPublished(tour.AuthorId);
+        
         return _mapper.Map<TourDto>(result);
     }
 

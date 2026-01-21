@@ -117,14 +117,14 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
             {
                 Name = "Reject Klub",
                 Description = "Test reject invite",
-                CreatorId = 1
+                CreatorId = -21
             }, new List<IFormFile> { CreateTestImage() });
 
-            inviteService.InviteTourist(club.Id, 3, 1);
+            inviteService.InviteTourist(club.Id, -22, -21);
 
-            var inviteId = dbContext.ClubInvites.First(i => i.ClubId == club.Id && i.TouristId == 3).Id;
+            var inviteId = dbContext.ClubInvites.First(i => i.ClubId == club.Id && i.TouristId == -22).Id;
 
-            inviteService.RejectInvite(inviteId, 3);
+            inviteService.RejectInvite(inviteId, -22);
 
             dbContext.ChangeTracker.Clear();
             dbContext.ClubInvites.Any(i => i.Id == inviteId).ShouldBeFalse();

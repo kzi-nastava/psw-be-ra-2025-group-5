@@ -3,6 +3,7 @@ using Explorer.Encounters.API.Internal;
 using Explorer.Stakeholders.API.Internal;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.API.Public.AppRatings;
+using Explorer.Stakeholders.API.Public.Badges;
 using Explorer.Stakeholders.API.Public.Clubs;
 using Explorer.Stakeholders.API.Public.ClubMessages;
 using Explorer.Stakeholders.API.Public.Diaries;
@@ -15,6 +16,7 @@ using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.AppRatings;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Badges;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Clubs;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Diaries;
@@ -26,6 +28,7 @@ using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TourProblems;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using Explorer.Stakeholders.Core.Mappers;
 using Explorer.Stakeholders.Core.UseCases;
+using Explorer.Stakeholders.Core.UseCases.Administration.Badges;
 using Explorer.Stakeholders.Core.UseCases.Administration.Social;
 using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.Core.UseCases.ClubMembership;
@@ -36,6 +39,7 @@ using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.AppRatings;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.Badges;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.Clubs;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.ClubMessages;
 using Explorer.Stakeholders.Infrastructure.Database.Repositories.Notifications;
@@ -84,6 +88,16 @@ public static class StakeholdersStartup
         services.AddScoped<IProfileFollowService, ProfileFollowService>();
         services.AddScoped<IProfileMessageService, ProfileMessageService>();
         services.AddScoped<IPaymentNotificationService, NotificationService>();
+        
+        services.AddScoped<IBadgeService, BadgeService>();
+        services.AddScoped<IUserBadgeService, UserBadgeService>();
+        services.AddScoped<IUserStatisticsService, UserStatisticsService>();
+        services.AddScoped<IBadgeAwardService, BadgeAwardService>();
+        services.AddScoped<IDailyBadgeCheckService, DailyBadgeCheckService>();
+        
+        // Internal API
+        services.AddScoped<IInternalBadgeService, InternalBadgeAdapter>();
+
         // NEW – experience / gamification
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
     }
@@ -103,6 +117,9 @@ public static class StakeholdersStartup
         services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
         services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
         services.AddScoped<IProfileMessageRepository, ProfileMessageDbRepository>();
+        services.AddScoped<IBadgeRepository, BadgeDbRepository>();
+        services.AddScoped<IUserBadgeRepository, UserBadgeDbRepository>();
+        services.AddScoped<IUserStatisticsRepository, UserStatisticsDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
         dataSourceBuilder.EnableDynamicJson();
