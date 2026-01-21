@@ -50,13 +50,16 @@ VALUES
 
 INSERT INTO tours."Equipment"(
     "Id", "Name", "Description")
-VALUES (1, 'Voda', 'Količina vode varira od temperature i trajanja ture. Preporuka je da se pije pola litre vode na jedan sat umerena fizičke aktivnosti (npr. hajk u prirodi bez značajnog uspona) po umerenoj vrućini');
+VALUES (1, 'Water', 'The amount of water depends on the temperature and the duration of the tour. It is recommended to drink half a liter of water per hour of moderate physical activity (e.g. hiking in nature without significant elevation gain) in moderate heat.');
+
 INSERT INTO tours."Equipment"(
     "Id", "Name", "Description")
-VALUES (2, 'Štapovi za šetanje', 'Štapovi umanjuju umor nogu, pospešuju aktivnost gornjeg dela tela i pružaju stabilnost na neravnom terenu.');
+VALUES (2, 'Walking poles', 'Walking poles reduce leg fatigue, encourage upper body activity, and provide stability on uneven terrain.');
+
 INSERT INTO tours."Equipment"(
     "Id", "Name", "Description")
-VALUES (3, 'Obična baterijska lampa', 'Baterijska lampa od 200 do 400 lumena.');
+VALUES (3, 'Standard flashlight', 'A flashlight with a brightness of 200 to 400 lumens.');
+
 
 INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (1, 4, 1);
 INSERT INTO tours."TouristEquipment" ("Id", "TouristId", "EquipmentId") VALUES (2, 4, 2);

@@ -20,7 +20,7 @@ namespace Explorer.Payments.Core.UseCases
 
         public void CreateWalletForPerson(long personId)
         {
-            var existingWallet = _walletRepository.GetByTouristId(personId);
+            var existingWallet = _walletRepository.GetByUserId(personId);
             if (existingWallet != null)
                 return;
 
