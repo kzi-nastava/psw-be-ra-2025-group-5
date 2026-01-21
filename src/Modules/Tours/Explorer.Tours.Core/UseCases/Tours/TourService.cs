@@ -62,7 +62,7 @@ public class TourService : ITourService, ITourSharedService
             Name = e.Name,
             Description = e.Description
         }).ToList();
-        _badgeService = badgeService;
+       
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
