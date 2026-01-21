@@ -4,6 +4,7 @@ using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
 using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
+using Explorer.Tours.API.Dtos.Equipments;
 
 namespace Explorer.Tours.API.Public.Tour;
 
@@ -52,5 +53,7 @@ public interface ITourService
 
     TourDto UploadThumbnail(long tourId, IFormFile file);
     bool CanEditTour(long tourId, long userId);
+
+    List<RequiredEquipmentDto> GetRequiredEquipment(long tourId);
 
 }

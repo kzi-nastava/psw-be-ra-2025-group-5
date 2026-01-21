@@ -17,12 +17,17 @@ namespace Explorer.Payments.Core.UseCases
         private readonly IWalletRepository _walletRepository;
         private readonly IPaymentNotificationService _notificationService;
         private readonly IUserInfoService _userInfoService;
+        private readonly IPaymentRepository _paymentRepository;
 
-        public WalletService(IWalletRepository walletRepository, IPaymentNotificationService notificationService, IUserInfoService userInfoService)
+        public WalletService(IWalletRepository walletRepository,
+                         IPaymentRepository paymentRepository,
+                         IPaymentNotificationService notificationService,
+                         IUserInfoService userInfoService)
         {
             _walletRepository = walletRepository;
+            _paymentRepository = paymentRepository;
             _notificationService = notificationService;
-            _userInfoService = userInfoService; 
+            _userInfoService = userInfoService;
         }
 
         public WalletDto GetWalletForUser(long userId)
@@ -78,6 +83,21 @@ namespace Explorer.Payments.Core.UseCases
 
             return result;
         }
+
+        public IEnumerable<PaymentDto> GetPaymentsForTourist(long touristId)
+        {
+            var payments = _paymentRepository.GetByTourist(touristId);
+
+            return payments.Select(p => new PaymentDto
+            {
+                TouristId = p.TouristId,
+                TourId = p.TourId,
+                Price = Convert.ToDecimal(p.Price), 
+                PaidAt = p.CreatedAt,             
+                Status = null                       
+            }).ToList();
+        }
+
 
     }
 }
