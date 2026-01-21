@@ -2,6 +2,7 @@
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Payments.API.Internal;
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
@@ -9,12 +10,12 @@ using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Equipments;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
-using Explorer.Tours.Core.Domain.Shared;
-using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -63,6 +64,13 @@ public class TourService : ITourService, ITourSharedService
         var filtered = result.Where(t => ids.Contains(t.Id)).ToList();
         var items = filtered.Select(_mapper.Map<TourDto>).ToList();
         return items;
+    }
+
+    public List<TourDto> GetPurchased(long touristId)
+    {
+        var purchaseTokens = _purchaseTokenService.GetByTourist(touristId);
+        var tourIds = purchaseTokens.Select(pt => pt.TourId).Distinct().ToArray();
+        return GetMultiple(tourIds);
     }
 
     public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)

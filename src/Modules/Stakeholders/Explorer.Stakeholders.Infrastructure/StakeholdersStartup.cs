@@ -47,6 +47,10 @@ using Explorer.Stakeholders.Infrastructure.Database.Repositories.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Explorer.Stakeholders.API.Public.TouristPlanner;
+using Explorer.Stakeholders.Core.UseCases.TouristPlanner;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TouristPlanner;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.TouristPlanner;
 
 namespace Explorer.Stakeholders.Infrastructure;
 
@@ -86,6 +90,8 @@ public static class StakeholdersStartup
         services.AddScoped<IPaymentNotificationService, NotificationService>();
         // NEW – experience / gamification
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
+
+        services.AddScoped<IPlannerService, PlannerService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -103,6 +109,7 @@ public static class StakeholdersStartup
         services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
         services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
         services.AddScoped<IProfileMessageRepository, ProfileMessageDbRepository>();
+        services.AddScoped<IPlannerRepository, PlannerDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
         dataSourceBuilder.EnableDynamicJson();

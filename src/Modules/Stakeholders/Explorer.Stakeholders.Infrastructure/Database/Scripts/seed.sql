@@ -8,6 +8,7 @@ DELETE FROM stakeholders."ClubInvites";
 DELETE FROM stakeholders."ClubMembers";
 DELETE FROM stakeholders."ProfileFollows";
 DELETE FROM stakeholders."ProfileMessages";
+DELETE FROM stakeholders."Planners";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
@@ -71,6 +72,9 @@ INSERT INTO stakeholders."TourProblems"(
 	"Id", "TourId", "ReporterId", "Category", "Priority", "Description", "OccurredAt",  "CreatedAt", "Comments", "IsResolved", "Deadline")
 VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-27T12:05:00Z', ARRAY[]::bigint[], true, null);
 
+INSERT INTO stakeholders."Planners"("Id", "TouristId") VALUES (1, 4);
+INSERT INTO stakeholders."PlannerDay"("Id", "Date", "PlannerId") VALUES (1, NOW(), 1);
+INSERT INTO stakeholders."PlannerTimeBlock"("Id", "TourId", "TimeRange", "PlannerDayId") VALUES (1, 5, jsonb_build_object('Start', '09:30', 'End', '11:00'), 1);
 
 SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."TourProblems"));
 SELECT setval(pg_get_serial_sequence('stakeholders."People"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."People"));
@@ -78,3 +82,7 @@ SELECT setval(pg_get_serial_sequence('stakeholders."Users"', 'Id'), (SELECT COAL
 SELECT setval(pg_get_serial_sequence('stakeholders."AppRatings"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."AppRatings"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Clubs"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Clubs"));
 SELECT setval(pg_get_serial_sequence('stakeholders."ProfileMessages"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."ProfileMessages"));
+SELECT setval(pg_get_serial_sequence('stakeholders."ProfileFollows"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."ProfileFollows"));
+SELECT setval(pg_get_serial_sequence('stakeholders."Planners"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Planners"));
+SELECT setval(pg_get_serial_sequence('stakeholders."PlannerDay"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."PlannerDay"));
+SELECT setval(pg_get_serial_sequence('stakeholders."PlannerTimeBlock"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."PlannerTimeBlock"));

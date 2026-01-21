@@ -1,28 +1,30 @@
 using AutoMapper;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.AppRatings;
-using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.ClubMessages;
+using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.Comments;
 using Explorer.Stakeholders.API.Dtos.Diaries;
 using Explorer.Stakeholders.API.Dtos.Locations;
 using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Dtos.TouristPlanner;
+using Explorer.Stakeholders.API.Dtos.ProfileMessages;
 using Explorer.Stakeholders.API.Dtos.Social;
 using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
-using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
+using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
+using Explorer.Stakeholders.Core.Domain.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
-using Explorer.Stakeholders.Core.Domain.ProfileMessages;
-using Explorer.Stakeholders.API.Dtos.ProfileMessages;
 
 namespace Explorer.Stakeholders.Core.Mappers
 {
@@ -159,6 +161,14 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
 
             CreateMap<ProfileMessageDto, ProfileMessage>();
+
+            // ========================= Planner <-> PlannerDto =========================
+            CreateMap<Planner, PlannerDto>().ReverseMap();
+            CreateMap<PlannerDay, PlannerDayDto>();
+
+            CreateMap<PlannerTimeBlock, PlannerTimeBlockDto>()
+                .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.TimeRange.Start))
+                .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.TimeRange.End));
         }
     }
 }
