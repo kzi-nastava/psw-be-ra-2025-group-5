@@ -7,8 +7,7 @@ namespace Explorer.API.Controllers.Users
 {
     [Route("api/premium")]
     [ApiController]
-    [Authorize(Policy = "authorPolicy")] 
-    [Authorize(Policy = "touristPolicy")]
+    [Authorize(Policy = "authorOrTouristPolicy")]
     public class PremiumController : ControllerBase
     {
         private readonly IPremiumPaymentService _paymentService;
@@ -26,16 +25,41 @@ namespace Explorer.API.Controllers.Users
         public IActionResult Purchase()
         {
             var userId = long.Parse(User.FindFirst("id")!.Value);
-            _paymentService.PurchasePremium(userId);
-            return NoContent();
+
+            // brza provera da purchase ne radi kao extend
+            if (_premiumService.IsPremium(userId))
+                return Conflict("User already has premium. Use /extend.");
+
+            try
+            {
+                _paymentService.PurchasePremium(userId);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("extend")]
         public IActionResult Extend()
         {
             var userId = long.Parse(User.FindFirst("id")!.Value);
-            _paymentService.ExtendPremium(userId);
-            return NoContent();
+
+            try
+            {
+                _paymentService.ExtendPremium(userId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound("Premium not found. Purchase first.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // npr expired, wallet not found, not enough coins
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("cancel")]

@@ -21,33 +21,39 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
         public void GrantPremium(long userId, DateTime validUntil)
         {
             UserPremium existing = null;
-            try
-            {
-                existing = _userPremiumRepository.Get((int)userId);
-            }
-            catch (KeyNotFoundException)
-            {
-                
-            }
+
+            try { existing = _userPremiumRepository.Get((int)userId); }
+            catch (KeyNotFoundException) { }
 
             if (existing == null)
             {
-                var newPremium = new UserPremium(userId, validUntil);
-                _userPremiumRepository.Add(newPremium);
+                _userPremiumRepository.Add(new UserPremium(userId, validUntil));
+                return;
             }
-            else
-            {
-                existing.Extend(validUntil);
-                _userPremiumRepository.Update(existing);
-            }
+
+            if (existing.IsActive())
+                throw new InvalidOperationException("User already has premium.");
+
+            // istekao premium -> obriši red, pa dodaj novi
+            _userPremiumRepository.Delete((int)userId);
+            _userPremiumRepository.Add(new UserPremium(userId, validUntil));
         }
 
-        public void ExtendPremium(long userId, DateTime newUntil)
+
+        public void ExtendPremium(long userId, DateTime _ignored)
         {
             var premium = _userPremiumRepository.Get((int)userId);
-            premium.Extend(newUntil);
+
+            if (!premium.IsActive())
+            {
+                _userPremiumRepository.Delete((int)userId);
+                throw new InvalidOperationException("Premium expired. Purchase again.");
+            }
+
+            premium.ValidUntil = premium.ValidUntil!.Value.AddDays(30);
             _userPremiumRepository.Update(premium);
         }
+
 
         public void RemovePremium(long userId)
         {
@@ -59,7 +65,11 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
             try
             {
                 var premium = _userPremiumRepository.Get((int)userId);
-                return premium.IsActive();
+                if (premium.IsActive()) return true;
+
+                // expired -> obriši red
+                _userPremiumRepository.Delete((int)userId);
+                return false;
             }
             catch (KeyNotFoundException)
             {

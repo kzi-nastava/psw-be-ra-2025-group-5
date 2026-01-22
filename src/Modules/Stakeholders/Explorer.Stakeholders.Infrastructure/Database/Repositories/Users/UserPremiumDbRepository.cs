@@ -38,11 +38,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database.Repositories.Users
             var existing = _dbSet.FirstOrDefault(up => up.UserId == userPremium.UserId)
                            ?? throw new KeyNotFoundException("UserPremium not found.");
 
-            if (userPremium.ValidUntil != null)
-            {
-                existing.Extend(userPremium.ValidUntil.Value);
-            }
-
+            existing.ValidUntil = userPremium.ValidUntil;
             _dbContext.SaveChanges();
             return existing;
         }

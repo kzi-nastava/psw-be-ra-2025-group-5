@@ -35,13 +35,15 @@ namespace Explorer.Payments.Core.UseCases
         public void ExtendPremium(long userId)
         {
             Charge(userId);
-            var until = DateTime.UtcNow.AddDays(PremiumDays);
-            _premiumService.ExtendPremium(userId, until);
+            _premiumService.ExtendPremium(userId, DateTime.UtcNow);
         }
 
         private void Charge(long userId)
         {
-            var wallet = _walletRepository.GetByTouristId(userId);
+            var wallet = _walletRepository.GetByUserId(userId);
+            if (wallet == null)
+                throw new InvalidOperationException("Wallet not found.");
+
             if (wallet.Balance < Price)
                 throw new InvalidOperationException("Not enough coins.");
 
