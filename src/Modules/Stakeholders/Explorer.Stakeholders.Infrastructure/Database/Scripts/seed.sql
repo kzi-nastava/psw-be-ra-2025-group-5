@@ -11,6 +11,7 @@ DELETE FROM stakeholders."ProfileMessages";
 DELETE FROM stakeholders."Badges";
 DELETE FROM stakeholders."UserStatistics";
 DELETE FROM stakeholders."UserBadges";
+DELETE FROM stakeholders."UserPremiums";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
@@ -77,6 +78,9 @@ VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-2
 INSERT INTO stakeholders."Streaks"(
     "Id", "UserId", "StartDate", "LastActivity", "LongestStreak")
 VALUES (1, 21, '2026-01-18', '2026-01-19', 2);
+INSERT INTO stakeholders."UserPremiums" 
+	("Id", "UserId", "ValidUntil")
+VALUES (1, 4, '2026-02-20T00:00:00Z');
 
 
 
@@ -195,3 +199,4 @@ SELECT setval(pg_get_serial_sequence('stakeholders."Badges"', 'Id'), (SELECT COA
 SELECT setval(pg_get_serial_sequence('stakeholders."UserStatistics"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."UserStatistics"));
 SELECT setval(pg_get_serial_sequence('stakeholders."UserBadges"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."UserBadges"));
 
+SELECT setval(pg_get_serial_sequence('stakeholders."UserPremiums"', 'Id'), (SELECT COALESCE(MAX("Id"), 0) FROM stakeholders."UserPremiums"));
