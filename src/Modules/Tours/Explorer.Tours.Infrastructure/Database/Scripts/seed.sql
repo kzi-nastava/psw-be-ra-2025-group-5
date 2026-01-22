@@ -5,6 +5,7 @@ DELETE FROM tours."Monument";
 DELETE FROM tours."Equipment";
 DELETE FROM tours."TouristEquipment";
 DELETE FROM tours."TourReviews";
+DELETE FROM tours."TourRequests";
 
 INSERT INTO tours."TouristPreferences" ("Id", "UserId", "PreferredDifficulty", "TransportationRatings", "PreferredTags")
 VALUES (1, 4, 1, '{"Walking":2,"Bicycle":3,"Car":1,"Boat":0}', '["Adventure","Nature"]');
@@ -70,6 +71,11 @@ VALUES
 (4, 'Very informative', NOW(), 100, 5, 2, 'turista2'),
 (3, 'It was ok', NOW(), 75, 6, 3, 'turista3');
 
+INSERT INTO tours."TourRequests" 
+("Id", "TouristId", "AuthorId", "Difficulty", "Status", "Description", "MaxPrice", "Tags", "Location_Latitude", "Location_Longitude", "AcceptedTourId")
+VALUES 
+(1, 4, 7, 0, 0, 'I would like a relaxing walk by the river focusing on nature.', 50.0, '["Nature", "Walking"]', 45.2671, 19.8335, NULL);
+
 SELECT setval(pg_get_serial_sequence('tours."TouristPreferences"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristPreferences"));
 SELECT setval(pg_get_serial_sequence('tours."Tours"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Tours"));
 SELECT setval(pg_get_serial_sequence('tours."Facilities"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."Facilities"));
@@ -78,3 +84,4 @@ SELECT setval(pg_get_serial_sequence('tours."Equipment"', 'Id'), (SELECT COALESC
 SELECT setval(pg_get_serial_sequence('tours."TouristEquipment"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TouristEquipment"));
 SELECT setval(pg_get_serial_sequence('tours."TourReviews"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourReviews"));
 SELECT setval(pg_get_serial_sequence('tours."KeyPoints"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."KeyPoints"));
+SELECT setval(pg_get_serial_sequence('tours."TourRequests"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM tours."TourRequests"));
