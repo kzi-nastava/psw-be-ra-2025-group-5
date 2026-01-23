@@ -27,6 +27,7 @@ public class PaymentsContext: DbContext
         ConfigureTourSale(modelBuilder);
         ConfigureCoupon(modelBuilder);
         ConfigureBundle(modelBuilder);
+        ConfigurePayment(modelBuilder);
     }
 
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
@@ -118,6 +119,15 @@ public class PaymentsContext: DbContext
             bi.ToTable("BundleItems");
             bi.HasKey(x => x.Id);
             bi.HasIndex(x => x.TourId);
+        });
+    }
+
+    private static void ConfigurePayment(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Payment>(builder =>
+        {
+            builder.Property(p => p.TourId).IsRequired(false);
+            builder.Property(p => p.BundleId).IsRequired(false);
         });
     }
 }

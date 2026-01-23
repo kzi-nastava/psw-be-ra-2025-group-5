@@ -40,6 +40,7 @@ public class PaymentsProfile: Profile
         CreateMap<Coupon, CouponDto>().ReverseMap();
 
         CreateMap<Bundle, BundleDto>()
-            .ForMember(dest => dest.TourIds, opt => opt.MapFrom(src => src.BundleItems.Select(bi => bi.TourId).ToList()));
+            .ForMember(dest => dest.TourIds, opt => opt.MapFrom(src => src.BundleItems.Select(bi => bi.TourId).ToList()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
     }
 }

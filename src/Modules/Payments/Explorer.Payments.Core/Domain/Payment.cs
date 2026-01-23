@@ -10,7 +10,8 @@ namespace Explorer.Payments.Core.Domain
     public class Payment : AggregateRoot
     {
         public long TouristId { get; private set; }
-        public long TourId { get; private set; }
+        public long? TourId { get; private set; }
+        public long? BundleId { get; private set; }
         public double Price { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
@@ -20,6 +21,16 @@ namespace Explorer.Payments.Core.Domain
         {
             TouristId = touristId;
             TourId = tourId;
+            BundleId = null;
+            Price = price;
+            CreatedAt = DateTime.UtcNow;
+        }
+
+        public Payment(long touristId, long bundleId, double price, bool isBundle)
+        {
+            TouristId = touristId;
+            TourId = null;
+            BundleId = bundleId;
             Price = price;
             CreatedAt = DateTime.UtcNow;
         }
