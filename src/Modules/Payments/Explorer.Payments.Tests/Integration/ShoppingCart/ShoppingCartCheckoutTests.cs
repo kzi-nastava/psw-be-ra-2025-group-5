@@ -293,7 +293,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         cartController.Checkout(touristId);
 
         // Assert
-        var payment = dbContext.Payments.First(p => p.TouristId == touristId && p.TourId == tourId);
+        var payment = dbContext.Payments.First(p => p.TouristId == touristId && p.TourId.HasValue && p.TourId.Value == tourId);
 
         payment.Id.ShouldBeGreaterThan(0);
         payment.TouristId.ShouldBe(touristId);
