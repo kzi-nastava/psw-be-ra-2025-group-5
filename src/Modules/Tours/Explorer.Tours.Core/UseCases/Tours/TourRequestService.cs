@@ -44,5 +44,41 @@ namespace Explorer.Tours.Core.UseCases.Tours
             var items = result.Results.Select(_mapper.Map<TourRequestDto>).ToList();
             return new PagedResult<TourRequestDto>(items, result.TotalCount);
         }
+
+        public TourRequestDto Accept(long requestId, long authorId)
+        {
+            var request = _tourRequestRepository.Get(requestId)
+                ?? throw new KeyNotFoundException("Tour request not found.");
+
+            if (request.AuthorId != authorId)
+                throw new UnauthorizedAccessException("Author cannot manage this request.");
+
+            if (request.Status != TourRequestStatus.Pending)
+                throw new InvalidOperationException("Only pending requests can be processed.");
+
+            request.Accept();
+            _tourRequestRepository.Update(request);
+
+            return _mapper.Map<TourRequestDto>(request);
+        }
+
+        public TourRequestDto Decline(long requestId, long authorId)
+        {
+            var request = _tourRequestRepository.Get(requestId)
+                ?? throw new KeyNotFoundException("Tour request not found.");
+
+            if (request.AuthorId != authorId)
+                throw new UnauthorizedAccessException("Author cannot manage this request.");
+
+            if (request.Status != TourRequestStatus.Pending)
+                throw new InvalidOperationException("Only pending requests can be processed.");
+
+            request.Decline();
+            _tourRequestRepository.Update(request);
+
+            return _mapper.Map<TourRequestDto>(request);
+        }
+
+        
     }
 }
