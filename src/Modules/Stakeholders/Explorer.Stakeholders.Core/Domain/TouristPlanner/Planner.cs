@@ -2,7 +2,6 @@
 using Explorer.Stakeholders.Core.Domain.Shared;
 
 namespace Explorer.Stakeholders.Core.Domain.TouristPlanner;
-
 public class Planner : AggregateRoot
 {
     public long TouristId { get; private set; }

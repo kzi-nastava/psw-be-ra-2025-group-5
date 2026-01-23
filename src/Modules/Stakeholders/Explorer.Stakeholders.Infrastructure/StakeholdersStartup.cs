@@ -92,6 +92,7 @@ public static class StakeholdersStartup
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
 
         services.AddScoped<IPlannerService, PlannerService>();
+        services.AddScoped<IPlannerValidationService, PlannerValidationService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
