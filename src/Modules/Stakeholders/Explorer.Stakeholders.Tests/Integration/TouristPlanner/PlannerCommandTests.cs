@@ -26,7 +26,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -1,
             StartTime = new TimeOnly(10, 0),
             EndTime = new TimeOnly(12, 0),
-            Duration = 0
+            Duration = 0,
+            TransportType = "Walking"
         };
 
         // Act
@@ -59,7 +60,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -2,
             StartTime = new TimeOnly(23, 0),
             EndTime = new TimeOnly(23, 10),
-            Duration = 0
+            Duration = 0,
+            TransportType = "Walking"
         };
 
         // Act
@@ -87,7 +89,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -1,
             StartTime = new TimeOnly(0, 0),
             EndTime = new TimeOnly(0, 0),
-            Duration = 120
+            Duration = 120,
+            TransportType = "Walking"
         };
 
         // Act
@@ -113,7 +116,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -3,
             StartTime = new TimeOnly(9, 0),
             EndTime = new TimeOnly(11, 0),
-            Duration = 0
+            Duration = 0,
+            TransportType = "Walking"
         };
 
         // Act & Assert
@@ -135,7 +139,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -2,
             StartTime = new TimeOnly(17, 0),
             EndTime = new TimeOnly(19, 0),
-            Duration = 0
+            Duration = 0,
+            TransportType = "Walking"
         };
 
         // Act
@@ -168,7 +173,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -1,
             StartTime = new TimeOnly(10, 0),
             EndTime = new TimeOnly(12, 0),
-            Duration = 0
+            Duration = 0,
+            TransportType = "Walking"
         };
 
         // Act
@@ -192,7 +198,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
             TourId = -2,
             StartTime = new TimeOnly(20, 0),
             EndTime = new TimeOnly(23, 0),
-            Duration = 0
+            Duration = 0,
+            TransportType = "Walking"
         };
 
         // Act & Assert
