@@ -37,5 +37,12 @@ namespace Explorer.API.Controllers.Tours.Tourist
             var result = _tourRequestService.GetByTourist(touristId, page, pageSize);
             return Ok(result);
         }
+
+        [HttpGet("authors")]
+        public ActionResult<List<object>> GetAllAuthors()
+        {
+            var result = _tourRequestService.GetAllAuthors();
+            return Ok(result);
+        }
     }
 }

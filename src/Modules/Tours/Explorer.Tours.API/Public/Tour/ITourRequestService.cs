@@ -13,5 +13,6 @@ namespace Explorer.Tours.API.Public.Tour
         TourRequestDto Create(TourRequestDto entity);
         PagedResult<TourRequestDto> GetByTourist(long touristId, int page, int pageSize);
         PagedResult<TourRequestDto> GetByAuthor(long authorId, int page, int pageSize);
+        List<object> GetAllAuthors();
     }
 }
