@@ -57,7 +57,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         payment.CreatedAt.ShouldNotBe(default(DateTime));
         payment.CreatedAt.ShouldBeLessThanOrEqualTo(DateTime.UtcNow);
 
-        var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
+        var walletAfter = dbContext.Wallets.First(w => w.UserId == touristId);
         walletAfter.Balance.ShouldBe(97.5);
     }
 
@@ -90,7 +90,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         var payments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         payments.Count.ShouldBe(0);
 
-        var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
+        var walletAfter = dbContext.Wallets.First(w => w.UserId == touristId);
         walletAfter.Balance.ShouldBe(2);
     }
 
@@ -259,7 +259,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         var result = ((ObjectResult)cartController.Checkout(touristId).Result)?.Value as ShoppingCartDto;
 
         // Assert
-        var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
+        var walletAfter = dbContext.Wallets.First(w => w.UserId == touristId);
         walletAfter.Balance.ShouldBe(197.5);
 
         var payments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
@@ -320,7 +320,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         var existingPayments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         dbContext.Payments.RemoveRange(existingPayments);
 
-        var existingWallet = dbContext.Wallets.FirstOrDefault(w => w.TouristId == touristId);
+        var existingWallet = dbContext.Wallets.FirstOrDefault(w => w.UserId == touristId);
         if (existingWallet != null)
         {
             dbContext.Wallets.Remove(existingWallet);
@@ -346,7 +346,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         payments[0].TourId.ShouldBe(-1);
         payments[0].Price.ShouldBe(2.5);
 
-        var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
+        var walletAfter = dbContext.Wallets.First(w => w.UserId == touristId);
         walletAfter.Balance.ShouldBe(97.5);
     }
     [Fact]
@@ -371,7 +371,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         cartController.Checkout(touristId);
 
         // Assert
-        var walletAfter = dbContext.Wallets.First(w => w.TouristId == touristId);
+        var walletAfter = dbContext.Wallets.First(w => w.UserId == touristId);
         var payments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         var totalPaid = payments.Sum(p => p.Price);
 
@@ -394,7 +394,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         dbContext.Payments.RemoveRange(existingPayments);
 
         // Obriši prethodni wallet
-        var existingWallet = dbContext.Wallets.FirstOrDefault(w => w.TouristId == touristId);
+        var existingWallet = dbContext.Wallets.FirstOrDefault(w => w.UserId == touristId);
         if (existingWallet != null)
         {
             dbContext.Wallets.Remove(existingWallet);

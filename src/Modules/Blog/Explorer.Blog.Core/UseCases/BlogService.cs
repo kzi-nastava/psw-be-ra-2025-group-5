@@ -6,6 +6,7 @@ using Explorer.Blog.Core.Domain.BlogPosts.Entities;
 using Explorer.Blog.API.Dtos.Posts;
 using Explorer.Blog.API.Dtos.Images;
 using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.Stakeholders.API.Internal;
 
 namespace Explorer.Blog.Core.UseCases
 {
@@ -15,12 +16,20 @@ namespace Explorer.Blog.Core.UseCases
         private readonly IMapper _mapper;
         private readonly BlogDomainService _domainService;
         private readonly IImageStorage _imageStorage;
-        public BlogService(IBlogRepository blogRepository, IMapper mapper, BlogDomainService domainService, IImageStorage imageStorage)
+        private readonly IInternalBadgeService _badgeService;
+        
+        public BlogService(
+            IBlogRepository blogRepository, 
+            IMapper mapper, 
+            BlogDomainService domainService, 
+            IImageStorage imageStorage,
+            IInternalBadgeService badgeService)
         {
             _blogRepository = blogRepository;
             _mapper = mapper; 
             _domainService = domainService;
-            _imageStorage = imageStorage;   
+            _imageStorage = imageStorage;
+            _badgeService = badgeService;
         }
         public List<BlogPostDto> GetAll(long userId)
         {
@@ -231,6 +240,8 @@ namespace Explorer.Blog.Core.UseCases
             _domainService.Publish(post);
             _blogRepository.Update(post);
 
+            _badgeService.OnBlogPublished(authorId);
+
             return _mapper.Map<BlogPostDto>(post);
         }
         
@@ -273,6 +284,8 @@ namespace Explorer.Blog.Core.UseCases
 
             _domainService.Publish(post);
             _blogRepository.Update(post);
+
+            _badgeService.OnBlogPublished(authorId);
 
             return _mapper.Map<BlogPostDto>(post);
         }

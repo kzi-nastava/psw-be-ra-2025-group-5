@@ -17,31 +17,36 @@ namespace Explorer.Payments.Core.UseCases
         private readonly IWalletRepository _walletRepository;
         private readonly IPaymentNotificationService _notificationService;
         private readonly IUserInfoService _userInfoService;
+        private readonly IPaymentRepository _paymentRepository;
 
-        public WalletService(IWalletRepository walletRepository, IPaymentNotificationService notificationService, IUserInfoService userInfoService)
+        public WalletService(IWalletRepository walletRepository,
+                         IPaymentRepository paymentRepository,
+                         IPaymentNotificationService notificationService,
+                         IUserInfoService userInfoService)
         {
             _walletRepository = walletRepository;
+            _paymentRepository = paymentRepository;
             _notificationService = notificationService;
-            _userInfoService = userInfoService; 
+            _userInfoService = userInfoService;
         }
 
-        public WalletDto GetWalletForTourist(long touristId)
+        public WalletDto GetWalletForUser(long userId)
         {
-            var wallet = _walletRepository.GetByTouristId(touristId);
+            var wallet = _walletRepository.GetByUserId(userId);
             if (wallet == null)
                 throw new KeyNotFoundException("Wallet not found for this tourist.");
 
             return new WalletDto
             {
-                TouristId = wallet.TouristId,
+                UserId = wallet.UserId,
                 Balance = wallet.Balance
             };
         }
-        public void CreditToTourist(long touristId, double amount)
+        public void CreditToTourist(long userId, double amount)
         {
-            var wallet = _walletRepository.GetByTouristId(touristId);
+            var wallet = _walletRepository.GetByUserId(userId);
             if (wallet == null)
-                throw new Exception("Tourist wallet not found");
+                throw new Exception("User wallet not found");
 
             wallet.Credit(amount);
 
@@ -49,7 +54,7 @@ namespace Explorer.Payments.Core.UseCases
 
             var notification = _notificationService.Create(new NotificationDto
             {
-                UserId = touristId,
+                UserId = userId,
                 Title = "Credit Added",
                 Message = $"You received {amount} AC from Admin.",
                 Type = "CreditAdded",
@@ -64,7 +69,7 @@ namespace Explorer.Payments.Core.UseCases
 
             foreach (var tourist in tourists)
             {
-                var wallet = _walletRepository.GetByTouristId(tourist.Id);
+                var wallet = _walletRepository.GetByUserId(tourist.Id);
 
                 result.Add(new WalletUserDto
                 {
@@ -78,6 +83,21 @@ namespace Explorer.Payments.Core.UseCases
 
             return result;
         }
+
+        public IEnumerable<PaymentDto> GetPaymentsForTourist(long touristId)
+        {
+            var payments = _paymentRepository.GetByTourist(touristId);
+
+            return payments.Select(p => new PaymentDto
+            {
+                TouristId = p.TouristId,
+                TourId = p.TourId,
+                Price = Convert.ToDecimal(p.Price), 
+                PaidAt = p.CreatedAt,             
+                Status = null                       
+            }).ToList();
+        }
+
 
     }
 }

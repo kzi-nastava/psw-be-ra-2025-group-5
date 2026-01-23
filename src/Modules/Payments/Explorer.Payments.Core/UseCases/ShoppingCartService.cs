@@ -21,10 +21,19 @@ public class ShoppingCartService : IShoppingCartService
     private readonly IPaymentNotificationService _notificationService;
     private readonly ITourSaleService _TourSaleService;
     private readonly ICouponRepository _couponRepository;
+    private readonly IInternalBadgeService _badgeService;
 
-    public ShoppingCartService(IShoppingCartRepository repository, ITourSharedService tourService, IMapper mapper, ITourPurchaseTokenService tokenService, 
-        IWalletRepository walletRepository, IPaymentRepository paymentRepository, IPaymentNotificationService notificationService, ITourSaleService tourSaleService, 
-        ICouponRepository couponRepository)
+    public ShoppingCartService(
+        IShoppingCartRepository repository, 
+        ITourSharedService tourService, 
+        IMapper mapper, 
+        ITourPurchaseTokenService tokenService, 
+        IWalletRepository walletRepository, 
+        IPaymentRepository paymentRepository, 
+        IPaymentNotificationService notificationService, 
+        ITourSaleService tourSaleService, 
+        ICouponRepository couponRepository,
+        IInternalBadgeService badgeService)
     {
         _ShoppingCartRepository = repository;
         _TourService = tourService;
@@ -35,6 +44,7 @@ public class ShoppingCartService : IShoppingCartService
         _notificationService = notificationService;
         _TourSaleService = tourSaleService;
         _couponRepository = couponRepository;
+        _badgeService = badgeService;
     }
 
     private ShoppingCartDto ValidateCart(ShoppingCartDto cart)
@@ -131,7 +141,7 @@ public class ShoppingCartService : IShoppingCartService
             }
         }
 
-        var wallet = _walletRepository.GetByTouristId(touristId);
+        var wallet = _walletRepository.GetByUserId(touristId);
 
         if (wallet == null)
             throw new InvalidOperationException("Wallet not found.");
@@ -143,8 +153,16 @@ public class ShoppingCartService : IShoppingCartService
 
         foreach (var item in purchasableItems)
         {
+            var tour = tours[item.TourId];
+            var authorId = tour.AuthorId;
+
+            CreditAuthorWallet(authorId, item.ItemPrice.FinalPrice);
+
             _paymentRepository.Create(new Payment(touristId, item.TourId, item.ItemPrice.FinalPrice));
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
+            
+            // Dodaj bedž vlasniku ture
+            _badgeService.OnTourSold(tour.AuthorId);
         }
 
         cart.ClearShoppingCart();
@@ -154,11 +172,25 @@ public class ShoppingCartService : IShoppingCartService
         return _mapper.Map<ShoppingCartDto>(result);
     }
 
-    private void ChargeWallet(long touristId, double totalPrice) 
+    private void ChargeWallet(long userId, double totalPrice) 
     {
-        var wallet = _walletRepository.GetByTouristId(touristId);
+        var wallet = _walletRepository.GetByUserId(userId);
         wallet.Debit(totalPrice);
         _walletRepository.Update(wallet);
+    }
+
+    private void CreditAuthorWallet(long authorId, double amount)
+    {
+        var authorWallet = _walletRepository.GetByUserId(authorId);
+
+        if (authorWallet == null)
+        {
+            authorWallet = new Wallet(authorId);
+            _walletRepository.Create(authorWallet);
+        }
+
+        authorWallet.Credit(amount);
+        _walletRepository.Update(authorWallet);
     }
 
     private void SendPurchaseNotification(long touristId, int toursCount)

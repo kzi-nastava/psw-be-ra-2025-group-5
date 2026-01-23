@@ -53,10 +53,10 @@ public class PaymentsContext: DbContext
             builder.ToTable("Wallets");
             builder.HasKey(w => w.Id);
 
-            builder.Property(w => w.TouristId).IsRequired();
+            builder.Property(w => w.UserId).IsRequired();
             builder.Property(w => w.Balance).IsRequired();
 
-            builder.HasIndex(w => w.TouristId).IsUnique(); 
+            builder.HasIndex(w => w.UserId).IsUnique(); 
         });
     }
 
