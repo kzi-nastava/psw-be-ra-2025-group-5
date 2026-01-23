@@ -170,6 +170,12 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.TimeRange.Start))
                 .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.TimeRange.End))
                 .ForMember(d => d.TransportType, opt => opt.MapFrom(s => s.TransportType.ToString()));
+
+            CreateMap<PlannerTimeBlockDto, PlannerTimeBlock>()
+                .ForMember(dest => dest.TimeRange, opt => opt.MapFrom(src => new TimeRange(src.StartTime, src.EndTime)))
+                .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src =>
+                   string.IsNullOrEmpty(src.TransportType) ? TransportType.Walking : Enum.Parse<TransportType>(src.TransportType, true)));
+
         }
     }
 }

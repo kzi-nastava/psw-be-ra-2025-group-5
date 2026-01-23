@@ -4,6 +4,7 @@ using Explorer.Stakeholders.API.Dtos.TouristPlanner;
 using Explorer.Stakeholders.API.Public.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.TouristPlanner;
+using Explorer.Tours.API.Internal;
 
 namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner;
 
@@ -12,10 +13,16 @@ public class PlannerService : IPlannerService
     private readonly IPlannerRepository _plannerRepository;
     private readonly IMapper _mapper;
 
-    public PlannerService(IPlannerRepository plannerRepository, IMapper mapper)
+    private readonly IPlannerValidationService _validationService;
+    private readonly ITourSharedService _tourSharedService;
+
+    public PlannerService(IPlannerRepository plannerRepository, IMapper mapper, ITourSharedService tourSharedService, IPlannerValidationService validationService)
     {
         _plannerRepository = plannerRepository;
         _mapper = mapper;
+        _tourSharedService = tourSharedService;
+        _validationService = validationService;
+        
     }
 
     public PlannerDto GetOrCreatePlanner(long touristId)
@@ -38,12 +45,21 @@ public class PlannerService : IPlannerService
             planner.AddDay(day);
         }
 
-        var block = new PlannerTimeBlock(dto.TourId, dto.StartTime, dto.EndTime);
+        var transportType = ParseTransportType(dto.TransportType);
+        var block = new PlannerTimeBlock(dto.TourId, dto.StartTime, dto.EndTime, transportType);
 
         day.AddBlock(block, dto.Duration);
+
+        var tourIds = day.TimeBlocks.Select(b => b.TourId).Distinct();
+
+        var systemDurations = _tourSharedService.GetDurationsByTransport(tourIds, transportType.ToString());
+
+        var dayDto = _mapper.Map<PlannerDayDto>(day);
+        dayDto.Warnings = _validationService.ValidateDay(dayDto, systemDurations);
+
         _plannerRepository.Update(planner);
 
-        return _mapper.Map<PlannerDayDto>(day);
+        return dayDto;
     }
 
     public PlannerDayDto RemoveBlock(long touristId, DateOnly date, long blockId)
@@ -64,14 +80,35 @@ public class PlannerService : IPlannerService
 
         if(day == null) return AddBlock(touristId, date, dto);
 
-        day.RescheduleBlock(blockId, dto.StartTime, dto.EndTime);
+        var transportType = ParseTransportType(dto.TransportType);
+        day.RescheduleBlock(blockId, dto.StartTime, dto.EndTime, transportType);
+
+        var tourIds = day.TimeBlocks.Select(b => b.TourId).Distinct();
+
+        var systemDurations = _tourSharedService.GetDurationsByTransport(tourIds, transportType.ToString());
+
+        var dayDto = _mapper.Map<PlannerDayDto>(day);
+        dayDto.Warnings = _validationService.ValidateDay(dayDto, systemDurations);
+
         _plannerRepository.Update(planner);
 
-        return _mapper.Map<PlannerDayDto>(day);
+        return dayDto;
     }
 
     private Planner GetOrCreatePlannerEntity(long touristId)
     {
         return _plannerRepository.GetByTouristId(touristId) ?? _plannerRepository.Create(touristId);
     }
+
+    private static TransportType ParseTransportType(string transportType)
+    {
+        if (string.IsNullOrEmpty(transportType))
+            return TransportType.Walking;
+
+        if (!Enum.TryParse<TransportType>(transportType, true, out var result))
+            throw new Exception($"Invalid transport type: {transportType}");
+
+        return result;
+    }
+
 }
