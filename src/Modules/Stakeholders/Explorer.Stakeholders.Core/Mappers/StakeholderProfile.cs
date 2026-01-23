@@ -168,7 +168,8 @@ namespace Explorer.Stakeholders.Core.Mappers
 
             CreateMap<PlannerTimeBlock, PlannerTimeBlockDto>()
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.TimeRange.Start))
-                .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.TimeRange.End));
+                .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.TimeRange.End))
+                .ForMember(d => d.TransportType, opt => opt.MapFrom(s => s.TransportType.ToString()));
         }
     }
 }
