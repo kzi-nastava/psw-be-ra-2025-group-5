@@ -14,7 +14,10 @@ namespace Explorer.Encounters.Core.Mappers
             CreateMap<ChallengeType, string>().ConvertUsing(src => src.ToString());
             CreateMap<string, ChallengeType>().ConvertUsing(src => Enum.Parse<ChallengeType>(src, true));
 
-            CreateMap<ChallengeDto, Challenge>()
+            CreateMap<ChallengeExecutionStatus, string>().ConvertUsing(src => src.ToString());
+            CreateMap<string, ChallengeExecutionStatus>().ConvertUsing(src => Enum.Parse<ChallengeExecutionStatus>(src, true));
+
+            CreateMap<ChallengeResponseDto, Challenge>()
                 .ConstructUsing(dto => new Challenge(
                     dto.Name,
                     dto.Description,
@@ -22,8 +25,10 @@ namespace Explorer.Encounters.Core.Mappers
                     dto.Longitude,
                     dto.ExperiencePoints,
                     Enum.Parse<ChallengeStatus>(dto.Status, true),
-                    Enum.Parse<ChallengeType>(dto.Type, true)
-                ))
+                    Enum.Parse<ChallengeType>(dto.Type, true),
+                    dto.CreatedById,
+                    dto.RequiredParticipants, dto.RadiusInMeters, dto.ImageUrl)
+                )
                 .AfterMap((dto, challenge) =>
                 {
                     if (dto.Id != 0)
@@ -32,9 +37,28 @@ namespace Explorer.Encounters.Core.Mappers
                     }
                 });
 
-            CreateMap<Challenge, ChallengeDto>()
+            CreateMap<Challenge, ChallengeResponseDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+                .ForMember(dest => dest.CreatedById, opt => opt.MapFrom(src => src.CreatedByTouristId)); 
+
+            CreateMap<ChallengeExecution, ChallengeExecutionDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<ChallengeExecutionDto, ChallengeExecution>()
+                .ConstructUsing(dto => new ChallengeExecution(dto.ChallengeId, dto.TouristId))
+                .AfterMap((dto, execution) =>
+                {
+                    if (dto.Id != 0)
+                    {
+                        typeof(ChallengeExecution).GetProperty("Id")!.SetValue(execution, dto.Id);
+                    }
+                });
+
+            CreateMap<UpdateTouristChallengeDto, Challenge>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByTouristId, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore());
         }
     }
 }

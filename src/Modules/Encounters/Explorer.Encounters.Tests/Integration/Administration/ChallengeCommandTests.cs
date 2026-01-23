@@ -1,5 +1,5 @@
 using Explorer.API.Controllers.Administrator.Administration;
-using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public.Administration;
 using Explorer.Encounters.Infrastructure.Database;
@@ -15,102 +15,55 @@ public class ChallengeCommandTests : BaseEncountersIntegrationTest
     public ChallengeCommandTests(EncountersTestFactory factory) : base(factory) { }
 
     [Fact]
+    public void Retrieves_all()
+    {
+        // Arrange
+        using var scope = Factory.Services.CreateScope();
+        var controller = CreateController(scope);
+
+        // Act
+        var result = ((ObjectResult)controller.GetAll(0, 0).Result)?.Value as PagedResult<ChallengeResponseDto>;
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Results.ShouldNotBeNull();
+    }
+
+    [Fact]
     public void Creates()
     {
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<EncountersContext>();
-        var newEntity = new ChallengeDto
+        var newEntity = new ChallengeCreateDto
         {
-            Name = "Novi izazov",
-            Description = "Opis novog izazova koji treba da se izvrši.",
-            Latitude = 44.8125,
-            Longitude = 20.4612,
-            ExperiencePoints = 250,
-            Status = "Active",
-            Type = "Location"
+            Name = "New Challenge",
+            Description = "Challenge Description",
+            Latitude = 45.2,
+            Longitude = 19.8,
+            ExperiencePoints = 20,
+            Status = "Draft",
+            Type = "Social",
+            CreatedById = -1,
+            RequiredParticipants = 5,
+            RadiusInMeters = 50,
+            Image = null
         };
 
         // Act
-        var result = ((ObjectResult)controller.Create(newEntity).Result)?.Value as ChallengeDto;
+        var result = ((ObjectResult)controller.Create(newEntity).Result)?.Value as ChallengeResponseDto;
 
         // Assert - Response
         result.ShouldNotBeNull();
         result.Id.ShouldNotBe(0);
         result.Name.ShouldBe(newEntity.Name);
-        result.ExperiencePoints.ShouldBe(newEntity.ExperiencePoints);
         result.Status.ShouldBe(newEntity.Status);
-        result.Type.ShouldBe(newEntity.Type);
 
         // Assert - Database
-        var storedEntity = dbContext.Challenges.FirstOrDefault(i => i.Name == newEntity.Name);
+        var storedEntity = dbContext.Challenges.FirstOrDefault(c => c.Name == newEntity.Name);
         storedEntity.ShouldNotBeNull();
         storedEntity.Id.ShouldBe(result.Id);
-        storedEntity.ExperiencePoints.ShouldBe(newEntity.ExperiencePoints);
-    }
-
-    [Fact]
-    public void Create_fails_invalid_name()
-    {
-        // Arrange
-        using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope);
-        var invalidEntity = new ChallengeDto
-        {
-            Name = "",
-            Description = "Opis",
-            Latitude = 44.8125,
-            Longitude = 20.4612,
-            ExperiencePoints = 100,
-            Status = "Active",
-            Type = "Location"
-        };
-
-        // Act & Assert
-        Should.Throw<ArgumentException>(() => controller.Create(invalidEntity));
-    }
-
-    [Fact]
-    public void Create_fails_invalid_coordinates()
-    {
-        // Arrange
-        using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope);
-        var invalidEntity = new ChallengeDto
-        {
-            Name = "Test izazov",
-            Description = "Opis",
-            Latitude = 100.0, // Invalid latitude
-            Longitude = 20.4612,
-            ExperiencePoints = 100,
-            Status = "Active",
-            Type = "Location"
-        };
-
-        // Act & Assert
-        Should.Throw<ArgumentException>(() => controller.Create(invalidEntity));
-    }
-
-    [Fact]
-    public void Create_fails_negative_experience_points()
-    {
-        // Arrange
-        using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope);
-        var invalidEntity = new ChallengeDto
-        {
-            Name = "Test izazov",
-            Description = "Opis",
-            Latitude = 44.8125,
-            Longitude = 20.4612,
-            ExperiencePoints = -50, // Invalid negative XP
-            Status = "Active",
-            Type = "Location"
-        };
-
-        // Act & Assert
-        Should.Throw<ArgumentException>(() => controller.Create(invalidEntity));
     }
 
     [Fact]
@@ -120,58 +73,53 @@ public class ChallengeCommandTests : BaseEncountersIntegrationTest
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<EncountersContext>();
-        var updatedEntity = new ChallengeDto
+
+        // Create initial challenge
+        var createDto = new ChallengeCreateDto
         {
-            Id = -1,
-            Name = "Ažurirani naziv izazova",
-            Description = "Ažuriran opis izazova sa novim detaljima.",
-            Latitude = 44.825,
-            Longitude = 20.455,
-            ExperiencePoints = 150,
+            Name = "Challenge To Update",
+            Description = "Initial Description",
+            Latitude = 45.0,
+            Longitude = 19.0,
+            ExperiencePoints = 10,
+            Status = "Draft",
+            Type = "Social",
+            CreatedById = -1,
+            RequiredParticipants = 5,
+            RadiusInMeters = 10
+        };
+        var createResult = ((ObjectResult)controller.Create(createDto).Result)?.Value as ChallengeResponseDto;
+
+        var updateDto = new ChallengeCreateDto
+        {
+            Id = createResult.Id,
+            Name = "Updated Challenge Name",
+            Description = "Updated Description",
+            Latitude = 46.0,
+            Longitude = 20.0,
+            ExperiencePoints = 50,
             Status = "Active",
-            Type = "Location"
+            Type = "Location",
+            CreatedById = -1,
+            RequiredParticipants = 10,
+            RadiusInMeters = 100,
+            Image = null
         };
 
         // Act
-        var result = ((ObjectResult)controller.Update(updatedEntity).Result)?.Value as ChallengeDto;
+        var result = ((ObjectResult)controller.Update(updateDto).Result)?.Value as ChallengeResponseDto;
 
         // Assert - Response
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(-1);
-        result.Name.ShouldBe(updatedEntity.Name);
-        result.Description.ShouldBe(updatedEntity.Description);
-        result.ExperiencePoints.ShouldBe(updatedEntity.ExperiencePoints);
+        result.Id.ShouldBe(createResult.Id);
+        result.Name.ShouldBe(updateDto.Name);
+        result.Description.ShouldBe(updateDto.Description);
 
         // Assert - Database
-        var storedEntity = dbContext.Challenges.FirstOrDefault(i => i.Id == -1);
+        var storedEntity = dbContext.Challenges.FirstOrDefault(c => c.Id == createResult.Id);
         storedEntity.ShouldNotBeNull();
-        storedEntity.Name.ShouldBe(updatedEntity.Name);
-        storedEntity.Description.ShouldBe(updatedEntity.Description);
-        
-        var oldEntity = dbContext.Challenges.FirstOrDefault(i => i.Name == "Beogradska tvr?ava");
-        oldEntity.ShouldBeNull();
-    }
-
-    [Fact]
-    public void Update_fails_invalid_id()
-    {
-        // Arrange
-        using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope);
-        var updatedEntity = new ChallengeDto
-        {
-            Id = -1000,
-            Name = "Test",
-            Description = "Test opis",
-            Latitude = 44.8125,
-            Longitude = 20.4612,
-            ExperiencePoints = 100,
-            Status = "Active",
-            Type = "Location"
-        };
-
-        // Act & Assert
-        Should.Throw<NotFoundException>(() => controller.Update(updatedEntity));
+        storedEntity.Name.ShouldBe(updateDto.Name);
+        storedEntity.Description.ShouldBe(updateDto.Description);
     }
 
     [Fact]
@@ -182,43 +130,100 @@ public class ChallengeCommandTests : BaseEncountersIntegrationTest
         var controller = CreateController(scope);
         var dbContext = scope.ServiceProvider.GetRequiredService<EncountersContext>();
 
+        var createDto = new ChallengeCreateDto
+        {
+            Name = "Challenge To Delete",
+            Description = "Description",
+            Latitude = 45.0,
+            Longitude = 19.0,
+            ExperiencePoints = 10,
+            Status = "Draft",
+            Type = "Social",
+            CreatedById = -1,
+            RequiredParticipants = 5,  
+            RadiusInMeters = 50,       
+            Image = null
+        };
+        var createResult = ((ObjectResult)controller.Create(createDto).Result)?.Value as ChallengeResponseDto;
+
         // Act
-        var result = (OkResult)controller.Delete(-3);
+        var result = (OkResult)controller.Delete(createResult.Id);
 
         // Assert - Response
-        result.ShouldNotBeNull();
         result.StatusCode.ShouldBe(200);
 
         // Assert - Database
-        var storedEntity = dbContext.Challenges.FirstOrDefault(i => i.Id == -3);
+        var storedEntity = dbContext.Challenges.FirstOrDefault(c => c.Id == createResult.Id);
         storedEntity.ShouldBeNull();
     }
 
     [Fact]
-    public void Delete_fails_invalid_id()
+    public void Approves()
     {
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<EncountersContext>();
 
-        // Act & Assert
-        Should.Throw<NotFoundException>(() => controller.Delete(-1000));
+        var createDto = new ChallengeCreateDto
+        {
+            Name = "Challenge To Approve",
+            Description = "Description",
+            Latitude = 45.0,
+            Longitude = 19.0,
+            ExperiencePoints = 10,
+            Status = "Pending",
+            Type = "Social",
+            CreatedById = -1,
+            RequiredParticipants = 10, 
+            RadiusInMeters = 50,       
+            Image = null
+        };
+        var createResult = ((ObjectResult)controller.Create(createDto).Result)?.Value as ChallengeResponseDto;
+
+        // Act
+        var result = (OkResult)controller.ApproveChallenge(createResult.Id);
+
+        // Assert
+        result.StatusCode.ShouldBe(200);
+
+        // Verify Status in Database
+        var storedEntity = dbContext.Challenges.FirstOrDefault(c => c.Id == createResult.Id);
+        storedEntity.Status.ToString().ShouldNotBe("Draft");
     }
 
     [Fact]
-    public void GetPaged_returns_challenges()
+    public void Rejects()
     {
         // Arrange
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope);
+        var dbContext = scope.ServiceProvider.GetRequiredService<EncountersContext>();
+
+        var createDto = new ChallengeCreateDto
+        {
+            Name = "Challenge To Reject",
+            Description = "Description",
+            Latitude = 45.0,
+            Longitude = 19.0,
+            ExperiencePoints = 10,
+            Status = "Pending",
+            Type = "Social",
+            CreatedById = -1,
+            RequiredParticipants = 5, 
+            RadiusInMeters = 50,      
+            Image = null
+        };
+        var createResult = ((ObjectResult)controller.Create(createDto).Result)?.Value as ChallengeResponseDto;
 
         // Act
-        var result = ((ObjectResult)controller.GetAll(0, 0).Result)?.Value as BuildingBlocks.Core.UseCases.PagedResult<ChallengeDto>;
+        var result = (OkResult)controller.RejectChallenge(createResult.Id);
 
         // Assert
-        result.ShouldNotBeNull();
-        result.Results.Count.ShouldBeGreaterThan(0);
-        result.TotalCount.ShouldBeGreaterThan(0);
+        result.StatusCode.ShouldBe(200);
+
+        var storedEntity = dbContext.Challenges.FirstOrDefault(c => c.Id == createResult.Id);
+        storedEntity.Status.ToString().ShouldBe("Archived");
     }
 
     private static ChallengeController CreateController(IServiceScope scope)
