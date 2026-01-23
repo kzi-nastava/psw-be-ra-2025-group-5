@@ -29,6 +29,7 @@ public class ToursContext : DbContext
     public DbSet<RequiredEquipment> RequiredEquipment { get; set; }
     public DbSet<TourManualProgress> TourManualProgress { get; set; }
     public DbSet<TourSearchHistory> TourSearchHistory { get; set; }
+    public DbSet<TourRequest> TourRequests { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 
@@ -43,7 +44,8 @@ public class ToursContext : DbContext
         ConfigureTourExecution(modelBuilder);
         ConfigureReview(modelBuilder);
         ConfigureTourManual(modelBuilder);
-        ConfigureSearchHistory(modelBuilder); 
+        ConfigureSearchHistory(modelBuilder);
+        ConfigureTourRequest(modelBuilder);
     }
 
     private static void ConfigureTour(ModelBuilder modelBuilder)
@@ -242,6 +244,33 @@ public class ToursContext : DbContext
                 .IsRequired();
 
             b.HasIndex(x => x.UserId);
+        });
+    }
+
+    private static void ConfigureTourRequest(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TourRequest>(b =>
+        {
+            b.ToTable("TourRequests");
+            b.HasKey(tr => tr.Id);
+
+            b.Property(tr => tr.Description).IsRequired();
+            b.Property(tr => tr.TouristId).IsRequired();
+            b.Property(tr => tr.AuthorId).IsRequired();
+            b.Property(tr => tr.Difficulty).HasConversion<int>();
+            b.Property(tr => tr.Status).HasConversion<int>();
+            b.OwnsOne(tr => tr.Location, io =>
+            {
+                io.Property(l => l.Latitude).HasColumnName("Location_Latitude");
+                io.Property(l => l.Longitude).HasColumnName("Location_Longitude");
+            });
+            b.Property(tr => tr.Tags)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = false }),
+                    v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>()
+                )
+                .Metadata.SetValueComparer(ValueComparer.CreateDefault<List<string>>(true));
         });
     }
 }
