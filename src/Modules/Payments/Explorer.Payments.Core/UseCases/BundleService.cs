@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Payments.API.Dtos;
+using Explorer.Payments.API.Dtos.PurchaseToken;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Core.Domain;
 using Explorer.Payments.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Internal;
 using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public.Tour;
 using System;
@@ -19,12 +22,22 @@ namespace Explorer.Payments.Core.UseCases
         private readonly IBundleRepository _repository;
         private readonly IMapper _mapper;
         private readonly ITourSharedService _tourSharedService;
+        private readonly IWalletRepository _walletRepository;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly ITourPurchaseTokenService _tokenService;
+        private readonly IPaymentNotificationService _notificationService;
 
-        public BundleService(IBundleRepository repository, IMapper mapper, ITourSharedService tourSharedService)
+        public BundleService(IBundleRepository repository, IMapper mapper, ITourSharedService tourSharedService,
+            IWalletRepository walletRepository, IPaymentRepository paymentRepository, ITourPurchaseTokenService tokenService,
+            IPaymentNotificationService notificationService)
         {
             _repository = repository;
             _mapper = mapper;
             _tourSharedService = tourSharedService;
+            _walletRepository = walletRepository;
+            _paymentRepository = paymentRepository;
+            _tokenService = tokenService;
+            _notificationService = notificationService;
         }
 
         public BundleDto Get(long id)
@@ -36,6 +49,12 @@ namespace Explorer.Payments.Core.UseCases
         public List<BundleDto> GetByAuthor(long authorId)
         {
             var result = _repository.GetByAuthor(authorId);
+            return _mapper.Map<List<BundleDto>>(result);
+        }
+
+        public List<BundleDto> GetAllPublished()
+        {
+            var result = _repository.GetAllPublished();
             return _mapper.Map<List<BundleDto>>(result);
         }
 
@@ -138,6 +157,68 @@ namespace Explorer.Payments.Core.UseCases
             }
 
             return totalPrice;
+        }
+
+        public BundleDto PurchaseBundle(long bundleId, long touristId)
+        {
+            var bundle = _repository.Get(bundleId);
+
+            if (bundle.Status != BundleStatus.Published)
+                throw new InvalidOperationException("Bundle is not published.");
+
+            var wallet = _walletRepository.GetByTouristId(touristId);
+            if (wallet == null)
+                throw new InvalidOperationException("Wallet not found.");
+
+            if (wallet.Balance < bundle.Price)
+                throw new InvalidOperationException("Not enough Adventure Coins.");
+
+            wallet.Debit(bundle.Price);
+            _walletRepository.Update(wallet);
+
+            var payment = new Payment(touristId, bundleId, bundle.Price, true);
+            _paymentRepository.Create(payment);
+
+            foreach (var bundleItem in bundle.BundleItems)
+            {
+                _tokenService.Create(new CreateTourPurchaseTokenDto 
+                { 
+                    TourId = bundleItem.TourId, 
+                    TouristId = touristId 
+                });
+            }
+
+            var tourCount = bundle.BundleItems.Count;
+            var message = tourCount == 1
+                ? "New tour has been added to your collection."
+                : $"{tourCount} new tours have been added to your collection.";
+
+            _notificationService.Create(new NotificationDto
+            {
+                UserId = touristId,
+                Title = "Bundle purchased",
+                Message = message,
+                Type = "TourPurchased",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            return _mapper.Map<BundleDto>(bundle);
+        }
+
+        public List<BundleDto> GetPurchasedBundles(long touristId)
+        {
+            var payments = _paymentRepository.GetByTourist(touristId);
+            var bundleIds = payments
+                .Where(p => p.BundleId.HasValue)
+                .Select(p => p.BundleId.Value)
+                .Distinct()
+                .ToList();
+
+            if (!bundleIds.Any())
+                return new List<BundleDto>();
+
+            var bundles = bundleIds.Select(bundleId => _repository.Get(bundleId)).ToList();
+            return _mapper.Map<List<BundleDto>>(bundles);
         }
     }
 }

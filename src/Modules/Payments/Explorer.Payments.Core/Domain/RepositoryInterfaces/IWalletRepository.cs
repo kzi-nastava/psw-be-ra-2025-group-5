@@ -12,5 +12,6 @@ namespace Explorer.Payments.Core.Domain.RepositoryInterfaces
         Wallet GetByUserId(long userId);
         Wallet Create(Wallet wallet);
         Wallet Update(Wallet wallet);
+        Wallet GetByTouristId(long touristId);
     }
 }
