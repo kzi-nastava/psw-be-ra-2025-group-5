@@ -91,7 +91,7 @@ namespace Explorer.Payments.Core.UseCases
             return payments.Select(p => new PaymentDto
             {
                 TouristId = p.TouristId,
-                TourId = p.TourId,
+                TourId = (long)p.TourId,
                 Price = Convert.ToDecimal(p.Price), 
                 PaidAt = p.CreatedAt,             
                 Status = null                       
