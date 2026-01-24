@@ -167,7 +167,8 @@ namespace Explorer.Stakeholders.Core.Mappers
             // ========================= Badge <-> BadgeDto =========================
             CreateMap<Badge, BadgeDto>()
                 .ForMember(dest => dest.Rank, opt => opt.MapFrom(src => (int)src.Rank))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (int)src.Type));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (int)src.Type))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => (int)src.Role));
 
             CreateMap<BadgeDto, Badge>()
                 .ConstructUsing(dto => new Badge(
@@ -176,7 +177,8 @@ namespace Explorer.Stakeholders.Core.Mappers
                     dto.ImagePath,
                     (BadgeRank)dto.Rank,
                     (BadgeType)dto.Type,
-                    dto.RequiredValue
+                    dto.RequiredValue,
+                    (BadgeRole)dto.Role
                 ));
 
             // ========================= UserBadge <-> UserBadgeDto =========================

@@ -46,4 +46,24 @@ public class BadgeService : IBadgeService
         var entities = _repository.GetByType((BadgeType)type);
         return _mapper.Map<List<BadgeDto>>(entities);
     }
+
+    public List<BadgeDto> GetByRole(int role)
+    {
+        var entities = _repository.GetByRole((BadgeRole)role);
+        return _mapper.Map<List<BadgeDto>>(entities);
+    }
+
+    public List<BadgeDto> GetByRank(int rank)
+    {
+        var entities = _repository.GetByRank((BadgeRank)rank);
+        return _mapper.Map<List<BadgeDto>>(entities);
+    }
+
+    public List<BadgeDto> GetByName(string name)
+    {
+        var entities = _repository.GetByName(name);
+        return _mapper.Map<List<BadgeDto>>(entities);
+    }
 }
+
+

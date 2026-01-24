@@ -32,6 +32,12 @@ public class TourPurchaseTokenDbRepository : ITourPurchaseTokenRepository
         return entities;
     }
 
+    public List<TourPurchaseToken> GetByTour(long tourId)
+    {
+        var entities = _dbSet.Where(t => t.TourId == tourId).ToList();
+        return entities;
+    }
+
     public TourPurchaseToken Create(TourPurchaseToken entity)
     {
         _dbSet.Add(entity);
