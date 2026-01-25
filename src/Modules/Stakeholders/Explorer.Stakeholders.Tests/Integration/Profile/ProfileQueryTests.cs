@@ -1,7 +1,14 @@
-﻿using Explorer.API.Controllers.Profile;
+﻿using AutoMapper;
+using Explorer.API.Controllers.Profile;
 using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.API.Internal;
+using Explorer.Stakeholders.API.Public.Statistics;
 using Explorer.Stakeholders.API.Public.Users;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
+using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +96,16 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
     {
         // Arrange
         using var scope = Factory.Services.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IProfileService>();
+
+        var stubStatsService = new StubTouristStatisticsService();
+
+        var service = new ProfileService(
+            scope.ServiceProvider.GetRequiredService<IPersonRepository>(),
+            scope.ServiceProvider.GetRequiredService<IMapper>(),
+            stubStatsService,
+            scope.ServiceProvider.GetRequiredService<IImageStorage>(),
+            scope.ServiceProvider.GetRequiredService<IUserRepository>()
+        );
 
         int page = 1;
         int pageSize = 2;
@@ -108,7 +124,6 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
             profile.Id.ShouldBeLessThan(0);
             profile.Name.ShouldNotBeNullOrEmpty();
             profile.Surname.ShouldNotBeNullOrEmpty();
-
             profile.Statistics.ShouldNotBeNull();
         }
 
@@ -118,9 +133,20 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
 
 
 
+
     private static ProfileController CreateController(IServiceScope scope)
     {
-        return new ProfileController(scope.ServiceProvider.GetRequiredService<IProfileService>())
+        var stubStatsService = new StubTouristStatisticsService();
+
+        var profileService = new ProfileService(
+            scope.ServiceProvider.GetRequiredService<IPersonRepository>(),
+            scope.ServiceProvider.GetRequiredService<IMapper>(),
+            stubStatsService,   
+            scope.ServiceProvider.GetRequiredService<IImageStorage>(),
+            scope.ServiceProvider.GetRequiredService<IUserRepository>()
+        );
+
+        return new ProfileController(profileService)
         {
             ControllerContext = new ControllerContext
             {
@@ -128,10 +154,39 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
                 {
                     User = new ClaimsPrincipal(new ClaimsIdentity(new[]
                     {
-                        new Claim("id", "-21")
-                    }))
+                    new Claim("id", "-21")
+                }))
                 }
             }
         };
     }
+
+
+
+    public class TestPremiumService : IPremiumSharedService
+    {
+        private readonly bool _isPremium;
+        public TestPremiumService(bool isPremium) => _isPremium = isPremium;
+
+        public bool IsPremium(long userId) => _isPremium;
+        public void GrantPremium(long userId, DateTime validUntil) { }
+        public void ExtendPremium(long userId, DateTime _ignored) { }
+        public void RemovePremium(long userId) { }
+    }
+
+    public class StubTouristStatisticsService : ITouristStatisticsService
+    {
+        public TouristStatisticsDto GetStatistics(long userId)
+        {
+            return new TouristStatisticsDto
+            {
+                PurchasedToursCount = 5,     
+                CompletedToursCount = 3,
+                MostCommonTag = "Adventure",
+                MostCommonDifficulty = "Medium"
+            };
+        }
+    }
+
+
 }

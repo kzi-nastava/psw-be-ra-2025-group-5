@@ -1,7 +1,11 @@
+using AutoMapper;
 using Explorer.API.Controllers.Tours.Tourist;
 using Explorer.BuildingBlocks.Core.Exceptions;
+using Explorer.Stakeholders.API.Internal;
 using Explorer.Tours.API.Dtos.Preferences;
 using Explorer.Tours.API.Public.Tour;
+using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Tours.Core.UseCases.Tours;
 using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +24,6 @@ public class TouristPreferencesCommandTests : BaseToursIntegrationTest
     {
         using var scope = Factory.Services.CreateScope();
         var controller = CreateController(scope, "-23");
-        var dbContext = scope.ServiceProvider.GetRequiredService<ToursContext>();
 
         var result = ((ObjectResult)controller.Get().Result)?.Value as TouristPreferencesDto;
 
@@ -174,9 +177,26 @@ public class TouristPreferencesCommandTests : BaseToursIntegrationTest
 
     private static TouristPreferencesController CreateController(IServiceScope scope, string userId)
     {
-        return new TouristPreferencesController(scope.ServiceProvider.GetRequiredService<ITouristPreferencesService>())
+
+        return new TouristPreferencesController(
+            new TouristPreferencesService(
+                scope.ServiceProvider.GetRequiredService<ITouristPreferencesRepository>(),
+                scope.ServiceProvider.GetRequiredService<IMapper>(),
+                new TestPremiumService(true))
+        )
         {
             ControllerContext = BuildContext(userId)
         };
+    }
+
+    private class TestPremiumService : IPremiumSharedService
+    {
+        private readonly bool _isPremium;
+        public TestPremiumService(bool isPremium) => _isPremium = isPremium;
+
+        public bool IsPremium(long userId) => _isPremium;
+        public void GrantPremium(long userId, DateTime validUntil) { }
+        public void ExtendPremium(long userId, DateTime _ignored) { }
+        public void RemovePremium(long userId) { }
     }
 }
