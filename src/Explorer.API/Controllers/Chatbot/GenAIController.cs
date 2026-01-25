@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Explorer.API.Controllers
 {
@@ -19,6 +20,7 @@ namespace Explorer.API.Controllers
             _httpClient = httpClientFactory.CreateClient();
         }
 
+        [EnableRateLimiting("ai-chat")]
         [HttpPost("chat")]
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
