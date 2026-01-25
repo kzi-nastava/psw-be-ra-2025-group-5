@@ -26,27 +26,23 @@ namespace Explorer.API.Controllers.Tours
         public ActionResult<PagedResult<TourDto>> GetAllPublished([FromQuery] int page, [FromQuery] int pageSize)
         {
             var allPublishedTours = _tourService.GetPagedPublished(page, pageSize);
-            List<TourDto> availableTours;
 
-
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
-                // korisnik je ulogovan → filtriraj kupljene ture
-                long userId = long.Parse(User.FindFirst("id")!.Value);
+                return Ok(allPublishedTours);
+            }
 
+            long userId = long.Parse(User.FindFirst("id")!.Value);
 
-                var purchasedTours = _tourExecutionService.GetPurchasedToursWithoutExecution(userId);
+            var purchasedTours = _tourExecutionService.GetPurchasedToursWithoutExecution(userId).Select(t => t.Id).ToHashSet();
 
+            var executedTourIds = _tourExecutionService.GetExecutedTourIdsForUser(userId).ToHashSet();
 
-                availableTours = allPublishedTours.Results
-                .Where(t => !purchasedTours.Any(pt => pt.Id == t.Id))
+            var availableTours = allPublishedTours.Results
+                .Where(t =>
+                    !purchasedTours.Contains(t.Id) &&
+                    !executedTourIds.Contains(t.Id))
                 .ToList();
-            }
-            else
-            {
-                // anonimni korisnik → sve ture su dostupne
-                availableTours = allPublishedTours.Results;
-            }
 
             return Ok(new PagedResult<TourDto>(availableTours, availableTours.Count));
         }

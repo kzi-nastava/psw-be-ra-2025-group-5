@@ -15,5 +15,6 @@ namespace Explorer.Tours.API.Public.Tour
         List<TourExecutionDto> GetExecutionsForUser(long userId);
         void ExpireOldTours();
         List<TourDto> GetPurchasedToursWithoutExecution(long userId);
+        List<long> GetExecutedTourIdsForUser(long userId);
     }
 }
