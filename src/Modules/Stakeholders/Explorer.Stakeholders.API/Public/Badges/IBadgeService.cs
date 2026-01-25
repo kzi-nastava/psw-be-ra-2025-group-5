@@ -9,4 +9,9 @@ public interface IBadgeService
     PagedResult<BadgeDto> GetPaged(int page, int pageSize);
     List<BadgeDto> GetAll();
     List<BadgeDto> GetByType(int type);
+    List<BadgeDto> GetByRole(int role);
+    List<BadgeDto> GetByRank(int rank);
+    List<BadgeDto> GetByName(string name);
 }
+
+

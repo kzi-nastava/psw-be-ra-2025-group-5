@@ -518,7 +518,14 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.Property(b => b.RequiredValue)
                     .IsRequired();
 
+                builder.Property(b => b.Role)
+                    .HasConversion<int>()
+                    .IsRequired();
+
                 builder.HasIndex(b => b.Type);
+                builder.HasIndex(b => b.Role);
+                builder.HasIndex(b => b.Rank);
+                builder.HasIndex(b => b.Name);
             });
         }
 

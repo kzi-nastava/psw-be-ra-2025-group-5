@@ -6,4 +6,5 @@ public interface ITourPurchaseTokenSharedService
 {
     TourPurchaseTokenDto GetByTourAndTourist(long tourId, long touristId);
     List<TourPurchaseTokenDto> GetByTourist(long touristId);
+    List<TourPurchaseTokenDto> GetByTour(long tourId);
 }
