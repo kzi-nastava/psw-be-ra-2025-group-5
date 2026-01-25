@@ -91,6 +91,7 @@ public static class StakeholdersStartup
         services.AddScoped<IProfileFollowService, ProfileFollowService>();
         services.AddScoped<IProfileMessageService, ProfileMessageService>();
         services.AddScoped<IPaymentNotificationService, NotificationService>();
+
         
         services.AddScoped<IBadgeService, BadgeService>();
         services.AddScoped<IUserBadgeService, UserBadgeService>();
@@ -107,6 +108,9 @@ public static class StakeholdersStartup
 
         services.AddScoped<IPremiumService, PremiumService>();
         services.AddScoped<IPremiumSharedService, PremiumSharedService>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+
+        services.AddScoped<IInternalProfileFollowService, ProfileFollowService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -129,6 +133,8 @@ public static class StakeholdersStartup
         services.AddScoped<IUserBadgeRepository, UserBadgeDbRepository>();
         services.AddScoped<IUserStatisticsRepository, UserStatisticsDbRepository>();
         services.AddScoped<IUserPremiumRepository, UserPremiumDbRepository>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<IInternalProfileFollowService, ProfileFollowService>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
         dataSourceBuilder.EnableDynamicJson();

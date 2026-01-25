@@ -161,7 +161,6 @@ public class ShoppingCartService : IShoppingCartService
             _paymentRepository.Create(new Payment(touristId, item.TourId, item.ItemPrice.FinalPrice));
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
             
-            // Dodaj bedž vlasniku ture
             _badgeService.OnTourSold(tour.AuthorId);
         }
 
@@ -234,4 +233,34 @@ public class ShoppingCartService : IShoppingCartService
 
         return _mapper.Map<ShoppingCartDto>(updatedCart);
     }
+
+    public ShoppingCartDto CheckoutAsGift(long donorId, long recipientId, long tourId)
+    {
+        var tour = _TourService.Get(tourId);
+
+        if (tour == null || tour.Status != "Published")
+            throw new InvalidOperationException("Tour not purchasable.");
+
+        var priceDto = _TourSaleService.GetFinalPrice(tourId);
+        var finalPrice = priceDto.FinalPrice;
+
+        ChargeWallet(donorId, finalPrice);
+
+        CreditAuthorWallet(tour.AuthorId, finalPrice);
+
+        _paymentRepository.Create(new Payment(recipientId, tourId, finalPrice));
+
+        _TokenService.Create(new CreateTourPurchaseTokenDto
+        {
+            TourId = tourId,
+            TouristId = recipientId
+        });
+
+        _badgeService.OnTourSold(tour.AuthorId);
+
+        return new ShoppingCartDto { TouristId = donorId, Items = new List<OrderItemDto>() };
+    }
+
+
+
 }
