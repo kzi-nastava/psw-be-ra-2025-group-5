@@ -14,22 +14,28 @@ public class ShoppingCart : AggregateRoot
     public ShoppingCart(long touristId)
     {
         Guard.AgainstZero(touristId, nameof(touristId));
-
         TouristId = touristId;
     }
 
-    public void AddItem(long tourId, string tourName, double tourPrice)
+    public void AddItem(long tourId, string tourName, double tourPrice, long? recipientId = null, string? giftMessage = null)
     {
-        if (Items.SingleOrDefault(i => i.TourId == tourId) is not null)
-            throw new InvalidOperationException("Tour is already in the cart.");
+        if (Items.Any(i => i.TourId == tourId && i.RecipientId == recipientId))
+        {
+            if (recipientId.HasValue)
+                throw new InvalidOperationException($"Tour is already in the cart as a gift for this recipient.");
+            else
+                throw new InvalidOperationException("Tour is already in the cart.");
+        }
 
-        var orderItem = new OrderItem(tourId, tourName, tourPrice);
+        var orderItem = new OrderItem(tourId, tourName, tourPrice, recipientId, giftMessage);
         Items.Add(orderItem);
     }
 
-    public void RemoveItem(long tourId)
+    public void RemoveItem(long tourId, long? recipientId = null)
     {
-        if (Items.SingleOrDefault(i => i.TourId == tourId) is not OrderItem item)
+        var item = Items.FirstOrDefault(i => i.TourId == tourId && i.RecipientId == recipientId);
+
+        if (item is null)
             throw new InvalidOperationException("Item not found in the cart.");
 
         Items.Remove(item);
