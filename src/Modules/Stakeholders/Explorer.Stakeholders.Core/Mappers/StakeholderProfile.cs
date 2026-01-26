@@ -120,14 +120,13 @@ namespace Explorer.Stakeholders.Core.Mappers
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
-            CreateMap<Diary, DiaryDto>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status));
+            CreateMap<Diary, DiaryDto>();
 
             CreateMap<DiaryDto, Diary>()
                 .ConstructUsing(dto => new Diary(
                     dto.Name,
                     dto.CreatedAt,
-                    (DiaryStatus)dto.Status,
+                    dto.Content,
                     dto.Country,
                     dto.City,
                     dto.TouristId
