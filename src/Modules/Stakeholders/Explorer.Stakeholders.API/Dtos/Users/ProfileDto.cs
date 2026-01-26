@@ -17,5 +17,6 @@ public class ProfileDto
     public bool CanCreateChallenges { get; set; }
 
     public TouristStatisticsDto Statistics { get; set; }
+    public AuthorStatisticsDto AuthorStatistics { get; set; }
 }
 

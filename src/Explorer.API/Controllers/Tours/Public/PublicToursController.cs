@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.Core.Domain.Users;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Tour;
@@ -13,16 +14,37 @@ namespace Explorer.API.Controllers.Tours
     public class PublicTourController : ControllerBase
     {
         private readonly ITourService _tourService;
+        private readonly ITourExecutionService _tourExecutionService;
 
-        public PublicTourController(ITourService tourService)
+        public PublicTourController(ITourService tourService, ITourExecutionService tourExecutionService)
         {
             _tourService = tourService;
+            _tourExecutionService = tourExecutionService;
         }
 
         [HttpGet]
         public ActionResult<PagedResult<TourDto>> GetAllPublished([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return Ok(_tourService.GetPagedPublished(page, pageSize));
+            var allPublishedTours = _tourService.GetPagedPublished(page, pageSize);
+
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return Ok(allPublishedTours);
+            }
+
+            long userId = long.Parse(User.FindFirst("id")!.Value);
+
+            var purchasedTours = _tourExecutionService.GetPurchasedToursWithoutExecution(userId).Select(t => t.Id).ToHashSet();
+
+            var executedTourIds = _tourExecutionService.GetExecutedTourIdsForUser(userId).ToHashSet();
+
+            var availableTours = allPublishedTours.Results
+                .Where(t =>
+                    !purchasedTours.Contains(t.Id) &&
+                    !executedTourIds.Contains(t.Id))
+                .ToList();
+
+            return Ok(new PagedResult<TourDto>(availableTours, availableTours.Count));
         }
 
         [HttpGet("batch")]

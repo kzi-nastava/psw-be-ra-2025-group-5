@@ -98,11 +98,13 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
         using var scope = Factory.Services.CreateScope();
 
         var stubStatsService = new StubTouristStatisticsService();
+        var stubAuthorStatsService = new StubAuthorStatisticsService();
 
         var service = new ProfileService(
             scope.ServiceProvider.GetRequiredService<IPersonRepository>(),
             scope.ServiceProvider.GetRequiredService<IMapper>(),
             stubStatsService,
+            stubAuthorStatsService,
             scope.ServiceProvider.GetRequiredService<IImageStorage>(),
             scope.ServiceProvider.GetRequiredService<IUserRepository>()
         );
@@ -137,11 +139,13 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
     private static ProfileController CreateController(IServiceScope scope)
     {
         var stubStatsService = new StubTouristStatisticsService();
+        var stubAuthorStatsService = new StubAuthorStatisticsService();
 
         var profileService = new ProfileService(
             scope.ServiceProvider.GetRequiredService<IPersonRepository>(),
             scope.ServiceProvider.GetRequiredService<IMapper>(),
-            stubStatsService,   
+            stubStatsService,
+            stubAuthorStatsService,
             scope.ServiceProvider.GetRequiredService<IImageStorage>(),
             scope.ServiceProvider.GetRequiredService<IUserRepository>()
         );
@@ -187,6 +191,19 @@ public class ProfileQueryTests : BaseStakeholdersIntegrationTest
             };
         }
     }
+
+    public class StubAuthorStatisticsService : IAuthorStatisticsService
+    {
+        public AuthorStatisticsDto GetStatistics(long userId)
+        {
+            return new AuthorStatisticsDto
+            {
+                PublishedToursCount = 2,
+                SoldToursCount = 10,
+            };
+        }
+    }
+
 
 
 }

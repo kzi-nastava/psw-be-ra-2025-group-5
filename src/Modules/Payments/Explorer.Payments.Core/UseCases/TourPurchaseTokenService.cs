@@ -36,6 +36,12 @@ public class TourPurchaseTokenService : ITourPurchaseTokenService, ITourPurchase
         return _mapper.Map<List<TourPurchaseTokenDto>>(result);
     }
 
+    public List<TourPurchaseTokenDto> GetByTour(long tourId)
+    {
+        var result = _TourPurchaseTokenRepository.GetByTour(tourId);
+        return _mapper.Map<List<TourPurchaseTokenDto>>(result);
+    }
+
     public TourPurchaseTokenDto Create(CreateTourPurchaseTokenDto entity)
     {
         if (GetAll().Any(token => token.TouristId == entity.TouristId && token.TourId == entity.TourId))

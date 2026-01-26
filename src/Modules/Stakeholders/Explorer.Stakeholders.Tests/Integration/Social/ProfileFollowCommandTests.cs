@@ -109,6 +109,7 @@ public class ProfileFollowCommandTests : BaseStakeholdersIntegrationTest
             scope.ServiceProvider.GetRequiredService<IPersonRepository>(),
             scope.ServiceProvider.GetRequiredService<AutoMapper.IMapper>(),
             new StubTouristStatisticsService(),
+            new StubAuthorStatisticsService(),
             scope.ServiceProvider.GetRequiredService<IImageStorage>(),
             scope.ServiceProvider.GetRequiredService<IUserRepository>()
         );
@@ -146,4 +147,18 @@ public class ProfileFollowCommandTests : BaseStakeholdersIntegrationTest
         public void ExtendPremium(long userId, DateTime validUntil) { }
         public void RemovePremium(long userId) { }
     }
+
+    public class StubAuthorStatisticsService : IAuthorStatisticsService
+    {
+        public AuthorStatisticsDto GetStatistics(long userId)
+        {
+            return new AuthorStatisticsDto
+            {
+                PublishedToursCount = 2,
+                SoldToursCount = 10,
+            };
+        }
+    }
+
+
 }

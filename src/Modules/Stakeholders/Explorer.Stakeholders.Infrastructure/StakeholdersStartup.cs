@@ -85,6 +85,7 @@ public static class StakeholdersStartup
         services.AddScoped<ITourProblemService, TourProblemService>();
         services.AddScoped<IPositionService, PositionService>();
         services.AddScoped<ITouristStatisticsService, TouristStatisticsService>();
+        services.AddScoped<IAuthorStatisticsService, AuthorStatisticsService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IDiaryService, DiaryService>();
 
