@@ -12,6 +12,7 @@ using Explorer.Tours.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using Explorer.Stakeholders.API.Internal;
 
 namespace Explorer.Tours.Tests.Integration.TourAuthoring
 {
@@ -34,7 +35,10 @@ namespace Explorer.Tours.Tests.Integration.TourAuthoring
             var repository = new TourStatisticsDbRepository(dbContext);
             var repositoryTour = new TourDbRepository(dbContext);
 
-            var service = new TourStatisticsService(repository, mapper, tokenService, repositoryTour);
+            var premiumService = new TestPremiumService(true);
+
+
+            var service = new TourStatisticsService(repository, mapper, tokenService, repositoryTour, premiumService);
 
             var controller = new AuthorAnalyticsController(service)
             {
@@ -52,5 +56,18 @@ namespace Explorer.Tours.Tests.Integration.TourAuthoring
             result.All(r => r.Count >= 0).ShouldBeTrue();
         }
 
+        private class TestPremiumService : IPremiumSharedService
+        {
+            private readonly bool _isPremium;
+            public TestPremiumService(bool isPremium) => _isPremium = isPremium;
+
+            public bool IsPremium(long userId) => _isPremium;
+            public void GrantPremium(long userId, DateTime validUntil) { }
+            public void ExtendPremium(long userId, DateTime _ignored) { }
+            public void RemovePremium(long userId) { }
+        }
+
     }
+
+
 }

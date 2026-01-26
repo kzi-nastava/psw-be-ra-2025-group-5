@@ -30,25 +30,29 @@ public class TourService : ITourService, ITourSharedService
     private readonly IMapper _mapper;
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IInternalBadgeService _badgeService;
+    private readonly IPremiumSharedService _premiumService;
 
 
-   public TourService(
+
+    public TourService(
     ITourRepository repository,
     IMapper mapper,
     ITourExecutionRepository execution,
     ITourPurchaseTokenSharedService purchaseToken,
     IEquipmentRepository equipmentRepository,
     IImageStorage imageStorage,
-    IInternalBadgeService badgeService)
-{
-    _tourRepository = repository;
-    _mapper = mapper;
-    _tourExecutionRepository = execution;
-    _purchaseTokenService = purchaseToken;
-    _equipmentRepository = equipmentRepository;
-    _imageStorage = imageStorage;
-    _badgeService = badgeService;
-}
+    IInternalBadgeService badgeService,
+    IPremiumSharedService premiumService)
+    {
+        _tourRepository = repository;
+        _mapper = mapper;
+        _tourExecutionRepository = execution;
+        _purchaseTokenService = purchaseToken;
+        _equipmentRepository = equipmentRepository;
+        _imageStorage = imageStorage;
+        _badgeService = badgeService;
+        _premiumService = premiumService;
+    }
 
     public List<RequiredEquipmentDto> GetRequiredEquipment(long tourId)
     {
@@ -535,5 +539,33 @@ public class TourService : ITourService, ITourSharedService
 
         return tour.AuthorId == userId;
     }
+
+    public TourDto SpinPremiumWheel(long userId)
+    {
+        if (!_premiumService.IsPremium(userId))
+            throw new UnauthorizedAccessException("Premium required.");
+
+        if (_purchaseTokenService.HasUsedPremiumWheelThisMonth(userId))
+                throw new InvalidOperationException(
+                "Premium wheel already used this month.");
+
+        var tours = _tourRepository.GetAll()
+            .Where(t => t.Status == TourStatus.Published)
+            .ToList();
+
+        if (!tours.Any())
+            throw new InvalidOperationException("No tours available.");
+
+        var random = new Random();
+        var tour = tours[random.Next(tours.Count)];
+
+        _purchaseTokenService.CreateFreeTokenFromWheel(
+            tour.Id,
+            userId
+        );
+
+        return _mapper.Map<TourDto>(tour);
+    }
+
 
 }

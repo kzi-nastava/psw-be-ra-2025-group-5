@@ -65,6 +65,28 @@ namespace Explorer.API.Controllers.Tours
             var result = _tourService.GetKeyPoint(tourId, keyPointId);
             return Ok(result);
         }
+
+        [Authorize] 
+        [HttpPost("premium-wheel")]
+        public ActionResult<TourDto> SpinWheel()
+        {
+            try
+            {
+                var userId = long.Parse(User.FindFirst("id")!.Value);
+                var result = _tourService.SpinPremiumWheel(userId);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+        }
+
+
     }
 
 }
