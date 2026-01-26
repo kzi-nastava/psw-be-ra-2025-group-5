@@ -29,14 +29,12 @@ public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsServi
 
     public int GetPurchasedToursCount(long userId)
     {
-        EnsurePremium(userId);
 
         return _TokenService.GetByTourist(userId).Count;
     }
 
     public IReadOnlyCollection<TourStatisticsItemDto> GetCompletedTours(long userId)
     {
-        EnsurePremium(userId);
 
 
         var result = _StatisticsRepository.GetCompletedTours(userId);
