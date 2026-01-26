@@ -80,12 +80,11 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
 
         cartController.AddOrderItem(touristId, tourId);
 
-        // Act & Assert
-        var exception = Should.Throw<InvalidOperationException>(() =>
-            cartController.Checkout(touristId)
-        );
+        var result = cartController.Checkout(touristId);
 
-        exception.Message.ShouldContain("Not enough Adventure Coins");
+        result.Result.ShouldBeOfType<BadRequestObjectResult>();
+        var badRequest = result.Result as BadRequestObjectResult;
+        badRequest.Value.ToString().ShouldContain("Not enough Adventure Coins");
 
         var payments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         payments.Count.ShouldBe(0);
@@ -313,10 +312,7 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
 
         long touristId = -5;
 
-        // NE POZIVAJ CleanupTestData ovde!
-        // CleanupTestData(dbContext, touristId); ← UKLONI OVO
 
-        // Obriši samo stare payments i wallet ako postoje
         var existingPayments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         dbContext.Payments.RemoveRange(existingPayments);
 
@@ -326,7 +322,6 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
             dbContext.Wallets.Remove(existingWallet);
         }
 
-        // Dodaj turu u korpu (jer možda ne postoji u test podacima)
         cartController.AddOrderItem(touristId, -1);
 
         var wallet = new Wallet(touristId);
@@ -386,21 +381,17 @@ public class ShoppingCartPaymentTests : BasePaymentsIntegrationTestWithNotificat
         };
     }
 
-    // Helper metoda za čišćenje test podataka
     private void CleanupTestData(PaymentsContext dbContext, long touristId)
     {
-        // Obriši prethodne payments
         var existingPayments = dbContext.Payments.Where(p => p.TouristId == touristId).ToList();
         dbContext.Payments.RemoveRange(existingPayments);
 
-        // Obriši prethodni wallet
         var existingWallet = dbContext.Wallets.FirstOrDefault(w => w.UserId == touristId);
         if (existingWallet != null)
         {
             dbContext.Wallets.Remove(existingWallet);
         }
 
-        // Obriši prethodnu shopping cart
         var existingCart = dbContext.ShoppingCarts.FirstOrDefault(c => c.TouristId == touristId);
         if (existingCart != null)
         {
