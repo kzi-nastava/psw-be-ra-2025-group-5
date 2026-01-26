@@ -6,4 +6,6 @@ public interface ITourPurchaseTokenSharedService
 {
     TourPurchaseTokenDto GetByTourAndTourist(long tourId, long touristId);
     List<TourPurchaseTokenDto> GetByTourist(long touristId);
+    TourPurchaseTokenDto CreateFreeTokenFromWheel(long tourId, long touristId);
+    bool HasUsedPremiumWheelThisMonth(long touristId);
 }

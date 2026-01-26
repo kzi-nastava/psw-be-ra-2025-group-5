@@ -7,7 +7,7 @@ DELETE FROM payments."Bundles";
 DELETE FROM payments."BundleItems";
 
 INSERT INTO payments."ShoppingCarts" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
-INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (1, 4, 5);
+INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt") VALUES (1, 4, 5, False, TIMESTAMP '2027-06-30 12:00:00');
 INSERT INTO payments."Wallets" ("Id", "UserId", "Balance") VALUES 
 (1, 4, 0), 
 (2, 5, 0),
