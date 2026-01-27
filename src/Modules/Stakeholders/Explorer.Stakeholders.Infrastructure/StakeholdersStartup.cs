@@ -88,11 +88,11 @@ public static class StakeholdersStartup
         services.AddScoped<IProfileFollowService, ProfileFollowService>();
         services.AddScoped<IProfileMessageService, ProfileMessageService>();
         services.AddScoped<IPaymentNotificationService, NotificationService>();
-        // NEW – experience / gamification
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
 
         services.AddScoped<IPlannerService, PlannerService>();
         services.AddScoped<IPlannerValidationService, PlannerValidationService>();
+        services.AddScoped<IPlannerOptimizationService, PlannerOptimizationService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
