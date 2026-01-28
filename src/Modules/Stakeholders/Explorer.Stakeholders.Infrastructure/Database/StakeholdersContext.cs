@@ -375,7 +375,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.HasKey(d => d.Id);
 
                 builder.Property(d => d.Name)
-                    .IsRequired()
+                    .IsRequired(false)
                     .HasMaxLength(300);
 
                 builder.Property(d => d.CreatedAt)
@@ -385,17 +385,17 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                         v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
                     );
 
-                builder.Property(d => d.Status)
-                    .HasConversion<int>()
-                    .IsRequired();
+                builder.Property(d => d.Content)
+                    .IsRequired(false)
+                    .HasMaxLength(3000);
 
                 builder.Property(d => d.Country)
-                    .IsRequired()
+                    .IsRequired(false)
                     .HasMaxLength(100);
 
                 builder.Property(d => d.City)
-                    .HasMaxLength(100)
-                    .IsRequired(false);
+                    .IsRequired(false)
+                    .HasMaxLength(100);
 
                 builder.Property(d => d.TouristId)
                     .IsRequired();
