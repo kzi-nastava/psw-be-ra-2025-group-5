@@ -16,6 +16,7 @@ using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using static Explorer.Tours.Core.Domain.Tours.ValueObjects.TourDuration;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -518,5 +519,30 @@ public class TourService : ITourService, ITourSharedService
 
         return tour.AuthorId == userId;
     }
+
+    public Dictionary<long, int> GetDurationsByTransport(IEnumerable<long> tourIds, string transportType)
+    {
+        var tours = _tourRepository.GetAll().Where(t => tourIds.Contains(t.Id)).ToList();
+
+        var result = new Dictionary<long, int>();
+
+        if (!Enum.TryParse<TransportTypeEnum>(transportType, out var parsedTransport))
+        {
+            return new Dictionary<long, int>();
+        }
+
+        foreach (var tour in tours)
+        {
+            var duration = tour.Durations.FirstOrDefault(d => d.TransportType == parsedTransport);
+
+            if (duration != null)
+            {
+                result[tour.Id] = duration.DurationMinutes;
+            }
+        }
+
+        return result;
+    }
+
 
 }
