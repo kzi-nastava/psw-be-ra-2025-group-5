@@ -12,10 +12,12 @@ namespace Explorer.API.Controllers.TouristPlanner;
 public class PlannerController : ControllerBase
 {
     private readonly IPlannerService _plannerService;
+    private readonly IPlannerOptimizationService _optimizationService;
 
-    public PlannerController(IPlannerService plannerService)
+    public PlannerController(IPlannerService plannerService, IPlannerOptimizationService optimizationService)
     {
         _plannerService = plannerService;
+        _optimizationService = optimizationService;
     }
 
     [HttpGet("{touristId:long}")]
@@ -70,6 +72,19 @@ public class PlannerController : ControllerBase
         {
             _plannerService.RemoveBlock(touristId, date, blockId);
             return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+    [HttpPost("{touristId:long}/optimize")]
+    public ActionResult<OptimizationResultDto> OptimizePlanner(long touristId)
+    {
+        try
+        {
+            return Ok(_optimizationService.OptimizePlanner(touristId));
         }
         catch (Exception ex)
         {

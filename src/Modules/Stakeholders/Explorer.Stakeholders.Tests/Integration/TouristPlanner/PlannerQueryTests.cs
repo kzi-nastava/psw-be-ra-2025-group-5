@@ -63,7 +63,9 @@ public class PlannerQueryTests : BaseStakeholdersIntegrationTest
 
     private static PlannerController CreateController(IServiceScope scope)
     {
-        return new PlannerController(scope.ServiceProvider.GetRequiredService<IPlannerService>())
+        return new PlannerController(
+            scope.ServiceProvider.GetRequiredService<IPlannerService>(),
+            scope.ServiceProvider.GetRequiredService<IPlannerOptimizationService>())
         {
             ControllerContext = BuildContext("-1")
         };

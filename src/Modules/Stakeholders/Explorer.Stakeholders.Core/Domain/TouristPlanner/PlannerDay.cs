@@ -1,4 +1,5 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
+using Explorer.Stakeholders.API.Dtos.TouristPlanner;
 
 namespace Explorer.Stakeholders.Core.Domain.TouristPlanner;
 
@@ -34,7 +35,7 @@ public class PlannerDay : Entity
         TimeBlocks.Remove(block);
     }
 
-    public void RescheduleBlock(long blockId, TimeOnly start, TimeOnly end)
+    public void RescheduleBlock(long blockId, TimeOnly start, TimeOnly end, TransportType transportType)
     {
         var block = TimeBlocks.First(b => b.Id == blockId) ?? throw new InvalidDataException("Planner block not found.");
         TimeRange candidate;
@@ -47,7 +48,7 @@ public class PlannerDay : Entity
             candidate = new TimeRange(start, end);
             EnsureNoOverlap(candidate, blockId);
         }
-        block.Reschedule(candidate);
+        block.Reschedule(candidate, transportType);
     }
 
     private TimeRange FindFirstAvailableSlot(TimeSpan duration)
