@@ -30,7 +30,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 yield return new PlannerWarningDto
                 {
                     Type = "TooManyTours",
-                    Message = $"You have {dayDto.TimeBlocks.Count} tours planned for this day.",
+                    Message = $"You have too many tours ({dayDto.TimeBlocks.Count}) planned for this day",
                     AffectedBlockIds = dayDto.TimeBlocks.Select(b => b.Id).ToList()
                 };
             }
@@ -48,7 +48,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                     yield return new PlannerWarningDto
                     {
                         Type = "NoBreaks",
-                        Message = "There are not enough breaks between some tours.",
+                        Message = "There are not enough breaks between some tours",
                         AffectedBlockIds = new List<long> { ordered[i - 1].Id, ordered[i].Id }
                     };
                 }
@@ -66,7 +66,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 yield return new PlannerWarningDto
                 {
                     Type = "LateNightActivity",
-                    Message = "You have planned tours late at night (after 22:00).",
+                    Message = "You have planned tours late at night (after 22:00)",
                     AffectedBlockIds = lateBlocks.Select(b => b.Id).ToList()
                 };
             }
@@ -86,7 +86,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                     yield return new PlannerWarningDto
                     {
                         Type = "DurationTooShort",
-                        Message = "Planned duration is much shorter than recommended.",
+                        Message = "Planned duration is much shorter than recommended",
                         AffectedBlockIds = new List<long> { block.Id }
                     };
                 }
