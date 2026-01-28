@@ -79,9 +79,9 @@ INSERT INTO stakeholders."PlannerTimeBlock"("Id", "TourId", "TimeRange", "Planne
 INSERT INTO stakeholders."Diaries"("Id", "Name", "CreatedAt", "Country", "City", "TouristId", "Content") VALUES
 	(1, 'Trip ideas', '2023-10-27T12:00:00Z', 'Italy', 'Rome', 4, 'Check out if there is any new tours around, or request them if not'),
 	(2, '', '2026-01-25T09:00:00Z', '', '', 4, '- Catch plane
-	- Take taxi to hotel
-	- Drop off stuff
-	- Do Belgrade tour');
+- Take taxi to hotel
+- Drop off stuff
+- Do Belgrade tour');
 
 SELECT setval(pg_get_serial_sequence('stakeholders."TourProblems"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."TourProblems"));
 SELECT setval(pg_get_serial_sequence('stakeholders."People"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."People"));
