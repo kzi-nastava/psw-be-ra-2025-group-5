@@ -82,7 +82,7 @@ public class PlannerService : IPlannerService
         day.RemoveBlock(blockId);
         _plannerRepository.Update(planner);
 
-        return _mapper.Map<PlannerDayDto>(day);
+        return MapAndValidateDay(day);
     }
 
     public PlannerDayDto RescheduleBlock(long touristId, DateOnly date, long blockId, CreatePlannerTimeBlockDto dto)
@@ -125,11 +125,19 @@ public class PlannerService : IPlannerService
 
     private PlannerDayDto MapAndValidateDay(PlannerDay day)
     {
+        var dayDto = _mapper.Map<PlannerDayDto>(day);
+
+        if (!day.TimeBlocks.Any())
+        {
+            dayDto.Warnings = new List<PlannerWarningDto>(); 
+            return dayDto;
+        }
+
         var tourIds = day.TimeBlocks.Select(b => b.TourId).Distinct();
         var transportType = day.TimeBlocks.FirstOrDefault()?.TransportType ?? TransportType.Walking;
         var systemDurations = _tourSharedService.GetDurationsByTransport(tourIds, transportType.ToString());
-        var dayDto = _mapper.Map<PlannerDayDto>(day);
         dayDto.Warnings = _validationService.ValidateDay(dayDto, systemDurations);
+
         return dayDto;
     }
 
