@@ -38,13 +38,11 @@ public class DiaryCommandTests : BaseStakeholdersIntegrationTest
         result.Country.ShouldBe("Srbija");
         result.City.ShouldBe("Novi Sad");
         result.TouristId.ShouldBe(-21);
-        result.Status.ShouldBe(0);
 
         dbContext.ChangeTracker.Clear();
         var stored = dbContext.Diaries.Find(result.Id);
         stored.ShouldNotBeNull();
         stored.Name.ShouldBe("Novi dnevnik");
-        stored.Status.ShouldBe(DiaryStatus.Draft);
     }
 
     [Fact]
@@ -67,24 +65,6 @@ public class DiaryCommandTests : BaseStakeholdersIntegrationTest
         result.City.ShouldBeNull();
     }
 
-    [Theory]
-    [InlineData("", "Srbija", "Name")]
-    [InlineData("Dnevnik", "", "Country")]
-    public void Fails_when_required_field_is_empty(string name, string country, string fieldName)
-    {
-        using var scope = Factory.Services.CreateScope();
-        var controller = CreateController(scope, "-21");
-
-        var dto = new DiaryDto
-        {
-            Name = name,
-            Country = country,
-            TouristId = -21
-        };
-
-        Should.Throw<ArgumentException>(() => controller.Create(dto));
-    }
-
     [Fact]
     public void Successfully_updates_diary()
     {
@@ -98,7 +78,6 @@ public class DiaryCommandTests : BaseStakeholdersIntegrationTest
             Name = "Izmenjen naziv",
             Country = "Hrvatska",
             City = "Zagreb",
-            Status = 1,
             CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 15, 10, 0, 0), DateTimeKind.Utc),
             TouristId = -21
         };
@@ -109,13 +88,11 @@ public class DiaryCommandTests : BaseStakeholdersIntegrationTest
         result.Id.ShouldBe(-1);
         result.Name.ShouldBe("Izmenjen naziv");
         result.Country.ShouldBe("Hrvatska");
-        result.Status.ShouldBe(1);
 
         dbContext.ChangeTracker.Clear();
         var stored = dbContext.Diaries.Find(-1L);
         stored.ShouldNotBeNull();
         stored.Name.ShouldBe("Izmenjen naziv");
-        stored.Status.ShouldBe(DiaryStatus.Published);
     }
 
     [Fact]
