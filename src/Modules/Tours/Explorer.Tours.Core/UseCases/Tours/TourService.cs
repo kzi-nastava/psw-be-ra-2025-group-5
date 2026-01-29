@@ -15,7 +15,8 @@ using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
+using Explorer.Tours.API.Dtos.Equipments;
+using Explorer.Stakeholders.API.Internal;
 using static Explorer.Tours.Core.Domain.Tours.ValueObjects.TourDuration;
 
 
@@ -28,21 +29,43 @@ public class TourService : ITourService, ITourSharedService
     private readonly ITourPurchaseTokenSharedService _purchaseTokenService;
     private readonly IImageStorage _imageStorage;
     private readonly IMapper _mapper;
-
+    private readonly IEquipmentRepository _equipmentRepository;
+    private readonly IInternalBadgeService _badgeService;
+    private readonly IPremiumSharedService _premiumService;
 
     public TourService(
-     ITourRepository repository,
-     IMapper mapper,
-     ITourExecutionRepository execution,
-     ITourPurchaseTokenSharedService purchaseToken,
-     IEquipmentRepository equipmentRepository,
-     IImageStorage imageStorage)
+    ITourRepository repository,
+    IMapper mapper,
+    ITourExecutionRepository execution,
+    ITourPurchaseTokenSharedService purchaseToken,
+    IEquipmentRepository equipmentRepository,
+    IImageStorage imageStorage,
+    IInternalBadgeService badgeService,
+    IPremiumSharedService premiumService)
     {
         _tourRepository = repository;
         _mapper = mapper;
         _tourExecutionRepository = execution;
         _purchaseTokenService = purchaseToken;
+        _equipmentRepository = equipmentRepository;
         _imageStorage = imageStorage;
+        _badgeService = badgeService;
+        _premiumService = premiumService;
+    }
+
+    public List<RequiredEquipmentDto> GetRequiredEquipment(long tourId)
+    {
+        var tour = _tourRepository.Get(tourId);
+        var equipmentIds = tour.RequiredEquipment.Select(re => re.EquipmentId).ToList();
+        var equipmentList = _equipmentRepository.GetByIds(equipmentIds);
+
+        return equipmentList.Select(e => new RequiredEquipmentDto
+        {
+            EquipmentId = e.Id,
+            Name = e.Name,
+            Description = e.Description
+        }).ToList();
+       
     }
 
     public PagedResult<TourDto> GetPaged(int page, int pageSize)
@@ -269,6 +292,9 @@ public class TourService : ITourService, ITourSharedService
         tour.Publish();
 
         var result = _tourRepository.Update(tour);
+        
+        _badgeService.OnTourPublished(tour.AuthorId);
+        
         return _mapper.Map<TourDto>(result);
     }
 
@@ -520,6 +546,33 @@ public class TourService : ITourService, ITourSharedService
         return tour.AuthorId == userId;
     }
 
+    public TourDto SpinPremiumWheel(long userId)
+    {
+        if (!_premiumService.IsPremium(userId))
+            throw new UnauthorizedAccessException("Premium required.");
+
+        if (_purchaseTokenService.HasUsedPremiumWheelThisMonth(userId))
+                throw new InvalidOperationException(
+                "Premium wheel already used this month.");
+
+        var tours = _tourRepository.GetAll()
+            .Where(t => t.Status == TourStatus.Published)
+            .ToList();
+
+        if (!tours.Any())
+            throw new InvalidOperationException("No tours available.");
+
+        var random = new Random();
+        var tour = tours[random.Next(tours.Count)];
+
+        _purchaseTokenService.CreateFreeTokenFromWheel(
+            tour.Id,
+            userId
+        );
+
+        return _mapper.Map<TourDto>(tour);
+    }
+
     public Dictionary<long, int> GetDurationsByTransport(IEnumerable<long> tourIds, string transportType)
     {
         var tours = _tourRepository.GetAll().Where(t => tourIds.Contains(t.Id)).ToList();
@@ -543,6 +596,4 @@ public class TourService : ITourService, ITourSharedService
 
         return result;
     }
-
-
 }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.API.Dtos.Users;
+using Explorer.Stakeholders.API.Public.Badges;
 
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
 {
@@ -21,13 +22,20 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
         private readonly IMapper _mapper;
         private readonly IImageStorage _imageStorage;
         private readonly IUserService _userService;
+        private readonly IBadgeAwardService _badgeService;
 
-        public ClubService(IClubRepository clubRepository, IMapper mapper, IImageStorage imageStorage, IUserService userService)
+        public ClubService(
+            IClubRepository clubRepository, 
+            IMapper mapper, 
+            IImageStorage imageStorage, 
+            IUserService userService,
+            IBadgeAwardService badgeService)
         {
             _clubRepository = clubRepository;
             _mapper = mapper;
             _imageStorage = imageStorage;
             _userService = userService;
+            _badgeService = badgeService;
         }
         public ClubDto Create(ClubDto clubDto, List<IFormFile> images)
         {
@@ -45,6 +53,9 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
             );
 
             var createdClub = _clubRepository.Create(club);
+            
+            _badgeService.OnClubJoined(clubDto.CreatorId);
+            
             return _mapper.Map<ClubDto>(createdClub);
         }
 

@@ -14,5 +14,15 @@ namespace Explorer.Payments.Tests.Stub
         {
             return dto;
         }
+        public void CreateGiftReceivedNotification(
+         long recipientId,
+         long tourId,
+         string tourName,
+         string donorName,
+         string? message = null
+        )
+        {
+           
+        }
     }
 }

@@ -5,6 +5,7 @@ using Explorer.Encounters.API.Internal;
 using Explorer.Encounters.Core.Domain;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces.Social;
+using Explorer.Stakeholders.API.Internal;
 
 namespace Explorer.Encounters.Core.UseCases.Tourist;
 
@@ -15,18 +16,22 @@ public class ChallengeExecutionService : IChallengeExecutionService
     private readonly IInternalPersonExperienceService _personExperienceService;
     private readonly IMapper _mapper;
     private readonly IChallengeParticipationRepository _presenceRepository;
+    private readonly IInternalBadgeService _badgeService;
 
     public ChallengeExecutionService(
         IChallengeExecutionRepository executionRepository,
         IChallengeRepository challengeRepository,
-        IInternalPersonExperienceService personExperienceService, IChallengeParticipationRepository presenceRepository,
-        IMapper mapper)
+        IInternalPersonExperienceService personExperienceService, 
+        IChallengeParticipationRepository presenceRepository,
+        IMapper mapper,
+        IInternalBadgeService badgeService)
     {
         _executionRepository = executionRepository;
         _challengeRepository = challengeRepository;
         _personExperienceService = personExperienceService;
         _presenceRepository = presenceRepository;
         _mapper = mapper;
+        _badgeService = badgeService;
     }
 
     public ChallengeExecutionDto StartChallenge(long challengeId, long touristId)
@@ -77,6 +82,7 @@ public class ChallengeExecutionService : IChallengeExecutionService
         var result = _executionRepository.Update(execution);
 
         _personExperienceService.AddExperience(touristId, challenge.ExperiencePoints);
+        _badgeService.OnChallengeCompleted(touristId, (int)challenge.Type);
         
         return _mapper.Map<ChallengeExecutionDto>(result);
     }
@@ -146,10 +152,8 @@ public class ChallengeExecutionService : IChallengeExecutionService
             execution.Complete();
             _executionRepository.Update(execution);
 
-            _personExperienceService.AddExperience(
-                touristId,
-                challenge.ExperiencePoints
-            );
+            _personExperienceService.AddExperience(touristId, challenge.ExperiencePoints);
+            _badgeService.OnChallengeCompleted(touristId, (int)challenge.Type);
         }
     }
 

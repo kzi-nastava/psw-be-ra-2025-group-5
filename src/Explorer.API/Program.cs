@@ -2,8 +2,15 @@ using Explorer.API.FileStorage;
 using Explorer.API.Middleware;
 using Explorer.API.Startup;
 using Explorer.BuildingBlocks.Core.FileStorage;
+using Explorer.API.BackgroundJobs;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var cultureInfo = new CultureInfo("en-US");
+cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 builder.Services.AddControllers();
 builder.Services.ConfigureSwagger(builder.Configuration);
@@ -16,6 +23,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpClient();
 
 builder.Services.AddHostedService<TourExpirationWorker>();
+builder.Services.AddHostedService<DailyBadgeCheckBackgroundService>();
 builder.Services.AddScoped<IImageStorage, FileSystemImageStorage>();
 
 var app = builder.Build();

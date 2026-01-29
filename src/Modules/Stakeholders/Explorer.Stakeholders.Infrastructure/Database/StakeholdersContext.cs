@@ -1,5 +1,7 @@
 ﻿using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
+using Explorer.Stakeholders.Core.Domain.Badges;
+using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
@@ -13,6 +15,8 @@ using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.Streaks;
 using System.Text.Json;
 
 
@@ -35,6 +39,11 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<ClubJoinRequest> ClubJoinRequests { get; set; }
         public DbSet<ProfileFollow> ProfileFollows { get; set; }
         public DbSet<ProfileMessage> ProfileMessages { get; set; }
+        public DbSet<Streak> Streaks { get; set; }
+        public DbSet<Badge> Badges { get; set; }
+        public DbSet<UserBadge> UserBadges { get; set; }
+        public DbSet<UserStatistics> UserStatistics { get; set; }
+        public DbSet<UserPremium> UserPremiums { get; set; }
         public DbSet<Planner> Planners { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
@@ -61,6 +70,11 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureFollow(modelBuilder);
             ConfigureProfileMessage(modelBuilder);
             ConfigurePlanner(modelBuilder);
+            ConfigureStreak(modelBuilder);
+            ConfigureBadge(modelBuilder);
+            ConfigureUserBadge(modelBuilder);
+            ConfigureUserStatistics(modelBuilder);
+            ConfigureUserPremium(modelBuilder);
         }
 
         private static void ConfigureClubJoinRequest(ModelBuilder modelBuilder)
@@ -483,6 +497,182 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                     v => JsonSerializer.Deserialize<TimeRange>(v, (JsonSerializerOptions)null)
                 );
+        }
+
+
+        private static void ConfigureStreak(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Streak>(builder =>
+            {
+                builder.HasKey(s => s.Id);
+                builder.Property(s => s.UserId)
+                    .IsRequired();
+                builder.Property(s => s.StartDate)
+                    .IsRequired();
+                builder.Property(s => s.LastActivity)
+                    .IsRequired();
+                builder.Property(s => s.LongestStreak)
+                    .IsRequired();
+                builder.HasIndex(s => s.UserId)
+                    .IsUnique();
+            });
+            
+        }
+
+        private static void ConfigureBadge(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Badge>(builder =>
+            {
+                builder.HasKey(b => b.Id);
+
+                builder.Property(b => b.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                builder.Property(b => b.Description)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                builder.Property(b => b.ImagePath)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                builder.Property(b => b.Rank)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(b => b.Type)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.Property(b => b.RequiredValue)
+                    .IsRequired();
+
+                builder.Property(b => b.Role)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                builder.HasIndex(b => b.Type);
+                builder.HasIndex(b => b.Role);
+                builder.HasIndex(b => b.Rank);
+                builder.HasIndex(b => b.Name);
+            });
+        }
+
+        private static void ConfigureUserBadge(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserBadge>(builder =>
+            {
+                builder.HasKey(ub => ub.Id);
+
+                builder.Property(ub => ub.UserId)
+                    .IsRequired();
+
+                builder.Property(ub => ub.BadgeId)
+                    .IsRequired();
+
+                builder.Property(ub => ub.EarnedAt)
+                    .IsRequired();
+
+                builder.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(ub => ub.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne<Badge>()
+                    .WithMany()
+                    .HasForeignKey(ub => ub.BadgeId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasIndex(ub => ub.UserId);
+                builder.HasIndex(ub => ub.BadgeId);
+                builder.HasIndex(ub => new { ub.UserId, ub.BadgeId }).IsUnique();
+            });
+        }
+
+        private static void ConfigureUserStatistics(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserStatistics>(builder =>
+            {
+                builder.HasKey(us => us.Id);
+
+                builder.Property(us => us.UserId)
+                    .IsRequired();
+
+                builder.Property(us => us.Level)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.AccountAgeDays)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.CompletedToursCount)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.CompletedChallengesCount)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.PublishedToursCount)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.SoldToursCount)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.BlogPostsCount)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.ChallengeTypesCompletedMask)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                builder.Property(us => us.JoinedClub)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+
+                builder.Property(us => us.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(us => us.UpdatedAt)
+                    .IsRequired();
+
+                builder.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(us => us.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasIndex(us => us.UserId).IsUnique();
+            });
+        }
+
+        private static void ConfigureUserPremium(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserPremium>(builder =>
+            {
+                builder.HasKey(up => up.Id);
+
+                builder.Property(up => up.UserId)
+                       .IsRequired();
+
+                builder.Property(up => up.ValidUntil)
+                       .IsRequired(false);
+
+                builder.HasIndex(up => up.UserId)
+                       .IsUnique();
+
+                // Foreign key ka User entitetu
+                builder.HasOne<User>()
+                       .WithMany()
+                       .HasForeignKey(up => up.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.ToTable("UserPremiums");
+            });
         }
     }
 }

@@ -9,6 +9,7 @@ using Explorer.Tours.API.Public.Tour;
 using Explorer.Payments.API.Internal;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.Core.Domain.Tours;
+using Explorer.Stakeholders.API.Internal;
 
 namespace Explorer.Tours.Core.UseCases.Tours
 {
@@ -19,13 +20,20 @@ namespace Explorer.Tours.Core.UseCases.Tours
         private readonly IMapper _mapper;
         private const double DefaultThresholdMeters = 20.0;
         private readonly ITourPurchaseTokenSharedService _tokenService;
+        private readonly IInternalBadgeService _badgeService;
 
-        public TourExecutionService(ITourExecutionRepository repo, ITourRepository tourRepo, IMapper mapper, ITourPurchaseTokenSharedService tokenService)
+        public TourExecutionService(
+            ITourExecutionRepository repo, 
+            ITourRepository tourRepo, 
+            IMapper mapper, 
+            ITourPurchaseTokenSharedService tokenService,
+            IInternalBadgeService badgeService)
         {
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
             _tourRepo = tourRepo ?? throw new ArgumentNullException(nameof(tourRepo));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _tokenService = tokenService; 
+            _tokenService = tokenService;
+            _badgeService = badgeService;
         }
 
         private void EnsureNotExpired(TourExecution execution)
@@ -171,6 +179,8 @@ namespace Explorer.Tours.Core.UseCases.Tours
             if (ex == null) throw new KeyNotFoundException("Execution not found");
             ex.CompleteTour();
             _repo.Update(ex);
+            
+            _badgeService.OnTourCompleted(ex.UserId);
         }
 
         public void AbandonExecution(long executionId)
@@ -251,6 +261,14 @@ namespace Explorer.Tours.Core.UseCases.Tours
             }
 
             return _mapper.Map<List<TourDto>>(tours);
+        }
+
+        public List<long> GetExecutedTourIdsForUser(long userId)
+        {
+            return _repo.GetByUserId(userId)
+            .Select(e => e.TourId)
+            .Distinct()
+            .ToList();
         }
 
     }

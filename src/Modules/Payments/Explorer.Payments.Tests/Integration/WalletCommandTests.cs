@@ -40,7 +40,7 @@ namespace Explorer.Payments.Tests.Integration
 
             var request = new WalletDto
             {
-                TouristId = -21,
+                UserId = -21,
                 Balance = 100
             };
 
@@ -51,7 +51,7 @@ namespace Explorer.Payments.Tests.Integration
             result.ShouldNotBeNull();
             result.Value.ShouldNotBeNull();
 
-            var updatedWallet = _dbContext.Wallets.First(w => w.TouristId == -21);
+            var updatedWallet = _dbContext.Wallets.First(w => w.UserId == -21);
             updatedWallet.Balance.ShouldBe(100);
         }
 
@@ -65,7 +65,7 @@ namespace Explorer.Payments.Tests.Integration
             _dbContext.SaveChanges();
 
             // Act
-            var savedWallet = _dbContext.Wallets.First(w => w.TouristId == touristId);
+            var savedWallet = _dbContext.Wallets.First(w => w.UserId == touristId);
 
             // Assert
             savedWallet.Balance.ShouldBe(0);
@@ -83,7 +83,7 @@ namespace Explorer.Payments.Tests.Integration
 
             var request = new WalletDto
             {
-                TouristId = touristId,
+                UserId = touristId,
                 Balance = 120
             };
 
@@ -93,7 +93,7 @@ namespace Explorer.Payments.Tests.Integration
             // Assert
             result.ShouldNotBeNull();
 
-            var updatedWallet = _dbContext.Wallets.First(w => w.TouristId == touristId);
+            var updatedWallet = _dbContext.Wallets.First(w => w.UserId == touristId);
             updatedWallet.Balance.ShouldBe(120);
 
             var notificationService = _scope.ServiceProvider.GetRequiredService<IPaymentNotificationService>() as StubPaymentNotificationService;

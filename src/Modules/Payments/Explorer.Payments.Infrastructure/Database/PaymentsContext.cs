@@ -15,6 +15,7 @@ public class PaymentsContext: DbContext
     public DbSet<Coupon> Coupons { get; set; }
     public DbSet<Bundle> Bundles { get; set; }
     public DbSet<BundleItem> BundleItems { get; set; }
+    public DbSet<Gift> Gifts { get; set; }
 
     public PaymentsContext(DbContextOptions<PaymentsContext> options) : base(options) {}
 
@@ -27,6 +28,26 @@ public class PaymentsContext: DbContext
         ConfigureTourSale(modelBuilder);
         ConfigureCoupon(modelBuilder);
         ConfigureBundle(modelBuilder);
+        ConfigureGifts(modelBuilder);
+    }
+
+    private static void ConfigureGifts(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Gift>(builder =>
+        {
+            builder.ToTable("Gifts");
+            builder.HasKey(g => g.Id);
+
+            builder.Property(g => g.DonorId).IsRequired();
+            builder.Property(g => g.RecipientId).IsRequired();
+            builder.Property(g => g.TourId).IsRequired();
+            builder.Property(g => g.Price).IsRequired();
+            builder.Property(g => g.Status).IsRequired();
+            builder.Property(g => g.CreatedAt).HasDefaultValueSql("NOW()");
+
+            builder.HasIndex(g => g.RecipientId);
+            builder.HasIndex(g => g.DonorId);
+        });
     }
 
     private static void ConfigureShoppingCart(ModelBuilder modelBuilder)
@@ -52,10 +73,10 @@ public class PaymentsContext: DbContext
             builder.ToTable("Wallets");
             builder.HasKey(w => w.Id);
 
-            builder.Property(w => w.TouristId).IsRequired();
+            builder.Property(w => w.UserId).IsRequired();
             builder.Property(w => w.Balance).IsRequired();
 
-            builder.HasIndex(w => w.TouristId).IsUnique(); 
+            builder.HasIndex(w => w.UserId).IsUnique(); 
         });
     }
 

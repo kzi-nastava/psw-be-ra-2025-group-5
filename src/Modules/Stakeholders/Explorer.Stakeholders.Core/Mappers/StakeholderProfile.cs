@@ -1,6 +1,8 @@
 using AutoMapper;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Dtos.AppRatings;
+using Explorer.Stakeholders.API.Dtos.Badges;
+using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.ClubMessages;
 using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.Comments;
@@ -14,6 +16,8 @@ using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain;
 using Explorer.Stakeholders.Core.Domain.AppRatings;
+using Explorer.Stakeholders.Core.Domain.Badges;
+using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
 using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
@@ -25,6 +29,10 @@ using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
+using Explorer.Stakeholders.API.Dtos.ProfileMessages;
+using Explorer.Stakeholders.Core.Domain.Streaks;
+using Explorer.Stakeholders.API.Dtos.Streaks;
 
 namespace Explorer.Stakeholders.Core.Mappers
 {
@@ -160,6 +168,42 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ForMember(dest => dest.AuthorName, opt => opt.Ignore());
 
             CreateMap<ProfileMessageDto, ProfileMessage>();
+
+            // ========================= Badge <-> BadgeDto =========================
+            CreateMap<Badge, BadgeDto>()
+                .ForMember(dest => dest.Rank, opt => opt.MapFrom(src => (int)src.Rank))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (int)src.Type))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => (int)src.Role));
+
+            CreateMap<BadgeDto, Badge>()
+                .ConstructUsing(dto => new Badge(
+                    dto.Name,
+                    dto.Description,
+                    dto.ImagePath,
+                    (BadgeRank)dto.Rank,
+                    (BadgeType)dto.Type,
+                    dto.RequiredValue,
+                    (BadgeRole)dto.Role
+                ));
+
+            // ========================= UserBadge <-> UserBadgeDto =========================
+            CreateMap<UserBadge, UserBadgeDto>()
+                .ForMember(dest => dest.Badge, opt => opt.Ignore());
+
+            CreateMap<UserBadgeDto, UserBadge>()
+                .ConstructUsing(dto => new UserBadge(dto.UserId, dto.BadgeId));
+
+            // ========================= UserStatistics <-> UserStatisticsDto =========================
+            CreateMap<UserStatistics, UserStatisticsDto>();
+
+            CreateMap<UserStatisticsDto, UserStatistics>()
+                .ConstructUsing(dto => new UserStatistics(dto.UserId));
+
+            // ========================= Streak <-> StreakDto =========================
+            CreateMap<Streak, StreakDto>()
+                .ForMember(dest => dest.CurrentStreak, opt => opt.MapFrom(src => src.GetCurrentStreak()));
+
+            CreateMap<StreakDto, Streak>();
 
             // ========================= Planner <-> PlannerDto =========================
             CreateMap<Planner, PlannerDto>().ReverseMap();

@@ -32,6 +32,8 @@ public static class PaymentsStartup
         services.AddScoped<ITourSaleService, TourSaleService>();
         services.AddScoped<ICouponService, CouponService>();
         services.AddScoped<IBundleService, BundleService>();
+        services.AddScoped<IPremiumPaymentService, PremiumPaymentService>();
+        services.AddScoped<IGiftsService, GiftsService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -43,6 +45,7 @@ public static class PaymentsStartup
         services.AddScoped<ITourSaleRepository, TourSaleDbRepository>();
         services.AddScoped<ICouponRepository,  CouponDbRepository>();
         services.AddScoped<IBundleRepository, BundleDbRepository>();
+        services.AddScoped<IGiftRepository, GiftDbRepository>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("payments"));
         dataSourceBuilder.EnableDynamicJson();
