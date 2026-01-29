@@ -54,6 +54,10 @@ using Explorer.Stakeholders.Infrastructure.Database.Repositories.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Explorer.Stakeholders.API.Public.TouristPlanner;
+using Explorer.Stakeholders.Core.UseCases.TouristPlanner;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TouristPlanner;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories.TouristPlanner;
 
 namespace Explorer.Stakeholders.Infrastructure;
 
@@ -85,13 +89,14 @@ public static class StakeholdersStartup
         services.AddScoped<ITourProblemService, TourProblemService>();
         services.AddScoped<IPositionService, PositionService>();
         services.AddScoped<ITouristStatisticsService, TouristStatisticsService>();
+        services.AddScoped<IAuthorStatisticsService, AuthorStatisticsService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IDiaryService, DiaryService>();
 
         services.AddScoped<IProfileFollowService, ProfileFollowService>();
         services.AddScoped<IProfileMessageService, ProfileMessageService>();
         services.AddScoped<IPaymentNotificationService, NotificationService>();
-        
+
         services.AddScoped<IBadgeService, BadgeService>();
         services.AddScoped<IUserBadgeService, UserBadgeService>();
         services.AddScoped<IUserStatisticsService, UserStatisticsService>();
@@ -103,10 +108,17 @@ public static class StakeholdersStartup
 
         // NEW – experience / gamification
         services.AddScoped<IInternalPersonExperienceService, PersonExperienceAdapter>();
+
+        services.AddScoped<IPlannerService, PlannerService>();
+        services.AddScoped<IPlannerValidationService, PlannerValidationService>();
+        services.AddScoped<IPlannerOptimizationService, PlannerOptimizationService>();
         services.AddScoped<IStreakService, StreakService>();
 
         services.AddScoped<IPremiumService, PremiumService>();
         services.AddScoped<IPremiumSharedService, PremiumSharedService>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+
+        services.AddScoped<IInternalProfileFollowService, ProfileFollowService>();
     }
 
     private static void SetupInfrastructure(IServiceCollection services)
@@ -124,11 +136,14 @@ public static class StakeholdersStartup
         services.AddScoped<IClubJoinRequestRepository, ClubJoinRequestDbRepository>();
         services.AddScoped<IProfileFollowRepository, ProfileFollowDbRepository>();
         services.AddScoped<IProfileMessageRepository, ProfileMessageDbRepository>();
+        services.AddScoped<IPlannerRepository, PlannerDbRepository>();
         services.AddScoped<IStreakRepository, StreakDbRepository>();
         services.AddScoped<IBadgeRepository, BadgeDbRepository>();
         services.AddScoped<IUserBadgeRepository, UserBadgeDbRepository>();
         services.AddScoped<IUserStatisticsRepository, UserStatisticsDbRepository>();
         services.AddScoped<IUserPremiumRepository, UserPremiumDbRepository>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<IInternalProfileFollowService, ProfileFollowService>();
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionStringBuilder.Build("stakeholders"));
         dataSourceBuilder.EnableDynamicJson();

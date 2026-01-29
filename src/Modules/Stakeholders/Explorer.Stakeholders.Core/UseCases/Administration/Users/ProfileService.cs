@@ -18,14 +18,16 @@ public class ProfileService : IProfileService
     private readonly IMapper _mapper;
     private readonly IImageStorage _imageStorage;
     ITouristStatisticsService _touristStatisticsService;
+    IAuthorStatisticsService _authorStatisticsService;
     private readonly IUserRepository _userRepository;
 
-    public ProfileService(IPersonRepository personRepository, IMapper mapper, ITouristStatisticsService touristStatisticsService, IImageStorage imageStorage, IUserRepository userRepository)
+    public ProfileService(IPersonRepository personRepository, IMapper mapper, ITouristStatisticsService touristStatisticsService, IAuthorStatisticsService authorStatisticsService, IImageStorage imageStorage, IUserRepository userRepository)
     {
         _personRepository = personRepository;
         _mapper = mapper;
         _imageStorage = imageStorage;
         _touristStatisticsService = touristStatisticsService;
+        _authorStatisticsService = authorStatisticsService;
         _userRepository = userRepository;
     }
 
@@ -35,6 +37,7 @@ public class ProfileService : IProfileService
 
         var profileDto = _mapper.Map<ProfileDto>(person);
         profileDto.Statistics = _touristStatisticsService.GetStatistics(person.UserId);
+        profileDto.AuthorStatistics = _authorStatisticsService.GetStatistics(person.UserId);
         return profileDto;
     }
 
@@ -48,6 +51,7 @@ public class ProfileService : IProfileService
 
             var profileDto = _mapper.Map<ProfileDto>(person);
             profileDto.Statistics = _touristStatisticsService.GetStatistics(userId);
+            profileDto.AuthorStatistics = _authorStatisticsService.GetStatistics(userId);
             return profileDto;
 
         }
@@ -71,6 +75,7 @@ public class ProfileService : IProfileService
 
         var profileDto = _mapper.Map<ProfileDto>(person);
         profileDto.Statistics = _touristStatisticsService.GetStatistics(userId);
+        profileDto.AuthorStatistics = _authorStatisticsService.GetStatistics(userId);
 
         return profileDto;
     }
@@ -141,6 +146,7 @@ public class ProfileService : IProfileService
         {
             var dto = _mapper.Map<ProfileDto>(person);
             dto.Statistics = _touristStatisticsService.GetStatistics(person.UserId);
+            dto.AuthorStatistics = _authorStatisticsService.GetStatistics(person.UserId);
 
             return dto;
         }).ToList();

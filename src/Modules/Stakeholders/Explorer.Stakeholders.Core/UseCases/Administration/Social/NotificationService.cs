@@ -163,5 +163,22 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Social
 
             _repository.Create(notification);
         }
+
+        public void CreateGiftReceivedNotification(long recipientId, long tourId, string tourName, string donorName, string message)
+        {
+            var notification = new Notification(
+                userId: recipientId,
+                type: NotificationType.GiftReceived,
+                title: "You received a gift!",
+                message: string.IsNullOrWhiteSpace(message)
+                    ? $"You received the tour '{tourName}' as a gift from {donorName}."
+                    : message,
+                tourProblemId: null,
+                tourId: tourId,
+                actionUrl: $"/public/tours/{tourId}"
+            );
+
+            _repository.Create(notification);
+        }
     }
 }

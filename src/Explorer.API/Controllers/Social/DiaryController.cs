@@ -31,7 +31,6 @@ public class DiaryController : ControllerBase
     {
         diary.TouristId = User.PersonId();
         diary.CreatedAt = DateTime.UtcNow;
-        diary.Status = 0;
 
         var created = _diaryService.Create(diary);
         return Ok(created);

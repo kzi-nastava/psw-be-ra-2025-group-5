@@ -9,4 +9,6 @@ public class BadgeDto
     public int Rank { get; set; }
     public int Type { get; set; }
     public int RequiredValue { get; set; }
+    public int Role { get; set; }
 }
+

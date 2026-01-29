@@ -12,4 +12,8 @@ public interface IBadgeRepository
     Badge Update(Badge badge);
     void Delete(long id);
     List<Badge> GetByType(BadgeType type);
+    List<Badge> GetByRole(BadgeRole role);
+    List<Badge> GetByRank(BadgeRank rank);
+    List<Badge> GetByName(string name);
 }
+

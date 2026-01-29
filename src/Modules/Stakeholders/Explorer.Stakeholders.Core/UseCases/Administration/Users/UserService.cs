@@ -131,5 +131,31 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
             return result;
         }
 
+
+
+        public ProfileDto GetProfileByUserId(long userId)
+        {
+            var user = _userRepository.Get(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var person = _personRepository.GetByUserId(userId);
+            if (person == null)
+                throw new Exception("Person not found.");
+
+            return new ProfileDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                ProfileImagePath = person.ProfileImagePath,
+                Name = person.Name,
+                Surname = person.Surname,
+                Email = person.Email
+            };
+        }
+
+
+
+
     }
 }

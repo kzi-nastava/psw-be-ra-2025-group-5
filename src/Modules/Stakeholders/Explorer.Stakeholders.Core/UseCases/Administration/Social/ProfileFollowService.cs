@@ -5,10 +5,10 @@ using Explorer.Stakeholders.API.Public.Social;
 using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Social;
 using Explorer.Stakeholders.Core.Domain.Social;
-
+using Explorer.Stakeholders.API.Internal;
 namespace Explorer.Stakeholders.Core.UseCases.Administration.Social;
 
-public class ProfileFollowService : IProfileFollowService
+public class ProfileFollowService : IProfileFollowService, IInternalProfileFollowService
 {
     private readonly IProfileFollowRepository _followRepository;
     private readonly IProfileService _personService;

@@ -73,6 +73,19 @@ public class UserBadgeService : IUserBadgeService
         return badgesByType;
     }
 
+    public List<BadgeDto> GetNotOwnedByUser(long userId)
+    {
+        var ownedBadgeIds = _repository
+        .GetByUserId(userId)
+        .Select(ub => ub.BadgeId);
+
+        var badges = _badgeRepository
+            .GetAll()
+            .Where(b => !ownedBadgeIds.Contains(b.Id));
+
+        return _mapper.Map<List<BadgeDto>>(badges);
+    }
+
     public bool HasBadge(long userId, long badgeId)
     {
         return _repository.HasBadge(userId, badgeId);

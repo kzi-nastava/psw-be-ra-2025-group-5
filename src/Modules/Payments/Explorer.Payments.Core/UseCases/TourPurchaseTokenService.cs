@@ -36,6 +36,12 @@ public class TourPurchaseTokenService : ITourPurchaseTokenService, ITourPurchase
         return _mapper.Map<List<TourPurchaseTokenDto>>(result);
     }
 
+    public List<TourPurchaseTokenDto> GetByTour(long tourId)
+    {
+        var result = _TourPurchaseTokenRepository.GetByTour(tourId);
+        return _mapper.Map<List<TourPurchaseTokenDto>>(result);
+    }
+
     public TourPurchaseTokenDto Create(CreateTourPurchaseTokenDto entity)
     {
         if (GetAll().Any(token => token.TouristId == entity.TouristId && token.TourId == entity.TourId))
@@ -44,4 +50,34 @@ public class TourPurchaseTokenService : ITourPurchaseTokenService, ITourPurchase
         var result = _TourPurchaseTokenRepository.Create(_mapper.Map<TourPurchaseToken>(entity));
         return _mapper.Map<TourPurchaseTokenDto>(result);
     }
+
+    public bool HasUsedPremiumWheelThisMonth(long touristId)
+    {
+        var oneMonthAgo = DateTime.UtcNow.AddMonths(-1);
+
+        return _TourPurchaseTokenRepository
+            .GetByTourist(touristId)
+            .Any(t =>
+                t.IsFree &&
+                t.PurchasedAt >= oneMonthAgo
+            );
+    }
+
+    public TourPurchaseTokenDto CreateFreeTokenFromWheel(long tourId, long touristId)
+    {
+        var dto = new CreateTourPurchaseTokenDto
+        {
+            TourId = tourId,
+            TouristId = touristId,
+            IsFree = true
+        };
+
+        var token = _TourPurchaseTokenRepository.Create(
+            _mapper.Map<TourPurchaseToken>(dto)
+        );
+
+        return _mapper.Map<TourPurchaseTokenDto>(token);
+    }
+
+
 }
