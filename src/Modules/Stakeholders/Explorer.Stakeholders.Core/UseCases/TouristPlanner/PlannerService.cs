@@ -27,13 +27,25 @@ public class PlannerService : IPlannerService
 
     public PlannerDto GetOrCreatePlanner(long touristId)
     {
-        return _mapper.Map<PlannerDto>(GetOrCreatePlannerEntity(touristId));
+        var planner = GetOrCreatePlannerEntity(touristId);
+        var plannerDto = _mapper.Map<PlannerDto>(planner);
+
+        foreach (var day in planner.Days)
+        {
+            var validatedDay = MapAndValidateDay(day);
+
+            var dtoDay = plannerDto.Days.First(d => d.Date == validatedDay.Date);
+            dtoDay.Warnings = validatedDay.Warnings;
+        }
+
+        return plannerDto;
     }
 
     public PlannerDayDto GetDay(long touristId, DateOnly date)
     {
         var planner = GetOrCreatePlannerEntity(touristId);
-        return _mapper.Map<PlannerDayDto>(planner.Days.FirstOrDefault(d => d.Date == date)) ?? throw new NotFoundException("Day not found");
+        var day = planner.Days.FirstOrDefault(d => d.Date == date) ?? throw new NotFoundException("Day not found");
+        return MapAndValidateDay(day);
     }
 
     public PlannerDayDto AddBlock(long touristId, DateOnly date, CreatePlannerTimeBlockDto dto)
@@ -59,7 +71,7 @@ public class PlannerService : IPlannerService
 
         _plannerRepository.Update(planner);
 
-        return dayDto;
+        return MapAndValidateDay(day);
     }
 
     public PlannerDayDto RemoveBlock(long touristId, DateOnly date, long blockId)
@@ -70,7 +82,7 @@ public class PlannerService : IPlannerService
         day.RemoveBlock(blockId);
         _plannerRepository.Update(planner);
 
-        return _mapper.Map<PlannerDayDto>(day);
+        return MapAndValidateDay(day);
     }
 
     public PlannerDayDto RescheduleBlock(long touristId, DateOnly date, long blockId, CreatePlannerTimeBlockDto dto)
@@ -92,7 +104,7 @@ public class PlannerService : IPlannerService
 
         _plannerRepository.Update(planner);
 
-        return dayDto;
+        return MapAndValidateDay(day);
     }
 
     private Planner GetOrCreatePlannerEntity(long touristId)
@@ -109,6 +121,24 @@ public class PlannerService : IPlannerService
             throw new Exception($"Invalid transport type: {transportType}");
 
         return result;
+    }
+
+    private PlannerDayDto MapAndValidateDay(PlannerDay day)
+    {
+        var dayDto = _mapper.Map<PlannerDayDto>(day);
+
+        if (!day.TimeBlocks.Any())
+        {
+            dayDto.Warnings = new List<PlannerWarningDto>(); 
+            return dayDto;
+        }
+
+        var tourIds = day.TimeBlocks.Select(b => b.TourId).Distinct();
+        var transportType = day.TimeBlocks.FirstOrDefault()?.TransportType ?? TransportType.Walking;
+        var systemDurations = _tourSharedService.GetDurationsByTransport(tourIds, transportType.ToString());
+        dayDto.Warnings = _validationService.ValidateDay(dayDto, systemDurations);
+
+        return dayDto;
     }
 
 }
