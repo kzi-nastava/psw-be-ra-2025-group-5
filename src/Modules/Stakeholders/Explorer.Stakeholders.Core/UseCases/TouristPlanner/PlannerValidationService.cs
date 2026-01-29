@@ -1,8 +1,5 @@
 ﻿using Explorer.Stakeholders.API.Dtos.TouristPlanner;
 using Explorer.Stakeholders.API.Public.TouristPlanner;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
 {

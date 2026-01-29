@@ -18,7 +18,7 @@ public class Planner : AggregateRoot
 
     public void AddDay(PlannerDay day)
     {
-        if (Days.Any(d => d.Date == day.Date)) throw new InvalidDataException("A planner day for this date already exists.");
+        if (Days.Any(d => d.Date == day.Date)) throw new InvalidDataException("A planner day for this date already exists");
         Days.Add(day);
     }
 }

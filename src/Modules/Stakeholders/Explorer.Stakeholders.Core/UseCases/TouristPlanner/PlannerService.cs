@@ -33,7 +33,7 @@ public class PlannerService : IPlannerService
     public PlannerDayDto GetDay(long touristId, DateOnly date)
     {
         var planner = GetOrCreatePlannerEntity(touristId);
-        return _mapper.Map<PlannerDayDto>(planner.Days.FirstOrDefault(d => d.Date == date)) ?? throw new NotFoundException("Day not found.");
+        return _mapper.Map<PlannerDayDto>(planner.Days.FirstOrDefault(d => d.Date == date)) ?? throw new NotFoundException("Day not found");
     }
 
     public PlannerDayDto AddBlock(long touristId, DateOnly date, CreatePlannerTimeBlockDto dto)
@@ -65,7 +65,7 @@ public class PlannerService : IPlannerService
     public PlannerDayDto RemoveBlock(long touristId, DateOnly date, long blockId)
     {
         var planner = GetOrCreatePlannerEntity(touristId);
-        var day = planner.Days.FirstOrDefault(d => d.Date == date) ?? throw new NotFoundException("Day not found.");
+        var day = planner.Days.FirstOrDefault(d => d.Date == date) ?? throw new NotFoundException("Day not found");
 
         day.RemoveBlock(blockId);
         _plannerRepository.Update(planner);

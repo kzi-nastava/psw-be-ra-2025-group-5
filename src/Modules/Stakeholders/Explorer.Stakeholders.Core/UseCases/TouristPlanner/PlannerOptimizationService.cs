@@ -36,7 +36,7 @@ public class PlannerOptimizationService : IPlannerOptimizationService
     {
         var planner = _plannerRepository.GetByTouristId(touristId);
         if (planner == null)
-            return new OptimizationResultDto { Success = false, UnresolvedWarnings = ["Planner not found."] };
+            return new OptimizationResultDto { Success = false, UnresolvedWarnings = ["Planner not found"] };
 
         var result = new OptimizationResultDto { Success = true };
         var daysToProcess = planner.Days.OrderBy(d => d.Date).ToList();
@@ -115,7 +115,7 @@ public class PlannerOptimizationService : IPlannerOptimizationService
             }
             else
             {
-                result.UnresolvedWarnings.Add($"Cannot move excess tour (ID: {blockToMove.TourId}) - no adjacent day available.");
+                result.UnresolvedWarnings.Add($"Cannot move excess tour (ID: {blockToMove.TourId}) - no adjacent day available");
                 break;
             }
         }
@@ -212,7 +212,7 @@ public class PlannerOptimizationService : IPlannerOptimizationService
             }
             else
             {
-                result.UnresolvedWarnings.Add($"Cannot move late tour (starting at {block.TimeRange.Start:HH:mm}) to earlier time.");
+                result.UnresolvedWarnings.Add($"Cannot move late tour (starting at {block.TimeRange.Start:HH:mm}) to earlier time");
             }
         }
     }
@@ -271,7 +271,7 @@ public class PlannerOptimizationService : IPlannerOptimizationService
                 }
                 else
                 {
-                    result.UnresolvedWarnings.Add($"Cannot create sufficient break before tour at {currBlock.TimeRange.Start:HH:mm}.");
+                    result.UnresolvedWarnings.Add($"Cannot create sufficient break before tour at {currBlock.TimeRange.Start:HH:mm}");
                 }
             }
         }
@@ -365,7 +365,7 @@ public class PlannerOptimizationService : IPlannerOptimizationService
                 }
                 else
                 {
-                    result.UnresolvedWarnings.Add($"Cannot extend tour duration to recommended {recommendedMinutes}min.");
+                    result.UnresolvedWarnings.Add($"Cannot extend tour duration to recommended {recommendedMinutes}min");
                 }
             }
         }

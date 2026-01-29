@@ -1,5 +1,4 @@
 ﻿using Explorer.BuildingBlocks.Core.Domain;
-using Explorer.Stakeholders.API.Dtos.TouristPlanner;
 
 namespace Explorer.Stakeholders.Core.Domain.TouristPlanner;
 
@@ -31,13 +30,13 @@ public class PlannerDay : Entity
 
     public void RemoveBlock(long blockId)
     {
-        var block = TimeBlocks.FirstOrDefault(b => b.Id == blockId) ?? throw new InvalidDataException("Planner block not found.");
+        var block = TimeBlocks.FirstOrDefault(b => b.Id == blockId) ?? throw new InvalidDataException("Planner block not found");
         TimeBlocks.Remove(block);
     }
 
     public void RescheduleBlock(long blockId, TimeOnly start, TimeOnly end, TransportType transportType)
     {
-        var block = TimeBlocks.First(b => b.Id == blockId) ?? throw new InvalidDataException("Planner block not found.");
+        var block = TimeBlocks.First(b => b.Id == blockId) ?? throw new InvalidDataException("Planner block not found");
         TimeRange candidate;
         var nullTime = new TimeOnly(0, 0);
 
@@ -71,7 +70,7 @@ public class PlannerDay : Entity
         if (dayEnd - pointer >= duration)
             return new TimeRange(pointer, pointer.Add(duration));
 
-        throw new InvalidOperationException("No available time slot found.");
+        throw new InvalidOperationException("No available time slot found");
     }
 
     private static TimeOnly SnapUpToQuarterHour(TimeOnly time)
@@ -94,7 +93,7 @@ public class PlannerDay : Entity
                 continue;
 
             if (block.TimeRange.OverlapsWith(candidate))
-                throw new InvalidDataException("Time block overlaps with an existing block.");
+                throw new InvalidDataException("Time block overlaps with an existing block");
         }
     }
 }
