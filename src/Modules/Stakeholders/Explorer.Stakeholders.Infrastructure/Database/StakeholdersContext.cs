@@ -3,17 +3,21 @@ using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Badges;
 using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
+using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.Social;
+using Explorer.Stakeholders.Core.Domain.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.Streaks;
+using System.Text.Json;
 
 
 namespace Explorer.Stakeholders.Infrastructure.Database
@@ -40,6 +44,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
         public DbSet<UserBadge> UserBadges { get; set; }
         public DbSet<UserStatistics> UserStatistics { get; set; }
         public DbSet<UserPremium> UserPremiums { get; set; }
+        public DbSet<Planner> Planners { get; set; }
 
         public StakeholdersContext(DbContextOptions<StakeholdersContext> options) : base(options) { }
 
@@ -64,6 +69,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
             ConfigureClubJoinRequest(modelBuilder);
             ConfigureFollow(modelBuilder);
             ConfigureProfileMessage(modelBuilder);
+            ConfigurePlanner(modelBuilder);
             ConfigureStreak(modelBuilder);
             ConfigureBadge(modelBuilder);
             ConfigureUserBadge(modelBuilder);
@@ -383,7 +389,7 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                 builder.HasKey(d => d.Id);
 
                 builder.Property(d => d.Name)
-                    .IsRequired()
+                    .IsRequired(false)
                     .HasMaxLength(300);
 
                 builder.Property(d => d.CreatedAt)
@@ -393,17 +399,17 @@ namespace Explorer.Stakeholders.Infrastructure.Database
                         v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
                     );
 
-                builder.Property(d => d.Status)
-                    .HasConversion<int>()
-                    .IsRequired();
+                builder.Property(d => d.Content)
+                    .IsRequired(false)
+                    .HasMaxLength(3000);
 
                 builder.Property(d => d.Country)
-                    .IsRequired()
+                    .IsRequired(false)
                     .HasMaxLength(100);
 
                 builder.Property(d => d.City)
-                    .HasMaxLength(100)
-                    .IsRequired(false);
+                    .IsRequired(false)
+                    .HasMaxLength(100);
 
                 builder.Property(d => d.TouristId)
                     .IsRequired();
@@ -467,6 +473,30 @@ namespace Explorer.Stakeholders.Infrastructure.Database
 
                 builder.ToTable("ProfileMessages");
             });
+        }
+
+        private static void ConfigurePlanner(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Planner>()
+                .HasMany(e => e.Days)
+                .WithOne()
+                .HasForeignKey("PlannerId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PlannerDay>()
+                .HasMany(e => e.TimeBlocks)
+                .WithOne()
+                .HasForeignKey(b => b.PlannerDayId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<PlannerTimeBlock>()
+                .Property(s => s.TimeRange)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<TimeRange>(v, (JsonSerializerOptions)null)
+                );
         }
 
 

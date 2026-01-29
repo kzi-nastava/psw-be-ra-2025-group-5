@@ -2,6 +2,7 @@
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Payments.API.Internal;
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
@@ -9,14 +10,14 @@ using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Equipments;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
-using Explorer.Tours.Core.Domain.Shared;
-using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Stakeholders.API.Internal;
+using static Explorer.Tours.Core.Domain.Tours.ValueObjects.TourDuration;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -31,8 +32,6 @@ public class TourService : ITourService, ITourSharedService
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IInternalBadgeService _badgeService;
     private readonly IPremiumSharedService _premiumService;
-
-
 
     public TourService(
     ITourRepository repository,
@@ -89,6 +88,13 @@ public class TourService : ITourService, ITourSharedService
         var filtered = result.Where(t => ids.Contains(t.Id)).ToList();
         var items = filtered.Select(_mapper.Map<TourDto>).ToList();
         return items;
+    }
+
+    public List<TourDto> GetPurchased(long touristId)
+    {
+        var purchaseTokens = _purchaseTokenService.GetByTourist(touristId);
+        var tourIds = purchaseTokens.Select(pt => pt.TourId).Distinct().ToArray();
+        return GetMultiple(tourIds);
     }
 
     public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
@@ -567,5 +573,27 @@ public class TourService : ITourService, ITourSharedService
         return _mapper.Map<TourDto>(tour);
     }
 
+    public Dictionary<long, int> GetDurationsByTransport(IEnumerable<long> tourIds, string transportType)
+    {
+        var tours = _tourRepository.GetAll().Where(t => tourIds.Contains(t.Id)).ToList();
 
+        var result = new Dictionary<long, int>();
+
+        if (!Enum.TryParse<TransportTypeEnum>(transportType, out var parsedTransport))
+        {
+            return new Dictionary<long, int>();
+        }
+
+        foreach (var tour in tours)
+        {
+            var duration = tour.Durations.FirstOrDefault(d => d.TransportType == parsedTransport);
+
+            if (duration != null)
+            {
+                result[tour.Id] = duration.DurationMinutes;
+            }
+        }
+
+        return result;
+    }
 }

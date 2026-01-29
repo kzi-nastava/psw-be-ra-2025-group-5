@@ -4,10 +4,13 @@ using Explorer.Stakeholders.API.Dtos.AppRatings;
 using Explorer.Stakeholders.API.Dtos.Badges;
 using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.ClubMessages;
+using Explorer.Stakeholders.API.Dtos.Clubs;
 using Explorer.Stakeholders.API.Dtos.Comments;
 using Explorer.Stakeholders.API.Dtos.Diaries;
 using Explorer.Stakeholders.API.Dtos.Locations;
 using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Dtos.TouristPlanner;
+using Explorer.Stakeholders.API.Dtos.ProfileMessages;
 using Explorer.Stakeholders.API.Dtos.Social;
 using Explorer.Stakeholders.API.Dtos.Tours.Problems;
 using Explorer.Stakeholders.API.Dtos.Users;
@@ -16,10 +19,13 @@ using Explorer.Stakeholders.Core.Domain.AppRatings;
 using Explorer.Stakeholders.Core.Domain.Badges;
 using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.ClubMessages;
+using Explorer.Stakeholders.Core.Domain.Clubs;
 using Explorer.Stakeholders.Core.Domain.Comments;
 using Explorer.Stakeholders.Core.Domain.Diaries;
 using Explorer.Stakeholders.Core.Domain.Notifications;
+using Explorer.Stakeholders.Core.Domain.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.Positions;
+using Explorer.Stakeholders.Core.Domain.ProfileMessages;
 using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.TourProblems;
 using Explorer.Stakeholders.Core.Domain.Users;
@@ -122,14 +128,13 @@ namespace Explorer.Stakeholders.Core.Mappers
                 ));
 
             // ========================= Diary <-> DiaryDto =========================
-            CreateMap<Diary, DiaryDto>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status));
+            CreateMap<Diary, DiaryDto>();
 
             CreateMap<DiaryDto, Diary>()
                 .ConstructUsing(dto => new Diary(
                     dto.Name,
                     dto.CreatedAt,
-                    (DiaryStatus)dto.Status,
+                    dto.Content,
                     dto.Country,
                     dto.City,
                     dto.TouristId
@@ -199,6 +204,21 @@ namespace Explorer.Stakeholders.Core.Mappers
                 .ForMember(dest => dest.CurrentStreak, opt => opt.MapFrom(src => src.GetCurrentStreak()));
 
             CreateMap<StreakDto, Streak>();
+
+            // ========================= Planner <-> PlannerDto =========================
+            CreateMap<Planner, PlannerDto>().ReverseMap();
+            CreateMap<PlannerDay, PlannerDayDto>();
+
+            CreateMap<PlannerTimeBlock, PlannerTimeBlockDto>()
+                .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.TimeRange.Start))
+                .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.TimeRange.End))
+                .ForMember(d => d.TransportType, opt => opt.MapFrom(s => s.TransportType.ToString()));
+
+            CreateMap<PlannerTimeBlockDto, PlannerTimeBlock>()
+                .ForMember(dest => dest.TimeRange, opt => opt.MapFrom(src => new TimeRange(src.StartTime, src.EndTime)))
+                .ForMember(dest => dest.TransportType, opt => opt.MapFrom(src =>
+                   string.IsNullOrEmpty(src.TransportType) ? TransportType.Walking : Enum.Parse<TransportType>(src.TransportType, true)));
+
         }
     }
 }
