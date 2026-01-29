@@ -24,10 +24,6 @@ builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
     options.AddPolicy("ai-chat", httpContext =>
     {
         var idStr = httpContext.User?.FindFirst("id")?.Value;
@@ -41,6 +37,7 @@ builder.Services.AddRateLimiter(options =>
 
         if (hasUser)
         {
+            
             using var scope = httpContext.RequestServices.CreateScope();
             var premiumService = scope.ServiceProvider.GetRequiredService<Explorer.Stakeholders.API.Public.Users.IPremiumService>();
             isPremium = premiumService.IsPremium(userId);
