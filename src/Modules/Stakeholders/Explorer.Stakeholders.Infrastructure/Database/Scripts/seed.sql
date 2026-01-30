@@ -79,7 +79,7 @@ VALUES (3, 3, 6, 1, 0, 'Problem sa vodičem', '2023-10-27T12:00:00Z', '2023-10-2
 
 INSERT INTO stakeholders."Planners"("Id", "TouristId") VALUES (1, 4);
 INSERT INTO stakeholders."PlannerDay"("Id", "Date", "PlannerId") VALUES (1, NOW(), 1);
-INSERT INTO stakeholders."PlannerTimeBlock"("Id", "TourId", "TimeRange", "PlannerDayId") VALUES (1, 5, jsonb_build_object('Start', '09:30', 'End', '11:00'), 1);
+INSERT INTO stakeholders."PlannerTimeBlock"("Id", "TourId", "TimeRange", "PlannerDayId", "TransportType") VALUES (1, 5, jsonb_build_object('Start', '09:30', 'End', '11:00'), 1, 1);
 
 INSERT INTO stakeholders."Diaries"("Id", "Name", "CreatedAt", "Country", "City", "TouristId", "Content") VALUES
 	(1, 'Trip ideas', '2023-10-27T12:00:00Z', 'Italy', 'Rome', 4, 'Check out if there is any new tours around, or request them if not'),
@@ -217,7 +217,6 @@ SELECT setval(pg_get_serial_sequence('stakeholders."Badges"', 'Id'), (SELECT COA
 SELECT setval(pg_get_serial_sequence('stakeholders."UserStatistics"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."UserStatistics"));
 SELECT setval(pg_get_serial_sequence('stakeholders."UserBadges"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."UserBadges"));
 SELECT setval(pg_get_serial_sequence('stakeholders."UserPremiums"', 'Id'), (SELECT COALESCE(MAX("Id"), 0) FROM stakeholders."UserPremiums"));
-SELECT setval(pg_get_serial_sequence('stakeholders."ProfileFollows"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."ProfileFollows"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Planners"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Planners"));
 SELECT setval(pg_get_serial_sequence('stakeholders."PlannerDay"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."PlannerDay"));
 SELECT setval(pg_get_serial_sequence('stakeholders."PlannerTimeBlock"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."PlannerTimeBlock"));
