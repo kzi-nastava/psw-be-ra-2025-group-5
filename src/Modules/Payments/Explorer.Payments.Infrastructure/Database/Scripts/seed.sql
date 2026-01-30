@@ -14,7 +14,9 @@ INSERT INTO payments."Wallets" ("Id", "UserId", "Balance") VALUES
 (3, 6, 4000),
 (4, 1, 1400), 
 (5, 2, 3040),
-(6, 3, 2040);
+(6, 3, 2040),
+(7, 7, 2040);
+
 INSERT INTO payments."TourSales"("Id", "AuthorId", "TourIds", "CreationDate", "ExpirationDate", "DiscountPercentage") VALUES (1, 7, '{2}', '2026-01-04', '2026-01-14', 50);
 
 INSERT INTO payments."Coupons" ("Id", "Code", "Percentage", "AuthorId", "TourId", "ExpirationDate") 

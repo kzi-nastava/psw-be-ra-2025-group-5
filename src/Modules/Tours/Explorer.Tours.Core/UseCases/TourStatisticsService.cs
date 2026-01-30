@@ -99,6 +99,48 @@ public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsServi
         return stats;
     }
 
+    public IReadOnlyCollection<TourReviewStatsItemDto> GetAuthorReviews(long authorId, string period)
+    {
+        EnsurePremium(authorId);
+
+        var pagedResult = _TourRepository.GetPagedByAuthor(authorId, 0, 10000);
+        var tours = pagedResult.Results;
+
+        DateTime periodStart = DateTime.UtcNow;
+        bool filterByDate = period != "all";
+
+        if (period == "24h") periodStart = periodStart.AddHours(-24);
+        else if (period == "week") periodStart = periodStart.AddDays(-7);
+        else if (period == "month") periodStart = periodStart.AddMonths(-1);
+        else if (period == "6months") periodStart = periodStart.AddMonths(-6);
+
+        var reviewsList = new List<TourReviewStatsItemDto>();
+
+        foreach (var tour in tours)
+        {
+            foreach (var review in tour.Reviews)
+            {
+                if (!filterByDate || review.ReviewTime >= periodStart)
+                {
+                    var item = new TourReviewStatsItemDto
+                    {
+                        Id = review.Id,
+                        Grade = review.Grade,
+                        Comment = review.Comment,
+                        TouristUsername = review.TouristUsername,
+                        ReviewTime = review.ReviewTime ?? DateTime.MinValue,
+                        TouristID = review.TouristID,
+                        TourName = tour.Name
+                    };
+
+                    reviewsList.Add(item);
+                }
+            }
+        }
+
+        return reviewsList.OrderByDescending(r => r.ReviewTime).ToList();
+    }
+
     private void EnsurePremium(long userId)
     {
         if (!_premiumService.IsPremium(userId))
