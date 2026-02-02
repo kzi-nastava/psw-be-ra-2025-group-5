@@ -132,7 +132,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
 
             foreach (var block in orderedBlocks)
             {
-                pointer = SnapUpToQuarterHour(pointer);
+                pointer = PlannerDay.SnapUpToQuarterHour(pointer);
 
                 if ((block.TimeRange.Start - pointer).TotalMinutes >= durationMinutes + breakMinutes)
                 {
@@ -143,22 +143,11 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 pointer = block.TimeRange.End.AddMinutes(breakMinutes);
             }
 
-            pointer = SnapUpToQuarterHour(pointer);
+            pointer = PlannerDay.SnapUpToQuarterHour(pointer);
             if ((workEnd - pointer).TotalMinutes >= durationMinutes)
                 return new TimeRange(pointer, pointer.AddMinutes(durationMinutes));
 
             return null;
-        }
-
-        private static TimeOnly SnapUpToQuarterHour(TimeOnly time)
-        {
-            var totalMinutes = time.Hour * 60 + time.Minute;
-            var snappedMinutes = ((totalMinutes + 14) / 15) * 15;
-
-            if (snappedMinutes >= 24 * 60)
-                return new TimeOnly(23, 59);
-
-            return TimeOnly.FromTimeSpan(TimeSpan.FromMinutes(snappedMinutes));
         }
 
     }
