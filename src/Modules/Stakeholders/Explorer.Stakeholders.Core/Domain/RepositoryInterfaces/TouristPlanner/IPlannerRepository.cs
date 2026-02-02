@@ -8,4 +8,5 @@ public interface IPlannerRepository
     Planner GetByTouristId(long touristId);
     Planner Create(long touristId);
     Planner Update(Planner planner);
+    void DeleteByTouristId(long touristId);
 }
