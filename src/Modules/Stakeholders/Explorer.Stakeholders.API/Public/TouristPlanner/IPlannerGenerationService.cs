@@ -9,6 +9,6 @@ namespace Explorer.Stakeholders.API.Public.TouristPlanner
 {
     public interface IPlannerGenerationService
     {
-        PlannerDto GeneratePlan(long touristId);
+        PlannerDto GeneratePlan(long touristId, PlannerGenerationOptionsDto options);
     }
 }

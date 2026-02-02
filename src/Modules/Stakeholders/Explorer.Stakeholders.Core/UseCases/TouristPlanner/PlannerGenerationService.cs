@@ -25,7 +25,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
             _mapper = mapper;
         }
 
-        public PlannerDto GeneratePlan(long touristId)
+        public PlannerDto GeneratePlan(long touristId, PlannerGenerationOptionsDto options)
         {
             var previousPlanner = _plannerRepository.GetByTouristId(touristId);
             var previousTransportTypes = new Dictionary<long, TransportType>();
@@ -39,7 +39,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                         previousTransportTypes[block.TourId] = block.TransportType;
                     }
                 }
-                
+
                 _plannerRepository.DeleteByTouristId(touristId);
             }
 
@@ -51,28 +51,70 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 return _mapper.Map<PlannerDto>(planner);
             }
 
-            var startDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-            int dayOffset = 0;
+            var plannerDays = new Dictionary<DateOnly, PlannerDay>();
+            PlannerDay GetOrCreateDay(DateOnly date)
+            {
+                if (!plannerDays.ContainsKey(date))
+                {
+                    var day = new PlannerDay(date);
+                    plannerDays[date] = day;
+                    planner.AddDay(day);
+                }
+
+                return plannerDays[date];
+            }
+
+            var startDate = options.StartDate;
+            int dayIndex = 0;
+            int toursInCurrentDay = 0;
 
             foreach (var tour in tours)
             {
-                var currentDate = startDate.AddDays(dayOffset);
-                var day = new PlannerDay(currentDate);
+                if (dayIndex >= options.NumberOfDays)
+                    break;
+
+                var date = startDate.AddDays(dayIndex);
+                var day = GetOrCreateDay(date);
+
+                if (day.TimeBlocks.Count >= 2)  
+                {
+                    dayIndex++;
+                    toursInCurrentDay = 0;
+                    if (dayIndex >= options.NumberOfDays)
+                        break;
+
+                    date = startDate.AddDays(dayIndex);
+                    day = GetOrCreateDay(date);
+                }
 
                 var durationByTransport = _tourSharedService.GetDurationsByTransport(new[] { tour.Id }, TransportType.Walking.ToString());
+
                 if (!durationByTransport.TryGetValue(tour.Id, out var duration))
                     continue;
 
-                var currentStartTime = new TimeOnly(9, 0); 
-                var endTime = currentStartTime.AddMinutes(duration);
+                var transportType = previousTransportTypes.TryGetValue(tour.Id, out var t) ? t : TransportType.Walking;
 
-                TransportType transportType = previousTransportTypes.ContainsKey(tour.Id) ? previousTransportTypes[tour.Id]: TransportType.Walking;
-                var block = new PlannerTimeBlock(tour.Id, currentStartTime, endTime, transportType);
+                TimeOnly startTime = FindFirstAvailableSlot(day, duration);
+                if (startTime == default)
+                {
+                    dayIndex++;
+                    toursInCurrentDay = 0;
+                    if (dayIndex >= options.NumberOfDays)
+                        break;
+
+                    date = startDate.AddDays(dayIndex);
+                    day = GetOrCreateDay(date);
+                    startTime = FindFirstAvailableSlot(day, duration);
+                    if (startTime == default)
+                        continue; 
+                }
+
+                var endTime = startTime.AddMinutes(duration);
+
+                var block = new PlannerTimeBlock(tour.Id, startTime, endTime, transportType);
                 day.AddBlock(block, duration);
 
-                planner.AddDay(day);
-
-                dayOffset += 2;
+                toursInCurrentDay++;
             }
 
             planner = _plannerRepository.Update(planner);
@@ -80,5 +122,30 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
             return _mapper.Map<PlannerDto>(planner);
         }
 
+        private TimeOnly FindFirstAvailableSlot(PlannerDay day, int duration)
+        {
+            var workStart = new TimeOnly(9, 0);
+            var workEnd = new TimeOnly(21, 0);
+            var breakMinutes = 60; 
+
+            var sortedBlocks = day.TimeBlocks.OrderBy(b => b.TimeRange.Start).ToList();
+
+            TimeOnly current = workStart;
+
+            foreach (var block in sortedBlocks)
+            {
+                if ((block.TimeRange.Start - current).TotalMinutes >= duration + breakMinutes)
+                    return current;
+
+                current = block.TimeRange.End.AddMinutes(breakMinutes);
+            }
+
+            if ((workEnd - current).TotalMinutes >= duration)
+                return current;
+
+            return default;
+        }
+
     }
+
 }
