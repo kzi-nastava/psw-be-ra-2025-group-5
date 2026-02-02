@@ -10,6 +10,7 @@ public interface IChallengeExecutionService
     ChallengeExecutionDto GetById(long id);
     List<ChallengeExecutionDto> GetByTourist(long touristId);
     void UpdateTouristLocation(long challengeId, long touristId, double latitude, double longitude);
+    List<ChallengeExecutionDto> GetTodayParticipants(long challengeId, DateTime date);
 }
 
 

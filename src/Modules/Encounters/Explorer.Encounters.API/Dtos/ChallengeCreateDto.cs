@@ -1,9 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Encounters.API.Dtos
 {
@@ -20,6 +15,8 @@ namespace Explorer.Encounters.API.Dtos
         public long CreatedById { get; set; }
         public int? RequiredParticipants { get; set; }
         public int? RadiusInMeters { get; set; }
+        public DateTime? EndChallenge { get; set; }
+        public int? DailyParticipantLimit { get; set; }
         public IFormFile? Image { get; set; }
     }
 }

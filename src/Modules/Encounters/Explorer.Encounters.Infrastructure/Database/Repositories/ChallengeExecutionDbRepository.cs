@@ -1,6 +1,7 @@
 using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Encounters.Core.Domain;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces;
+using Google.GenAI.Types;
 using Microsoft.EntityFrameworkCore;
 
 namespace Explorer.Encounters.Infrastructure.Database.Repositories;
@@ -64,4 +65,21 @@ public class ChallengeExecutionDbRepository : IChallengeExecutionRepository
             e.TouristId == touristId && 
             e.Status == ChallengeExecutionStatus.Completed);
     }
+
+    public List<ChallengeExecution>? GetTodayParticipants(long challengeId, DateTime now)
+    {
+        var today = now.Date;
+        var tomorrow = today.AddDays(1);
+
+        return _dbSet.Where(e => e.ChallengeId == challengeId && e.Status == ChallengeExecutionStatus.Completed && e.CompletedAt >= today && e.CompletedAt < tomorrow).ToList();
+
+    }
+
+    public List<ChallengeExecution> GetByChallenge(long challengeId)
+    {
+        return _dbContext.ChallengeExecutions
+                       .Where(e => e.ChallengeId == challengeId)
+                       .ToList();
+    }
+
 }

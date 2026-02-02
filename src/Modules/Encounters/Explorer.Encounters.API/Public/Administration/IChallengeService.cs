@@ -1,5 +1,6 @@
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
+using Explorer.Encounters.API.Public.Tourist;
 using Microsoft.AspNetCore.Http;
 
 namespace Explorer.Encounters.API.Public.Administration;
@@ -14,4 +15,6 @@ public interface IChallengeService
     ChallengeResponseDto GetById(long challengeId);
     void Approve(long challengeId);
     void Reject(long challengeId);
+    List<ChallengeResponseDto> GetAllAvailableForTourist(long touristId, IChallengeExecutionService executionService);
+
 }
