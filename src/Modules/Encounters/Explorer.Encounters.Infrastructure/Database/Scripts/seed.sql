@@ -25,6 +25,6 @@ VALUES (5, 'Još malo pa nestalo', 'Izazov koji morate rešiti u određenom vrem
 
 INSERT INTO encounters."Challenges"(
     "Id", "Name", "Description", "Latitude", "Longitude", "ExperiencePoints", "Status", "Type", "CreatedByTouristId", "RequiredParticipants", "RadiusInMeters", "ImageUrl", "EndChallenge", "DailyParticipantLimit")
-VALUES (6, 'Samo za petoro', 'Izazov koji može prihvatiti samo petoro učesnika dnevno.', 45.38165, 19.92138, 120, 1, 4, null, 2, 100, null, null, 5);
+VALUES (6, 'Samo za dvoje', 'Izazov koji može prihvatiti samo petoro učesnika dnevno.', 45.38165, 19.92138, 120, 1, 4, null, 2, 100, null, null, 2);
 
 SELECT setval(pg_get_serial_sequence('encounters."Challenges"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM encounters."Challenges"));
