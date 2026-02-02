@@ -76,7 +76,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 var date = startDate.AddDays(dayIndex);
                 var day = GetOrCreateDay(date);
 
-                if (day.TimeBlocks.Count >= 2)  
+                if (day.TimeBlocks.Count >= 2)
                 {
                     dayIndex++;
                     toursInCurrentDay = 0;
@@ -88,14 +88,13 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 }
 
                 var durationByTransport = _tourSharedService.GetDurationsByTransport(new[] { tour.Id }, TransportType.Walking.ToString());
-
                 if (!durationByTransport.TryGetValue(tour.Id, out var duration))
                     continue;
 
                 var transportType = previousTransportTypes.TryGetValue(tour.Id, out var t) ? t : TransportType.Walking;
 
-                TimeOnly startTime = FindFirstAvailableSlot(day, duration);
-                if (startTime == default)
+                var slot = FindFirstAvailableSlot(day, duration);
+                if (slot == null)
                 {
                     dayIndex++;
                     toursInCurrentDay = 0;
@@ -104,46 +103,62 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
 
                     date = startDate.AddDays(dayIndex);
                     day = GetOrCreateDay(date);
-                    startTime = FindFirstAvailableSlot(day, duration);
-                    if (startTime == default)
-                        continue; 
+                    slot = FindFirstAvailableSlot(day, duration);
+                    if (slot == null)
+                        continue;
                 }
 
-                var endTime = startTime.AddMinutes(duration);
-
-                var block = new PlannerTimeBlock(tour.Id, startTime, endTime, transportType);
+                var block = new PlannerTimeBlock(tour.Id, slot.Start, slot.End, transportType);
                 day.AddBlock(block, duration);
 
                 toursInCurrentDay++;
             }
+
 
             planner = _plannerRepository.Update(planner);
 
             return _mapper.Map<PlannerDto>(planner);
         }
 
-        private TimeOnly FindFirstAvailableSlot(PlannerDay day, int duration)
+        private TimeRange FindFirstAvailableSlot(PlannerDay day, int durationMinutes)
         {
             var workStart = new TimeOnly(9, 0);
             var workEnd = new TimeOnly(21, 0);
-            var breakMinutes = 60; 
+            var breakMinutes = 60;
 
-            var sortedBlocks = day.TimeBlocks.OrderBy(b => b.TimeRange.Start).ToList();
+            var orderedBlocks = day.TimeBlocks.OrderBy(b => b.TimeRange.Start).ToList();
 
-            TimeOnly current = workStart;
+            var pointer = workStart;
 
-            foreach (var block in sortedBlocks)
+            foreach (var block in orderedBlocks)
             {
-                if ((block.TimeRange.Start - current).TotalMinutes >= duration + breakMinutes)
-                    return current;
+                pointer = SnapUpToQuarterHour(pointer);
 
-                current = block.TimeRange.End.AddMinutes(breakMinutes);
+                if ((block.TimeRange.Start - pointer).TotalMinutes >= durationMinutes + breakMinutes)
+                {
+                    var endTime = pointer.AddMinutes(durationMinutes);
+                    return new TimeRange(pointer, endTime);
+                }
+
+                pointer = block.TimeRange.End.AddMinutes(breakMinutes);
             }
 
-            if ((workEnd - current).TotalMinutes >= duration)
-                return current;
+            pointer = SnapUpToQuarterHour(pointer);
+            if ((workEnd - pointer).TotalMinutes >= durationMinutes)
+                return new TimeRange(pointer, pointer.AddMinutes(durationMinutes));
 
-            return default;
+            return null;
+        }
+
+        private static TimeOnly SnapUpToQuarterHour(TimeOnly time)
+        {
+            var totalMinutes = time.Hour * 60 + time.Minute;
+            var snappedMinutes = ((totalMinutes + 14) / 15) * 15;
+
+            if (snappedMinutes >= 24 * 60)
+                return new TimeOnly(23, 59);
+
+            return TimeOnly.FromTimeSpan(TimeSpan.FromMinutes(snappedMinutes));
         }
 
     }
