@@ -309,4 +309,15 @@ public class TourDbRepository : ITourRepository
 
         DbContext.SaveChanges();
     }
+
+    public int CountCreatedByAuthorSince(long authorId, DateTime since)
+    {
+        return _dbSet
+            .AsNoTracking()
+            .Count(t =>
+                t.AuthorId == authorId &&
+                t.CreatedAt >= since
+            );
+    }
+
 }

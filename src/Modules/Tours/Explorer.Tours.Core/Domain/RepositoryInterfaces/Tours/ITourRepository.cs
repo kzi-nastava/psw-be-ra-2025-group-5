@@ -20,4 +20,6 @@ public interface ITourRepository
     void UpdateReview(long tourId, long reviewId, int grade, string? comment, double progress, List<ReviewImage>? images = null);
     void RemoveReview(long tourId, long reviewId);
     void Close(long tourId);
+    int CountCreatedByAuthorSince(long authorId, DateTime since);
+
 }
