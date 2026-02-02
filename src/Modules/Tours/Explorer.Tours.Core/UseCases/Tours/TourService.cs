@@ -614,7 +614,7 @@ public class TourService : ITourService, ITourSharedService
 
     public TourCreationQuotaDto GetCreationQuota(long userId)
     {
-        if (!_premiumService.IsPremium(userId))
+        if (_premiumService.IsPremium(userId))
         {
             return new TourCreationQuotaDto
             {
