@@ -73,7 +73,7 @@ public class PlannerDay : Entity
         throw new InvalidOperationException("No available time slot found");
     }
 
-    private static TimeOnly SnapUpToQuarterHour(TimeOnly time)
+    public static TimeOnly SnapUpToQuarterHour(TimeOnly time)
     {
         var totalMinutes = time.Hour * 60 + time.Minute;
         var snappedMinutes = ((totalMinutes + 14) / 15) * 15;

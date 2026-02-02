@@ -96,16 +96,18 @@ public class PlannerController : ControllerBase
     }
 
     [HttpPost("{touristId:long}/generate")]
-    public ActionResult<PlannerDto> GeneratePlan(long touristId)
+    public ActionResult<PlannerDto> GeneratePlan(long touristId, [FromBody] PlannerGenerationOptionsDto options)
     {
         try
         {
-            return Ok(_generationService.GeneratePlan(touristId));
+            var planner = _generationService.GeneratePlan(touristId, options);
+            return Ok(planner);
         }
         catch (Exception ex)
         {
             return Conflict(ex.Message);
         }
     }
+
 
 }

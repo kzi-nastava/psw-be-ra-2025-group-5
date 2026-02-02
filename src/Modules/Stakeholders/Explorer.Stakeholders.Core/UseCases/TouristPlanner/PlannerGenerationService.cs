@@ -25,7 +25,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
             _mapper = mapper;
         }
 
-        public PlannerDto GeneratePlan(long touristId)
+        public PlannerDto GeneratePlan(long touristId, PlannerGenerationOptionsDto options)
         {
             var previousPlanner = _plannerRepository.GetByTouristId(touristId);
             var previousTransportTypes = new Dictionary<long, TransportType>();
@@ -39,7 +39,7 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                         previousTransportTypes[block.TourId] = block.TransportType;
                     }
                 }
-                
+
                 _plannerRepository.DeleteByTouristId(touristId);
             }
 
@@ -51,34 +51,105 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
                 return _mapper.Map<PlannerDto>(planner);
             }
 
-            var startDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-            int dayOffset = 0;
+            var plannerDays = new Dictionary<DateOnly, PlannerDay>();
+            PlannerDay GetOrCreateDay(DateOnly date)
+            {
+                if (!plannerDays.ContainsKey(date))
+                {
+                    var day = new PlannerDay(date);
+                    plannerDays[date] = day;
+                    planner.AddDay(day);
+                }
+
+                return plannerDays[date];
+            }
+
+            var startDate = options.StartDate;
+            int dayIndex = 0;
+            int toursInCurrentDay = 0;
 
             foreach (var tour in tours)
             {
-                var currentDate = startDate.AddDays(dayOffset);
-                var day = new PlannerDay(currentDate);
+                if (dayIndex >= options.NumberOfDays)
+                    break;
+
+                var date = startDate.AddDays(dayIndex);
+                var day = GetOrCreateDay(date);
+
+                if (day.TimeBlocks.Count >= 2)
+                {
+                    dayIndex++;
+                    toursInCurrentDay = 0;
+                    if (dayIndex >= options.NumberOfDays)
+                        break;
+
+                    date = startDate.AddDays(dayIndex);
+                    day = GetOrCreateDay(date);
+                }
 
                 var durationByTransport = _tourSharedService.GetDurationsByTransport(new[] { tour.Id }, TransportType.Walking.ToString());
                 if (!durationByTransport.TryGetValue(tour.Id, out var duration))
                     continue;
 
-                var currentStartTime = new TimeOnly(9, 0); 
-                var endTime = currentStartTime.AddMinutes(duration);
+                var transportType = previousTransportTypes.TryGetValue(tour.Id, out var t) ? t : TransportType.Walking;
 
-                TransportType transportType = previousTransportTypes.ContainsKey(tour.Id) ? previousTransportTypes[tour.Id]: TransportType.Walking;
-                var block = new PlannerTimeBlock(tour.Id, currentStartTime, endTime, transportType);
+                var slot = FindFirstAvailableSlot(day, duration);
+                if (slot == null)
+                {
+                    dayIndex++;
+                    toursInCurrentDay = 0;
+                    if (dayIndex >= options.NumberOfDays)
+                        break;
+
+                    date = startDate.AddDays(dayIndex);
+                    day = GetOrCreateDay(date);
+                    slot = FindFirstAvailableSlot(day, duration);
+                    if (slot == null)
+                        continue;
+                }
+
+                var block = new PlannerTimeBlock(tour.Id, slot.Start, slot.End, transportType);
                 day.AddBlock(block, duration);
 
-                planner.AddDay(day);
-
-                dayOffset += 2;
+                toursInCurrentDay++;
             }
+
 
             planner = _plannerRepository.Update(planner);
 
             return _mapper.Map<PlannerDto>(planner);
         }
 
+        private TimeRange FindFirstAvailableSlot(PlannerDay day, int durationMinutes)
+        {
+            var workStart = new TimeOnly(9, 0);
+            var workEnd = new TimeOnly(21, 0);
+            var breakMinutes = 60;
+
+            var orderedBlocks = day.TimeBlocks.OrderBy(b => b.TimeRange.Start).ToList();
+
+            var pointer = workStart;
+
+            foreach (var block in orderedBlocks)
+            {
+                pointer = PlannerDay.SnapUpToQuarterHour(pointer);
+
+                if ((block.TimeRange.Start - pointer).TotalMinutes >= durationMinutes + breakMinutes)
+                {
+                    var endTime = pointer.AddMinutes(durationMinutes);
+                    return new TimeRange(pointer, endTime);
+                }
+
+                pointer = block.TimeRange.End.AddMinutes(breakMinutes);
+            }
+
+            pointer = PlannerDay.SnapUpToQuarterHour(pointer);
+            if ((workEnd - pointer).TotalMinutes >= durationMinutes)
+                return new TimeRange(pointer, pointer.AddMinutes(durationMinutes));
+
+            return null;
+        }
+
     }
+
 }
