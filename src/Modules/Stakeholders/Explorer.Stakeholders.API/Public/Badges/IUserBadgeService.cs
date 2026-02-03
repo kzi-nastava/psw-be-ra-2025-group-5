@@ -8,5 +8,6 @@ public interface IUserBadgeService
     UserBadgeDto Get(long id);
     List<UserBadgeDto> GetByUserId(long userId);
     List<UserBadgeDto> GetBestBadgesByUserId(long userId);
+    List<BadgeDto> GetNotOwnedByUser(long userId);
     bool HasBadge(long userId, long badgeId);
 }

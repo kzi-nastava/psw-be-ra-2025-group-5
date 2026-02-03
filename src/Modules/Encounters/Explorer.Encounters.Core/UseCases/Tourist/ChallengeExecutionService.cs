@@ -17,6 +17,7 @@ public class ChallengeExecutionService : IChallengeExecutionService
     private readonly IMapper _mapper;
     private readonly IChallengeParticipationRepository _presenceRepository;
     private readonly IInternalBadgeService _badgeService;
+    private readonly IPremiumSharedService _premiumService;
 
     public ChallengeExecutionService(
         IChallengeExecutionRepository executionRepository,
@@ -24,7 +25,8 @@ public class ChallengeExecutionService : IChallengeExecutionService
         IInternalPersonExperienceService personExperienceService, 
         IChallengeParticipationRepository presenceRepository,
         IMapper mapper,
-        IInternalBadgeService badgeService)
+        IInternalBadgeService badgeService,
+        IPremiumSharedService premiumService)
     {
         _executionRepository = executionRepository;
         _challengeRepository = challengeRepository;
@@ -32,6 +34,7 @@ public class ChallengeExecutionService : IChallengeExecutionService
         _presenceRepository = presenceRepository;
         _mapper = mapper;
         _badgeService = badgeService;
+        _premiumService = premiumService;
     }
 
     public ChallengeExecutionDto StartChallenge(long challengeId, long touristId)
@@ -81,10 +84,17 @@ public class ChallengeExecutionService : IChallengeExecutionService
         execution.Complete();
         var result = _executionRepository.Update(execution);
 
-        _personExperienceService.AddExperience(touristId, challenge.ExperiencePoints);
+        var xp = GetAwardedXp(touristId, challenge.ExperiencePoints);
+        _personExperienceService.AddExperience(touristId, xp);
+
         _badgeService.OnChallengeCompleted(touristId, (int)challenge.Type);
         
         return _mapper.Map<ChallengeExecutionDto>(result);
+    }
+
+    private int GetAwardedXp(long touristId, int baseXp)
+    {
+        return _premiumService.IsPremium(touristId) ? baseXp * 2 : baseXp;
     }
 
     public ChallengeExecutionDto AbandonChallenge(long executionId, long touristId)
@@ -152,7 +162,9 @@ public class ChallengeExecutionService : IChallengeExecutionService
             execution.Complete();
             _executionRepository.Update(execution);
 
-            _personExperienceService.AddExperience(touristId, challenge.ExperiencePoints);
+            var xp = GetAwardedXp(touristId, challenge.ExperiencePoints);
+            _personExperienceService.AddExperience(touristId, xp);
+
             _badgeService.OnChallengeCompleted(touristId, (int)challenge.Type);
         }
     }

@@ -22,7 +22,9 @@ public class DiaryRepository : IDiaryRepository
 
         var totalCount = query.Count();
 
-        var items = query
+        var items = pageSize == 0 
+            ? query.ToList()
+            : query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();

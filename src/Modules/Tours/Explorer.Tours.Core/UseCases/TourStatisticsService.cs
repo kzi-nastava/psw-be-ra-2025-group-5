@@ -5,6 +5,7 @@ using Explorer.Tours.API.Internal;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.API.Public;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Stakeholders.API.Internal;
 
 namespace Explorer.Tours.Core.UseCases;
 
@@ -14,22 +15,28 @@ public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsServi
     private readonly ITourPurchaseTokenSharedService _TokenService;
     private readonly IMapper _mapper;
     private readonly ITourRepository _TourRepository;
+    private readonly IPremiumSharedService _premiumService;
 
-    public TourStatisticsService(ITourStatisticsDbRepository statisticsRepository, IMapper mapper, ITourPurchaseTokenSharedService tokenService, ITourRepository tourRepository)
+
+    public TourStatisticsService(ITourStatisticsDbRepository statisticsRepository, IMapper mapper, ITourPurchaseTokenSharedService tokenService, ITourRepository tourRepository, IPremiumSharedService premiumService)
     {
         _StatisticsRepository = statisticsRepository;
         _mapper = mapper;
         _TokenService = tokenService;
         _TourRepository = tourRepository;
+        _premiumService = premiumService;
     }
 
     public int GetPurchasedToursCount(long userId)
     {
+
         return _TokenService.GetByTourist(userId).Count;
     }
 
     public IReadOnlyCollection<TourStatisticsItemDto> GetCompletedTours(long userId)
     {
+
+
         var result = _StatisticsRepository.GetCompletedTours(userId);
         var tours = result.Select(_mapper.Map<TourStatisticsItemDto>).ToList();
         return tours;
@@ -37,6 +44,9 @@ public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsServi
 
     public IReadOnlyCollection<ToursByPriceDto> GetToursCountByPrice(long userId)
     {
+        EnsurePremium(userId);
+
+
         var data = _StatisticsRepository.GetToursCountByPrice(userId);
 
         return data
@@ -51,6 +61,9 @@ public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsServi
 
     public TourReviewStatisticsDto GetReviewStatistics(long authorId, string period)
     {
+        EnsurePremium(authorId);
+
+
         var pagedResult = _TourRepository.GetPagedByAuthor(authorId, 0, 10000);
         var tours = pagedResult.Results;
 
@@ -84,5 +97,53 @@ public class TourStatisticsService : ITourStatisticsService, ITourAnalyticsServi
             stats.AverageGrade = 0;
 
         return stats;
+    }
+
+    public IReadOnlyCollection<TourReviewStatsItemDto> GetAuthorReviews(long authorId, string period)
+    {
+        EnsurePremium(authorId);
+
+        var pagedResult = _TourRepository.GetPagedByAuthor(authorId, 0, 10000);
+        var tours = pagedResult.Results;
+
+        DateTime periodStart = DateTime.UtcNow;
+        bool filterByDate = period != "all";
+
+        if (period == "24h") periodStart = periodStart.AddHours(-24);
+        else if (period == "week") periodStart = periodStart.AddDays(-7);
+        else if (period == "month") periodStart = periodStart.AddMonths(-1);
+        else if (period == "6months") periodStart = periodStart.AddMonths(-6);
+
+        var reviewsList = new List<TourReviewStatsItemDto>();
+
+        foreach (var tour in tours)
+        {
+            foreach (var review in tour.Reviews)
+            {
+                if (!filterByDate || review.ReviewTime >= periodStart)
+                {
+                    var item = new TourReviewStatsItemDto
+                    {
+                        Id = review.Id,
+                        Grade = review.Grade,
+                        Comment = review.Comment,
+                        TouristUsername = review.TouristUsername,
+                        ReviewTime = review.ReviewTime ?? DateTime.MinValue,
+                        TouristID = review.TouristID,
+                        TourName = tour.Name
+                    };
+
+                    reviewsList.Add(item);
+                }
+            }
+        }
+
+        return reviewsList.OrderByDescending(r => r.ReviewTime).ToList();
+    }
+
+    private void EnsurePremium(long userId)
+    {
+        if (!_premiumService.IsPremium(userId))
+            throw new UnauthorizedAccessException("Premium required.");
     }
 }

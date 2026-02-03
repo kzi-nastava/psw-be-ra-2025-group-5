@@ -8,4 +8,6 @@ public interface ITourPurchaseTokenService
     TourPurchaseTokenDto GetByTourAndTourist(long tourId, long touristId);
     List<TourPurchaseTokenDto> GetByTourist(long touristId);
     TourPurchaseTokenDto Create(CreateTourPurchaseTokenDto entity);
+
+
 }

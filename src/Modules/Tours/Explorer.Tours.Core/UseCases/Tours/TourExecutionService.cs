@@ -263,5 +263,13 @@ namespace Explorer.Tours.Core.UseCases.Tours
             return _mapper.Map<List<TourDto>>(tours);
         }
 
+        public List<long> GetExecutedTourIdsForUser(long userId)
+        {
+            return _repo.GetByUserId(userId)
+            .Select(e => e.TourId)
+            .Distinct()
+            .ToList();
+        }
+
     }
 }
