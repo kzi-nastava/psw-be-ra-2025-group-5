@@ -51,5 +51,10 @@ namespace Explorer.Payments.Infrastructure.Database.Repositories
             }
             return entity;
         }
+
+        public Wallet GetByTouristId(long touristId)
+        {
+            return _dbSet.FirstOrDefault(w => w.UserId == touristId);
+        }
     }
 }

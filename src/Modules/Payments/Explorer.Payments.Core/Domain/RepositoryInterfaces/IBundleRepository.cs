@@ -10,6 +10,7 @@ namespace Explorer.Payments.Core.Domain.RepositoryInterfaces
     {
         Bundle Get(long id);
         List<Bundle> GetByAuthor(long authorId);
+        List<Bundle> GetAllPublished();
         Bundle Create(Bundle bundle);
         Bundle Update(Bundle bundle);
         void Delete(long id);
