@@ -63,7 +63,8 @@ public class StakeholdersTestFactory : BaseTestFactory<StakeholdersContext>
         public List<ChallengeExecutionDto> GetByTourist(long touristId) => new List<ChallengeExecutionDto>();
 
         public void UpdateTouristLocation(long challengeId, long touristId, double latitude, double longitude) { /* ne radi ništa za test */ }
-    }
+        public List<ChallengeExecutionDto> GetTodayParticipants(long challengeId, DateTime date) => new List<ChallengeExecutionDto>();
+}
 
 
     public class StubWalletService : IInternalWalletService

@@ -1,4 +1,5 @@
 using Explorer.BuildingBlocks.Core.Domain;
+using System.Xml.Linq;
 
 namespace Explorer.Encounters.Core.Domain;
 
@@ -15,25 +16,15 @@ public class Challenge : AggregateRoot
     public int? RequiredParticipants { get; private set; }
     public int? RadiusInMeters { get; private set; }
     public string? ImageUrl { get; private set; }
+    public DateTime? EndChallenge { get; private set; }
+    public int? DailyParticipantLimit { get; private set; }
 
     public Challenge() { }
 
     public Challenge(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
-        long? createdByTouristId = null, int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
+        long? createdByTouristId = null, int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null, DateTime? endChallenge = null, int? dailyParticipantLimit = null)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Invalid Name.");
-        if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Invalid Description.");
-        if (experiencePoints < 0) throw new ArgumentException("Experience points must be non-negative.");
-        if (latitude < -90 || latitude > 90) throw new ArgumentException("Latitude must be between -90 and 90.");
-        if (longitude < -180 || longitude > 180) throw new ArgumentException("Longitude must be between -180 and 180.");
-        if (type == ChallengeType.Social)
-        {
-            if (requiredParticipants is null || requiredParticipants < 2)
-                throw new ArgumentException("Social challenge must require at least 2 participants.");
-
-            if (radiusInMeters is null || radiusInMeters <= 0)
-                throw new ArgumentException("Social challenge must have a positive radius.");
-        }
+        Validate(name, description, latitude, longitude, experiencePoints, status, type, requiredParticipants, radiusInMeters, imageUrl, endChallenge, dailyParticipantLimit);
 
         Name = name;
         Description = description;
@@ -45,10 +36,36 @@ public class Challenge : AggregateRoot
         CreatedByTouristId = createdByTouristId;
         RequiredParticipants = requiredParticipants;
         RadiusInMeters = radiusInMeters;
+        EndChallenge = endChallenge;
+        DailyParticipantLimit = dailyParticipantLimit;
     }
 
     public void Update(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
-        int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null)
+        int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null, DateTime? endChallenge = null, int? dailyParticipantLimit = null)
+    {
+        Validate(name, description, latitude, longitude, experiencePoints, status, type, requiredParticipants, radiusInMeters, imageUrl, endChallenge, dailyParticipantLimit);
+
+        Name = name;
+        Description = description;
+        Latitude = latitude;
+        Longitude = longitude;
+        ExperiencePoints = experiencePoints;
+        Status = status;
+        Type = type;
+        RequiredParticipants = requiredParticipants;
+        RadiusInMeters = radiusInMeters;
+        ImageUrl = imageUrl;
+        EndChallenge = endChallenge;
+        DailyParticipantLimit = dailyParticipantLimit;
+    }
+
+    public void UpdateImage(string? imagePath)
+    {
+        ImageUrl = imagePath;
+    }
+
+    private void Validate(string name, string description, double latitude, double longitude, int experiencePoints, ChallengeStatus status, ChallengeType type,
+        int? requiredParticipants = null, int? radiusInMeters = null, string? imageUrl = null, DateTime? endChallenge = null, int? dailyParticipantLimit = null)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Invalid Name.");
         if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Invalid Description.");
@@ -63,22 +80,21 @@ public class Challenge : AggregateRoot
             if (radiusInMeters is null || radiusInMeters <= 0)
                 throw new ArgumentException("Social challenge must have a positive radius.");
         }
+        if ( type == ChallengeType.TimeBased && endChallenge == null)
+        {
+            throw new ArgumentException("Time-based challenge must have an end date.");
+        }
 
-        Name = name;
-        Description = description;
-        Latitude = latitude;
-        Longitude = longitude;
-        ExperiencePoints = experiencePoints;
-        Status = status;
-        Type = type;
-        RequiredParticipants = requiredParticipants;
-        RadiusInMeters = radiusInMeters;
-        ImageUrl = imageUrl;
-    }
+        if( type == ChallengeType.Community && (dailyParticipantLimit == null || dailyParticipantLimit < 1))
+        {
+            throw new ArgumentException("Community challenge must have a positive daily participant limit.");
+        }
+        if (type == ChallengeType.TimeBased &&
+    endChallenge <= DateTime.UtcNow)
+        {
+            throw new ArgumentException("End date must be in the future.");
+        }
 
-    public void UpdateImage(string? imagePath)
-    {
-        ImageUrl = imagePath;
     }
 }
 public enum ChallengeStatus
@@ -92,5 +108,7 @@ public enum ChallengeType
 {
     Social,
     Location,
-    Misc
+    Misc,
+    TimeBased,
+    Community
 }

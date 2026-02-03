@@ -29,17 +29,11 @@ public class TouristChallengeController : ControllerBase
     [HttpGet]
     public ActionResult<List<ChallengeResponseDto>> GetAllActive()
     {
-        var result = _challengeService.GetAllActive();
-        // Izbaci one koje je korisnik vec zavrsio
-        var completed = _challengeExecutionService.GetByTourist(long.Parse(User.Claims.First(c => c.Type == "id").Value))
-            .Where(e => e.Status == "Completed" || e.Status == "InProgress" || e.Status == "Pending")
-            .Select(e => e.ChallengeId)
-            .ToHashSet();
-        
-        result = result.Where(challenge => !completed.Contains(challenge.Id)).ToList();
-
-        return Ok(result);
+        var userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        var available = _challengeService.GetAllAvailableForTourist(userId, _challengeExecutionService);
+        return Ok(available);
     }
+
 
     [HttpGet("{challengeId:long}")]
     public ActionResult<ChallengeResponseDto> GetById(long challengeId)
@@ -81,7 +75,9 @@ public class TouristChallengeController : ControllerBase
                 ExperiencePoints = challenge.ExperiencePoints,
                 Type = challenge.Type,
                 RequiredParticipants = challenge.RequiredParticipants,
-                RadiusInMeters = challenge.RadiusInMeters
+                RadiusInMeters = challenge.RadiusInMeters,
+                EndChallenge = challenge.EndChallenge,
+                DailyParticipantLimit = challenge.DailyParticipantLimit
             };
 
             return Ok(_challengeTouristService.CreateByTourist(challengeDto, profile.Id, challenge.Image));

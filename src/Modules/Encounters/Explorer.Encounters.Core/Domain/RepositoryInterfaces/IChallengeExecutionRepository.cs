@@ -10,4 +10,6 @@ public interface IChallengeExecutionRepository
     List<ChallengeExecution> GetByTourist(long touristId);
     ChallengeExecution? GetActiveByChallengeAndTourist(long challengeId, long touristId);
     ChallengeExecution? GetCompletedByChallengeAndTourist(long challengeId, long touristId);
+    List<ChallengeExecution>? GetTodayParticipants(long challengeId, DateTime now);
+    List<ChallengeExecution> GetByChallenge(long challengeId);
 }
