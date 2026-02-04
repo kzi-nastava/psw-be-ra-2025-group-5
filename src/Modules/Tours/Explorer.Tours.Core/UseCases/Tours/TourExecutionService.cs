@@ -255,8 +255,12 @@ namespace Explorer.Tours.Core.UseCases.Tours
                 bool hasExecution = _repo.HasAnyExecution(userId, token.TourId);
                 if (!hasExecution)
                 {
-                    var tour = _tourRepo.Get(token.TourId);
-                    if (tour != null) tours.Add(tour);
+                    try
+                    {
+                        var tour = _tourRepo.Get(token.TourId);
+                        tours.Add(tour);
+                    }
+                    catch (Explorer.BuildingBlocks.Core.Exceptions.NotFoundException) { }
                 }
             }
 

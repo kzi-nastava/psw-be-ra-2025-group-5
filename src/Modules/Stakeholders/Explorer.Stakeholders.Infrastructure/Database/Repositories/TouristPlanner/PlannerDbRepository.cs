@@ -51,4 +51,15 @@ public class PlannerDbRepository : IPlannerRepository
         foreach (var day in planner.Days)
             day.TimeBlocks = [.. day.TimeBlocks.OrderBy(b => b.TimeRange.Start)];
     }
+
+    public void DeleteByTouristId(long touristId)
+    {
+        var planner = _dbSet.Include(p => p.Days).ThenInclude(d => d.TimeBlocks).SingleOrDefault(p => p.TouristId == touristId);
+
+        if (planner == null) return;
+
+        _dbSet.Remove(planner);
+        DbContext.SaveChanges();
+    }
+
 }

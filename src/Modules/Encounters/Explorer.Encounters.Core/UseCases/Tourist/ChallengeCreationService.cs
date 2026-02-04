@@ -37,7 +37,10 @@ namespace Explorer.Encounters.Core.UseCases.Tourist
                 type,
                 creatorId,
                 dto.RequiredParticipants ?? null,
-                dto.RadiusInMeters ?? null
+                dto.RadiusInMeters ?? null,
+                null,
+                dto.EndChallenge ?? null,
+                dto.DailyParticipantLimit ?? null
             );
 
             var result = _challengeRepository.Create(challenge);

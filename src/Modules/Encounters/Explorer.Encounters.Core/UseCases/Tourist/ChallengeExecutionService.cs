@@ -57,6 +57,8 @@ public class ChallengeExecutionService : IChallengeExecutionService
         if (completedExecution != null)
             throw new InvalidOperationException("You already completed this challenge.");
 
+        SpecialValidation(challenge);
+
         var execution = new ChallengeExecution(challengeId, touristId);
         var result = _executionRepository.Create(execution);
         
@@ -81,6 +83,8 @@ public class ChallengeExecutionService : IChallengeExecutionService
                 throw new InvalidOperationException("Challenge cannot be completed yet – not enough participants in range.");
         }
 
+        SpecialValidation(challenge);
+
         execution.Complete();
         var result = _executionRepository.Update(execution);
 
@@ -95,6 +99,29 @@ public class ChallengeExecutionService : IChallengeExecutionService
     private int GetAwardedXp(long touristId, int baseXp)
     {
         return _premiumService.IsPremium(touristId) ? baseXp * 2 : baseXp;
+    }
+
+    private void SpecialValidation(Challenge? challenge)
+    {
+        DateTime now = DateTime.UtcNow;
+
+        if (challenge.Type == ChallengeType.Community)
+        {
+            List<ChallengeExecution>? participantsToday = _executionRepository.GetTodayParticipants(challenge.Id, now);
+
+            if (participantsToday.Count >= challenge.DailyParticipantLimit)
+            {
+                throw new InvalidOperationException("Challenge cannot be completed – community goal is reached for today.");
+            }
+        }
+
+        if (challenge.Type == ChallengeType.TimeBased)
+        {
+            if (now > challenge.EndChallenge)
+            {
+                throw new InvalidOperationException("Challenge cannot be completed – the time limit has expired.");
+            }
+        }
     }
 
     public ChallengeExecutionDto AbandonChallenge(long executionId, long touristId)
@@ -182,6 +209,19 @@ public class ChallengeExecutionService : IChallengeExecutionService
     }
 
     private double DegreesToRadians(double deg) => deg * Math.PI / 180;
+
+    public List<ChallengeExecutionDto> GetTodayParticipants(long challengeId, DateTime date)
+    {
+        var executions = _executionRepository.GetByChallenge(challengeId);
+
+        var filtered = executions
+            .Where(e => e.CompletedAt.HasValue && e.CompletedAt.Value.Date == date.Date)
+            .ToList();
+
+        return filtered.Select(_mapper.Map<ChallengeExecutionDto>).ToList();
+    }
+
+
 
 }
 

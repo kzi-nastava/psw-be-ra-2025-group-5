@@ -112,6 +112,7 @@ public static class StakeholdersStartup
         services.AddScoped<IPlannerService, PlannerService>();
         services.AddScoped<IPlannerValidationService, PlannerValidationService>();
         services.AddScoped<IPlannerOptimizationService, PlannerOptimizationService>();
+        services.AddScoped<IPlannerGenerationService, PlannerGenerationService>();
         services.AddScoped<IStreakService, StreakService>();
 
         services.AddScoped<IPremiumService, PremiumService>();

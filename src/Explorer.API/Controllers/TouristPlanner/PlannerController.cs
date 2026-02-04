@@ -1,6 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos.TouristPlanner;
 using Explorer.Stakeholders.API.Public.TouristPlanner;
+using Explorer.Stakeholders.Core.UseCases.TouristPlanner;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,13 @@ public class PlannerController : ControllerBase
 {
     private readonly IPlannerService _plannerService;
     private readonly IPlannerOptimizationService _optimizationService;
+    private readonly IPlannerGenerationService _generationService;
 
-    public PlannerController(IPlannerService plannerService, IPlannerOptimizationService optimizationService)
+    public PlannerController(IPlannerService plannerService, IPlannerOptimizationService optimizationService, IPlannerGenerationService generationService)
     {
         _plannerService = plannerService;
         _optimizationService = optimizationService;
+        _generationService = generationService;
     }
 
     [HttpGet("{touristId:long}")]
@@ -91,4 +94,20 @@ public class PlannerController : ControllerBase
             return Conflict(ex.Message);
         }
     }
+
+    [HttpPost("{touristId:long}/generate")]
+    public ActionResult<PlannerDto> GeneratePlan(long touristId, [FromBody] PlannerGenerationOptionsDto options)
+    {
+        try
+        {
+            var planner = _generationService.GeneratePlan(touristId, options);
+            return Ok(planner);
+        }
+        catch (Exception ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+
 }

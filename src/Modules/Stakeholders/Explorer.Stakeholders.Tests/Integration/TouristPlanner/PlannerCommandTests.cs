@@ -262,7 +262,8 @@ public class PlannerCommandTests : BaseStakeholdersIntegrationTest
     {
         return new PlannerController(
             scope.ServiceProvider.GetRequiredService<IPlannerService>(),
-            scope.ServiceProvider.GetRequiredService<IPlannerOptimizationService>())
+            scope.ServiceProvider.GetRequiredService<IPlannerOptimizationService>(),
+            scope.ServiceProvider.GetRequiredService<IPlannerGenerationService>())
         {
             ControllerContext = BuildContext("-1")
         };

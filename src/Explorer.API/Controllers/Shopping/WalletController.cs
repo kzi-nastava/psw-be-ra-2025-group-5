@@ -88,7 +88,7 @@ namespace Explorer.API.Controllers.Shopping
         }
 
 
-        [Authorize(Policy = "touristPolicy")]
+        [Authorize(Policy = "authorOrTouristPolicy")]
         [HttpGet("{touristId:long}/payments")]
         public ActionResult<List<PaymentDto>> GetPayments(long touristId)
         {
