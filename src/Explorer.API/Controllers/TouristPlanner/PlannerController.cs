@@ -98,9 +98,10 @@ public class PlannerController : ControllerBase
     [HttpPost("{touristId:long}/generate")]
     public ActionResult<PlannerDto> GeneratePlan(long touristId, [FromBody] PlannerGenerationOptionsDto options)
     {
+        long userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
         try
         {
-            var planner = _generationService.GeneratePlan(touristId, options);
+            var planner = _generationService.GeneratePlan(touristId, options, userId);
             return Ok(planner);
         }
         catch (Exception ex)
