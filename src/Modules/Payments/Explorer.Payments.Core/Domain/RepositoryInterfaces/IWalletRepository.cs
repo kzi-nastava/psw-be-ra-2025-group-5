@@ -9,7 +9,7 @@ namespace Explorer.Payments.Core.Domain.RepositoryInterfaces
     public interface IWalletRepository
     {
         List<Wallet> GetAll();
-        Wallet GetByTouristId(long userId);
+        Wallet GetByUserId(long userId);
         Wallet Create(Wallet wallet);
         Wallet Update(Wallet wallet);
     }

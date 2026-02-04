@@ -51,6 +51,15 @@ namespace Explorer.Tours.Infrastructure.Database.Repositories.Tours
             return entity;
         }
 
+        public void Delete(long id)
+        {
+            var entity = _dbSet.Find(id);
+            if (entity == null) throw new NotFoundException("Not found: " + id);
+
+            _dbSet.Remove(entity);
+            DbContext.SaveChanges();
+        }
+
         public PagedResult<TourRequest> GetPagedByTourist(long touristId, int page, int pageSize)
         {
             var query = _dbSet.Where(tr => tr.TouristId == touristId);

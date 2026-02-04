@@ -9,4 +9,5 @@ public interface IEquipmentRepository
     Equipment Create(Equipment map);
     Equipment Update(Equipment map);
     void Delete(long id);
+    List<Equipment> GetByIds(List<long> ids);
 }

@@ -9,10 +9,10 @@ namespace Explorer.Payments.API.Public
 {
     public interface IWalletService
     {
-        WalletDto GetWalletForTourist(long touristId);
+        WalletDto GetWalletForUser(long touristId);
         void CreditToTourist(long touristId, double amount);
         List<WalletUserDto> GetAllTourist();
 
-
+        IEnumerable<PaymentDto> GetPaymentsForTourist(long touristId);
     }
 }

@@ -8,10 +8,13 @@ DELETE FROM payments."BundleItems";
 
 INSERT INTO payments."ShoppingCarts" ("Id", "TouristId", "Items") VALUES (1, 4, '[{"TourId": 2, "TourName": "Niš WWII History Trail", "ItemPrice": 5.05}]'), (2, 5, '[]');
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId") VALUES (1, 4, 5);
-INSERT INTO payments."Wallets" ("Id", "TouristId", "Balance") VALUES 
+INSERT INTO payments."Wallets" ("Id", "UserId", "Balance") VALUES 
 (1, 4, 0), 
 (2, 5, 0),
-(3, 6, 20);
+(3, 6, 20),
+(4, 1, 100), 
+(5, 2, 300),
+(6, 3, 200);
 INSERT INTO payments."TourSales"("Id", "AuthorId", "TourIds", "CreationDate", "ExpirationDate", "DiscountPercentage") VALUES (1, 7, '{2}', '2026-01-04', '2026-01-14', 50);
 
 INSERT INTO payments."Coupons" ("Id", "Code", "Percentage", "AuthorId", "TourId", "ExpirationDate") 

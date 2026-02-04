@@ -2,6 +2,7 @@
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Tours.API.Public.Administration;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -31,9 +32,13 @@ public class TouristEquipmentQueryTests : BaseToursIntegrationTest
 
     private static TouristEquipmentController CreateController(IServiceScope scope, string personId)
     {
-        return new TouristEquipmentController(scope.ServiceProvider.GetRequiredService<ITouristEquipmentService>())
+         return new TouristEquipmentController(
+         scope.ServiceProvider.GetRequiredService<ITouristEquipmentService>(),
+         scope.ServiceProvider.GetRequiredService<ITourService>()
+        )
         {
             ControllerContext = BuildContext(personId)
         };
+
     }
 }

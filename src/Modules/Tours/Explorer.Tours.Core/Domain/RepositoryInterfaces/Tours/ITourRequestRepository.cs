@@ -15,6 +15,10 @@ namespace Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours
         PagedResult<TourRequest> GetPagedByTourist(long touristId, int page, int pageSize);
         PagedResult<TourRequest> GetPagedByAuthor(long authorId, int page, int pageSize);
         TourRequest Get(long id);
+<<<<<<< HEAD
 
+=======
+        void Delete(long id);
+>>>>>>> feat/requests
     }
 }

@@ -141,7 +141,7 @@ public class ShoppingCartService : IShoppingCartService
             }
         }
 
-        var wallet = _walletRepository.GetByTouristId(touristId);
+        var wallet = _walletRepository.GetByUserId(touristId);
 
         if (wallet == null)
             throw new InvalidOperationException("Wallet not found.");
@@ -153,11 +153,15 @@ public class ShoppingCartService : IShoppingCartService
 
         foreach (var item in purchasableItems)
         {
+            var tour = tours[item.TourId];
+            var authorId = tour.AuthorId;
+
+            CreditAuthorWallet(authorId, item.ItemPrice.FinalPrice);
+
             _paymentRepository.Create(new Payment(touristId, item.TourId, item.ItemPrice.FinalPrice));
             _TokenService.Create(new CreateTourPurchaseTokenDto { TourId = item.TourId, TouristId = touristId });
             
             // Dodaj bedž vlasniku ture
-            var tour = tours[item.TourId];
             _badgeService.OnTourSold(tour.AuthorId);
         }
 
@@ -168,11 +172,25 @@ public class ShoppingCartService : IShoppingCartService
         return _mapper.Map<ShoppingCartDto>(result);
     }
 
-    private void ChargeWallet(long touristId, double totalPrice) 
+    private void ChargeWallet(long userId, double totalPrice) 
     {
-        var wallet = _walletRepository.GetByTouristId(touristId);
+        var wallet = _walletRepository.GetByUserId(userId);
         wallet.Debit(totalPrice);
         _walletRepository.Update(wallet);
+    }
+
+    private void CreditAuthorWallet(long authorId, double amount)
+    {
+        var authorWallet = _walletRepository.GetByUserId(authorId);
+
+        if (authorWallet == null)
+        {
+            authorWallet = new Wallet(authorId);
+            _walletRepository.Create(authorWallet);
+        }
+
+        authorWallet.Credit(amount);
+        _walletRepository.Update(authorWallet);
     }
 
     private void SendPurchaseNotification(long touristId, int toursCount)
