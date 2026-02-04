@@ -52,6 +52,7 @@ public class ToursProfile : Profile
                 dto.Description,
                 Enum.Parse<TourDifficulty>(dto.Difficulty, true),
                 dto.Tags,
+                DateTime.UtcNow,
                 dto.Price
             ));
 

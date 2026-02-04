@@ -27,6 +27,7 @@ public class TourExecutionCommandTests : BaseToursIntegrationTest
             description: "Opis test ture",
             difficulty: TourDifficulty.Easy,
             tags: new List<string> { "test" },
+            DateTime.UtcNow,
             price: 10.0
         );
 

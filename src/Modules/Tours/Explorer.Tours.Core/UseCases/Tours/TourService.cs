@@ -165,8 +165,23 @@ public class TourService : ITourService, ITourSharedService
         );
     }
 
-    public TourDto Create(CreateTourDto dto)
+    public TourDto Create(CreateTourDto dto, long userId)
     {
+        if (!_premiumService.IsPremium(userId))
+        {
+            var startOfWeek = DateTime.UtcNow.Date
+                .AddDays(-(int)DateTime.UtcNow.DayOfWeek + (int)DayOfWeek.Monday);
+
+
+            var createdCount =
+                _tourRepository.CountCreatedByAuthorSince(userId, startOfWeek);
+
+            if (createdCount >= 3)
+                throw new InvalidOperationException(
+                    "Free users can create up to 3 tours per week."
+                );
+        }
+
         var tour = _mapper.Map<Tour>(dto);
         var result = _tourRepository.Create(tour);
         return _mapper.Map<TourDto>(result);
@@ -614,4 +629,37 @@ public class TourService : ITourService, ITourSharedService
 
         return result;
     }
+
+    public TourCreationQuotaDto GetCreationQuota(long userId)
+    {
+        if (_premiumService.IsPremium(userId))
+        {
+            return new TourCreationQuotaDto
+            {
+                CanCreate = true,
+                Remaining = int.MaxValue,
+                Limit = null,
+                ResetAt = null
+            };
+        }
+
+        var startOfWeek = DateTime.UtcNow.Date
+            .AddDays(-(int)DateTime.UtcNow.DayOfWeek + (int)DayOfWeek.Monday);
+
+        var createdThisWeek =
+            _tourRepository.CountCreatedByAuthorSince(userId, startOfWeek);
+
+        const int limit = 3;
+
+        var resetAt = startOfWeek.AddDays(7);
+
+        return new TourCreationQuotaDto
+        {
+            CanCreate = createdThisWeek < limit,
+            Remaining = Math.Max(0, limit - createdThisWeek),
+            Limit = limit,
+            ResetAt = resetAt
+        };
+    }
+
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Explorer.BuildingBlocks.Core.Exceptions;
 using Explorer.Stakeholders.API.Dtos.TouristPlanner;
 using Explorer.Stakeholders.API.Public.TouristPlanner;
+using Explorer.Stakeholders.API.Public.Users;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.TouristPlanner;
 using Explorer.Stakeholders.Core.Domain.TouristPlanner;
 using Explorer.Tours.API.Internal;
@@ -16,17 +18,24 @@ namespace Explorer.Stakeholders.Core.UseCases.TouristPlanner
     {
         private readonly IPlannerRepository _plannerRepository;
         private readonly ITourSharedService _tourSharedService;
+        private readonly IPremiumService _premiumService;
         private readonly IMapper _mapper;
 
-        public PlannerGenerationService(IPlannerRepository plannerRepository, ITourSharedService tourSharedService, IMapper mapper)
+        public PlannerGenerationService(IPlannerRepository plannerRepository, ITourSharedService tourSharedService, IPremiumService premiumService, IMapper mapper)
         {
             _plannerRepository = plannerRepository;
             _tourSharedService = tourSharedService;
+            _premiumService = premiumService;
             _mapper = mapper;
         }
 
-        public PlannerDto GeneratePlan(long touristId, PlannerGenerationOptionsDto options)
+        public PlannerDto GeneratePlan(long touristId, PlannerGenerationOptionsDto options, long userId)
         {
+            if (!_premiumService.IsPremium(userId))
+            {
+                throw new ForbiddenException("Plan generation is only available for premium users.");
+            }
+
             var previousPlanner = _plannerRepository.GetByTouristId(touristId);
             var previousTransportTypes = new Dictionary<long, TransportType>();
 

@@ -77,5 +77,12 @@ namespace Explorer.API.Controllers.Users
             var result = _premiumService.IsPremium(userId);
             return Ok(result);
         }
+
+        [HttpPost("status/batch")]
+        public ActionResult<Dictionary<long, bool>> BatchStatus([FromBody] List<long> userIds)
+        {
+            var result = _premiumService.ArePremium(userIds);
+            return Ok(result);
+        }
     }
 }

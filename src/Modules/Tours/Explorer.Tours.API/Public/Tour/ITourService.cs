@@ -16,7 +16,7 @@ public interface ITourService
     List<TourDto> GetPurchased(long touristId);
     PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize);
     List<string> GetAllTags();
-    TourDto Create(CreateTourDto tour);
+    TourDto Create(CreateTourDto tour, long userId);
     TourDto Update(long id, UpdateTourDto tour);
     void Delete(long id);
 
@@ -59,5 +59,5 @@ public interface ITourService
 
     TourDto SpinPremiumWheel(long userId);
 
-
+    TourCreationQuotaDto GetCreationQuota(long userId);
 }

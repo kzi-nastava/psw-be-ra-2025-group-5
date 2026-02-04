@@ -18,6 +18,7 @@ public class Tour : AggregateRoot
     public List<string> Tags { get; private set; }
     public double Price { get; private set; }
     public TourStatus Status { get; private set; }
+    public DateTime CreatedAt { get; private set; }
     public DateTime? PublishedDate { get; private set; }
     public DateTime? ArchivedDate { get; private set; }
     public List<KeyPoint> KeyPoints { get; private set; }
@@ -36,12 +37,13 @@ public class Tour : AggregateRoot
         KeyPoints = new List<KeyPoint>();
         Reviews = new List<TourReview>();
         AverageRating = 0;
+        CreatedAt = DateTime.UtcNow;
         Durations = new List<TourDuration>();
         RequiredEquipment = new List<RequiredEquipment>();
         TourLength = 0;
     }
 
-    public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, double price = 0.0)
+    public Tour(int authorId, string name, string? description, TourDifficulty difficulty, List<string> tags, DateTime createdAt, double price = 0.0)
     {
         Guard.AgainstZero(authorId, nameof(authorId));
         Guard.AgainstNegative(price, nameof(price));
@@ -56,6 +58,7 @@ public class Tour : AggregateRoot
         Tags = tags ?? new List<string>();
         Price = price;
         Status = TourStatus.Draft;
+        CreatedAt = createdAt;
         KeyPoints = new List<KeyPoint>();
         Durations = new List<TourDuration>();
         Reviews = new List<TourReview>();
