@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Payments.API.Dtos;
 using Explorer.Payments.API.Dtos.PurchaseToken;
@@ -43,19 +43,27 @@ namespace Explorer.Payments.Core.UseCases
         public BundleDto Get(long id)
         {
             var result = _repository.Get(id);
-            return _mapper.Map<BundleDto>(result);
+            var dto = _mapper.Map<BundleDto>(result);
+            PopulateTourNames(dto);
+            return dto;
         }
 
         public List<BundleDto> GetByAuthor(long authorId)
         {
             var result = _repository.GetByAuthor(authorId);
-            return _mapper.Map<List<BundleDto>>(result);
+            var dtos = _mapper.Map<List<BundleDto>>(result);
+            foreach (var dto in dtos)
+                PopulateTourNames(dto);
+            return dtos;
         }
 
         public List<BundleDto> GetAllPublished()
         {
             var result = _repository.GetAllPublished();
-            return _mapper.Map<List<BundleDto>>(result);
+            var dtos = _mapper.Map<List<BundleDto>>(result);
+            foreach (var dto in dtos)
+                PopulateTourNames(dto);
+            return dtos;
         }
 
         public BundleDto Create(BundleDto dto)
@@ -71,7 +79,9 @@ namespace Explorer.Payments.Core.UseCases
             }
 
             var result = _repository.Create(bundle);
-            return _mapper.Map<BundleDto>(result);
+            var createdDto = _mapper.Map<BundleDto>(result);
+            PopulateTourNames(createdDto);
+            return createdDto;
         }
 
         public BundleDto Update(BundleDto dto)
@@ -91,7 +101,9 @@ namespace Explorer.Payments.Core.UseCases
             }
 
             var result = _repository.Update(bundle);
-            return _mapper.Map<BundleDto>(result);
+            var updatedDto = _mapper.Map<BundleDto>(result);
+            PopulateTourNames(updatedDto);
+            return updatedDto;
         }
 
         public void Delete(long id)
@@ -131,8 +143,9 @@ namespace Explorer.Payments.Core.UseCases
 
             bundle.Publish();
             var result = _repository.Update(bundle);
-
-            return _mapper.Map<BundleDto>(result);
+            var dto = _mapper.Map<BundleDto>(result);
+            PopulateTourNames(dto);
+            return dto;
         }
 
         public BundleDto ArchiveBundle(long bundleId)
@@ -140,7 +153,9 @@ namespace Explorer.Payments.Core.UseCases
             var bundle = _repository.Get(bundleId);
             bundle.Archive();
             var result = _repository.Update(bundle);
-            return _mapper.Map<BundleDto>(result);
+            var dto = _mapper.Map<BundleDto>(result);
+            PopulateTourNames(dto);
+            return dto;
         }
 
         public double GetTotalToursPrice(long bundleId)
@@ -166,7 +181,7 @@ namespace Explorer.Payments.Core.UseCases
             if (bundle.Status != BundleStatus.Published)
                 throw new InvalidOperationException("Bundle is not published.");
 
-            var wallet = _walletRepository.GetByTouristId(touristId);
+            var wallet = _walletRepository.GetByUserId(touristId);
             if (wallet == null)
                 throw new InvalidOperationException("Wallet not found.");
 
@@ -202,7 +217,9 @@ namespace Explorer.Payments.Core.UseCases
                 CreatedAt = DateTime.UtcNow
             });
 
-            return _mapper.Map<BundleDto>(bundle);
+            var dto = _mapper.Map<BundleDto>(bundle);
+            PopulateTourNames(dto);
+            return dto;
         }
 
         public List<BundleDto> GetPurchasedBundles(long touristId)
@@ -218,7 +235,31 @@ namespace Explorer.Payments.Core.UseCases
                 return new List<BundleDto>();
 
             var bundles = bundleIds.Select(bundleId => _repository.Get(bundleId)).ToList();
-            return _mapper.Map<List<BundleDto>>(bundles);
+            var dtos = _mapper.Map<List<BundleDto>>(bundles);
+            foreach (var dto in dtos)
+                PopulateTourNames(dto);
+            return dtos;
+        }
+
+        private void PopulateTourNames(BundleDto dto)
+        {
+            if (dto.TourIds == null || !dto.TourIds.Any())
+            {
+                dto.TourNames = new List<string>();
+                return;
+            }
+            var names = new List<string>();
+            foreach (var tourId in dto.TourIds)
+            {
+                try
+                {
+                    var tour = _tourSharedService.Get(tourId);
+                    if (!string.IsNullOrWhiteSpace(tour.Name))
+                        names.Add(tour.Name);
+                }
+                catch { /* preskoči ako tura više ne postoji */ }
+            }
+            dto.TourNames = names;
         }
     }
 }
