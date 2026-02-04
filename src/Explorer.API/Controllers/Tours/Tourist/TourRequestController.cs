@@ -37,5 +37,37 @@ namespace Explorer.API.Controllers.Tours.Tourist
             var result = _tourRequestService.GetByTourist(touristId, page, pageSize);
             return Ok(result);
         }
+
+        [HttpGet("authors")]
+        public ActionResult<List<object>> GetAllAuthors()
+        {
+            var result = _tourRequestService.GetAllAuthors();
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<TourRequestDto> Get(long id)
+        {
+            var result = _tourRequestService.Get(id);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult<TourRequestDto> Update(long id, [FromBody] TourRequestDto tourRequest)
+        {
+            var touristId = User.PersonId();
+            tourRequest.Id = id;
+            tourRequest.TouristId = touristId;
+
+            var result = _tourRequestService.Update(id, tourRequest);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(long id)
+        {
+            _tourRequestService.Delete(id);
+            return Ok();
+        }
     }
 }

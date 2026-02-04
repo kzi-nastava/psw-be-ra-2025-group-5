@@ -131,5 +131,36 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
             return result;
         }
 
+        public List<ProfileDto> GetAuthors()
+        {
+            var users = _userRepository.GetAll()
+                .Where(u => u.Role == UserRole.Author)
+                .ToList();
+
+            var result = new List<ProfileDto>();
+
+            foreach (var user in users)
+            {
+                if (user.IsActive)
+                {
+                    var person = _personRepository.GetByUserId(user.Id);
+
+                    if (person != null)
+                    {
+                        result.Add(new ProfileDto
+                        {
+                            Id = user.Id,
+                            Username = user.Username,
+                            ProfileImagePath = person.ProfileImagePath,
+                            Name = person.Name,
+                            Surname = person.Surname
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
+
     }
 }
