@@ -89,6 +89,15 @@ public class StakeholdersTestFactory : BaseTestFactory<StakeholdersContext>
         {
             // Stub za test, ne radi ništa
         }
+
+        public void DebitWallet(long userId, double amount)
+        {
+        }
+
+        public double GetWalletBalance(long userId)
+        {
+            return 1000;
+        }
     }
 
   

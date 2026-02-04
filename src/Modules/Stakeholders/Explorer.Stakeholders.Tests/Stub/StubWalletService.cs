@@ -12,5 +12,14 @@ namespace Explorer.Stakeholders.Tests.Stub
         public void CreateWalletForPerson(long personId)
         {
         }
+
+        public void DebitWallet(long userId, double amount)
+        {
+        }
+
+        public double GetWalletBalance(long userId)
+        {
+            return 1000;
+        }
     }
 }

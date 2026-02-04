@@ -22,5 +22,6 @@ public class TourDto
     public double TourLength { get; set; }
     public List<long> RequiredEquipmentIds { get; set; }
     public string? ThumbnailPath { get; set; }
+    public bool IsSponsored { get; set; }
 
 }
