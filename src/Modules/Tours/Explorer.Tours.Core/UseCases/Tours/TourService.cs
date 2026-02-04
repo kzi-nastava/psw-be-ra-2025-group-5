@@ -32,6 +32,7 @@ public class TourService : ITourService, ITourSharedService
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IInternalBadgeService _badgeService;
     private readonly IPremiumSharedService _premiumService;
+    private readonly ITourSponsorshipRepository _sponsorshipRepository;
 
     public TourService(
     ITourRepository repository,
@@ -41,7 +42,8 @@ public class TourService : ITourService, ITourSharedService
     IEquipmentRepository equipmentRepository,
     IImageStorage imageStorage,
     IInternalBadgeService badgeService,
-    IPremiumSharedService premiumService)
+    IPremiumSharedService premiumService,
+    ITourSponsorshipRepository sponsorshipRepository)
     {
         _tourRepository = repository;
         _mapper = mapper;
@@ -51,6 +53,7 @@ public class TourService : ITourService, ITourSharedService
         _imageStorage = imageStorage;
         _badgeService = badgeService;
         _premiumService = premiumService;
+        _sponsorshipRepository = sponsorshipRepository;
     }
 
     public List<RequiredEquipmentDto> GetRequiredEquipment(long tourId)
@@ -77,8 +80,14 @@ public class TourService : ITourService, ITourSharedService
 
     public PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize)
     {
+        var sponsoredTourIds = _sponsorshipRepository.GetActiveSponsoredTourIds().ToHashSet();
         var result = _tourRepository.GetPagedByAuthor(authorId, page, pageSize);
-        var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
+        var items = result.Results.Select(tour =>
+        {
+            var dto = _mapper.Map<TourDto>(tour);
+            dto.IsSponsored = sponsoredTourIds.Contains(tour.Id);
+            return dto;
+        }).ToList();
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
@@ -319,11 +328,20 @@ public class TourService : ITourService, ITourSharedService
     // for tourists
     public PagedResult<TourDto> GetPagedPublished(int page, int pageSize)
     {
-        var result = _tourRepository.GetPagedByStatus(TourStatus.Published, page, pageSize);
+        var sponsoredTourIds = _sponsorshipRepository.GetActiveSponsoredTourIds().ToHashSet();
 
-        var items = result.Results.Select(tour =>
+        var allPublished = _tourRepository.GetAll()
+            .Where(t => t.Status == TourStatus.Published)
+            .OrderByDescending(t => sponsoredTourIds.Contains(t.Id))
+            .ToList();
+
+        int totalCount = allPublished.Count;
+        var paged = allPublished.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+        var items = paged.Select(tour =>
         {
             var dto = _mapper.Map<TourDto>(tour);
+            dto.IsSponsored = sponsoredTourIds.Contains(tour.Id);
 
             foreach (var kp in dto.KeyPoints)
             {
@@ -333,7 +351,7 @@ public class TourService : ITourService, ITourSharedService
             return dto;
         }).ToList();
 
-        return new PagedResult<TourDto>(items, result.TotalCount);
+        return new PagedResult<TourDto>(items, totalCount);
     }
 
     public TourDto GetPublished(long id)

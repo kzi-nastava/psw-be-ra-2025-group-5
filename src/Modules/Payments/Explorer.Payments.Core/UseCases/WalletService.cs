@@ -33,13 +33,11 @@ namespace Explorer.Payments.Core.UseCases
         public WalletDto GetWalletForUser(long userId)
         {
             var wallet = _walletRepository.GetByUserId(userId);
-            if (wallet == null)
-                throw new KeyNotFoundException("Wallet not found for this tourist.");
 
             return new WalletDto
             {
-                UserId = wallet.UserId,
-                Balance = wallet.Balance
+                UserId = userId,
+                Balance = wallet?.Balance ?? 0
             };
         }
         public void CreditToTourist(long userId, double amount)
