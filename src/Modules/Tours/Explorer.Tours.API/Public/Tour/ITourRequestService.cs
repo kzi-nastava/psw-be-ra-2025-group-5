@@ -13,14 +13,11 @@ namespace Explorer.Tours.API.Public.Tour
         TourRequestDto Create(TourRequestDto entity);
         PagedResult<TourRequestDto> GetByTourist(long touristId, int page, int pageSize);
         PagedResult<TourRequestDto> GetByAuthor(long authorId, int page, int pageSize);
-<<<<<<< HEAD
-        TourRequestDto Accept(long id, long authorId);
-        TourRequestDto Decline(long id, long authorId);
-=======
         List<object> GetAllAuthors();
         TourRequestDto Update(long id, TourRequestDto request);
         void Delete(long id);
         TourRequestDto Get(long id);
->>>>>>> feat/requests
+        TourRequestDto Accept(long id, long authorId);
+        TourRequestDto Decline(long id, long authorId);
     }
 }
