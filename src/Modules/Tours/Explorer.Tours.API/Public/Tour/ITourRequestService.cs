@@ -1,0 +1,23 @@
+﻿using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Tours.API.Dtos.Tours;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Explorer.Tours.API.Public.Tour
+{
+    public interface ITourRequestService
+    {
+        TourRequestDto Create(TourRequestDto entity);
+        PagedResult<TourRequestDto> GetByTourist(long touristId, int page, int pageSize);
+        PagedResult<TourRequestDto> GetByAuthor(long authorId, int page, int pageSize);
+        List<object> GetAllAuthors();
+        TourRequestDto Update(long id, TourRequestDto request);
+        void Delete(long id);
+        TourRequestDto Get(long id);
+        TourRequestDto Accept(long id, long authorId);
+        TourRequestDto Decline(long id, long authorId);
+    }
+}
