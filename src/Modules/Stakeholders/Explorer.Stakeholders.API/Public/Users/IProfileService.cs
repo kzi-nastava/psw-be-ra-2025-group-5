@@ -11,4 +11,5 @@ public interface IProfileService
     ProfileDto GetPublicProfile(long userId);
     ProfileDto Update(ProfileDto profile, IFormFile? profileImage);
     PagedResult<ProfileDto> GetPaged(int page, int pageSize);
+    PagedResult<ProfileDto> GetFollowingPaged(long userId, int page, int pageSize);
 }
