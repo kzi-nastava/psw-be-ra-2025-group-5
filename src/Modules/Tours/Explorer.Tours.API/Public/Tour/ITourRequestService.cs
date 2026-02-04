@@ -14,5 +14,8 @@ namespace Explorer.Tours.API.Public.Tour
         PagedResult<TourRequestDto> GetByTourist(long touristId, int page, int pageSize);
         PagedResult<TourRequestDto> GetByAuthor(long authorId, int page, int pageSize);
         List<object> GetAllAuthors();
+        TourRequestDto Update(long id, TourRequestDto request);
+        void Delete(long id);
+        TourRequestDto Get(long id);
     }
 }

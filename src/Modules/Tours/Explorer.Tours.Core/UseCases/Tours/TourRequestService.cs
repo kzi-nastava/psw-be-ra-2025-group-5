@@ -66,5 +66,25 @@ namespace Explorer.Tours.Core.UseCases.Tours
 
             return result;
         }
+
+        public TourRequestDto Update(long id, TourRequestDto dto)
+        {
+            var tourRequest = _tourRequestRepository.Get(id);
+            _mapper.Map(dto, tourRequest);
+            var result = _tourRequestRepository.Update(tourRequest);
+
+            return _mapper.Map<TourRequestDto>(result);
+        }
+
+        public void Delete(long id)
+        {
+            _tourRequestRepository.Delete(id);
+        }
+
+        public TourRequestDto Get(long id)
+        {
+            var result = _tourRequestRepository.Get(id);
+            return _mapper.Map<TourRequestDto>(result);
+        }
     }
 }
