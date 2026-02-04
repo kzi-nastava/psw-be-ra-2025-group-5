@@ -12,5 +12,6 @@ namespace Explorer.Stakeholders.API.Public.Users
         void ExtendPremium(long userId, DateTime newUntil);
         void RemovePremium(long userId);
         bool IsPremium(long userId);
+        Dictionary<long, bool> ArePremium(List<long> ids);
     }
 }

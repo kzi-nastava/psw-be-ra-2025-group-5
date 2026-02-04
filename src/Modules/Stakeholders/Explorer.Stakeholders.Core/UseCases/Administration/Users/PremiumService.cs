@@ -76,5 +76,23 @@ namespace Explorer.Stakeholders.Core.UseCases.Administration.Users
                 return false;
             }
         }
+
+        public Dictionary<long, bool> ArePremium(List<long> ids)
+        {
+            Dictionary<long, bool> retVal = new Dictionary<long, bool>();
+            foreach(long indexer in ids)
+            {
+                if (IsPremium(indexer))
+                {
+                    retVal[indexer] = true;
+                }
+                else
+                {
+                    retVal[indexer] = false;
+                }
+            }
+
+            return retVal;
+        }
     }
 }
