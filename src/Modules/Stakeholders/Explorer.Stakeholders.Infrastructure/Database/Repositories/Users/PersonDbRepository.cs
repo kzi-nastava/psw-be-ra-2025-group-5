@@ -1,6 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
+using Explorer.Stakeholders.Core.Domain.Social;
 using Explorer.Stakeholders.Core.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,5 +52,26 @@ public class PersonDbRepository : IPersonRepository
     public List<Person> GetAll()
     {
         return _dbSet.ToList();
+    }
+
+    public PagedResult<Person> GetFollowingPaged(long userId, int page, int pageSize)
+    {
+        var person = _dbSet.FirstOrDefault(p => p.UserId == userId)
+                     ?? throw new KeyNotFoundException("Person not found for this user.");
+
+        var followsQuery = DbContext.Set<ProfileFollow>()
+            .Include(f => f.Following)
+            .Where(f => f.FollowerId == person.Id);
+
+        var totalCount = followsQuery.Count();
+
+        var results = followsQuery
+            .OrderBy(f => f.Following.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(f => f.Following)
+            .ToList();
+
+        return new PagedResult<Person>(results, totalCount);
     }
 }

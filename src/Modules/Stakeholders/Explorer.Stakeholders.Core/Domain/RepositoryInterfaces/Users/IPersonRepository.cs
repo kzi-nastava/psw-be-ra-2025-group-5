@@ -11,4 +11,5 @@ public interface IPersonRepository
     Person? Get(long id);
     PagedResult<Person> GetPaged(int page, int pageSize);
     List<Person> GetAll();
+    PagedResult<Person> GetFollowingPaged(long userId, int page, int pageSize);
 }

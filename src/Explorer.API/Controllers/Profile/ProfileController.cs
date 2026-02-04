@@ -138,5 +138,14 @@ public class ProfileController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize]
+    [HttpGet("following")]
+    public ActionResult<PagedResult<ProfileDto>> GetFollowing([FromQuery] int page, [FromQuery] int pageSize)
+    {
+        var loggedInUserId = long.Parse(User.FindFirst("id").Value);
+
+        var result = _profileService.GetFollowingPaged(loggedInUserId, page, pageSize);
+        return Ok(result);
+    }
 }
 

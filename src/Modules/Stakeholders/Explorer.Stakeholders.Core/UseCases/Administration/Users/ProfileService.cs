@@ -154,4 +154,18 @@ public class ProfileService : IProfileService
         return new PagedResult<ProfileDto>(profileDtos, pagedPersons.TotalCount);
     }
 
+    public PagedResult<ProfileDto> GetFollowingPaged(long userId, int page, int pageSize)
+    {
+        var pagedPersons = _personRepository.GetFollowingPaged(userId, page, pageSize);
+
+        var profileDtos = pagedPersons.Results.Select(person =>
+        {
+            var dto = _mapper.Map<ProfileDto>(person);
+            dto.Statistics = _touristStatisticsService.GetStatistics(person.UserId);
+            dto.AuthorStatistics = _authorStatisticsService.GetStatistics(person.UserId);
+            return dto;
+        }).ToList();
+
+        return new PagedResult<ProfileDto>(profileDtos, pagedPersons.TotalCount);
+    }
 }
