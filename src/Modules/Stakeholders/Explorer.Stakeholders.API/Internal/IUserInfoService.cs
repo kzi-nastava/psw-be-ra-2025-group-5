@@ -11,5 +11,6 @@ namespace Explorer.Stakeholders.API.Internal
     {
         List<ProfileDto> GetTourists();
         List<ProfileDto> GetAuthors();
+        ProfileDto GetProfileByUserId(long userId);
     }
 }

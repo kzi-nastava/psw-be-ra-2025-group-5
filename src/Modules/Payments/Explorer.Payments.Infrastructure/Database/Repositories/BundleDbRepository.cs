@@ -36,6 +36,13 @@ namespace Explorer.Payments.Infrastructure.Database.Repositories
                          .ToList();
         }
 
+        public List<Bundle> GetAllPublished()
+        {
+            return _dbSet.Include(b => b.BundleItems)
+                         .Where(b => b.Status == BundleStatus.Published)
+                         .ToList();
+        }
+
         public Bundle Create(Bundle bundle)
         {
             _dbSet.Add(bundle);

@@ -2,6 +2,7 @@
 using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Payments.API.Internal;
+using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Dtos.KeyPoints;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Dtos.Tours.Reviews;
@@ -9,14 +10,14 @@ using Explorer.Tours.API.Internal;
 using Explorer.Tours.API.Public.Tour;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Equipments;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces.Tours;
+using Explorer.Tours.Core.Domain.Shared;
 using Explorer.Tours.Core.Domain.Tours;
 using Explorer.Tours.Core.Domain.Tours.Entities;
 using Explorer.Tours.Core.Domain.Tours.ValueObjects;
-using Explorer.Tours.Core.Domain.Shared;
-using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Http;
 using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Stakeholders.API.Internal;
+using static Explorer.Tours.Core.Domain.Tours.ValueObjects.TourDuration;
 
 
 namespace Explorer.Tours.Core.UseCases.Tours;
@@ -30,25 +31,30 @@ public class TourService : ITourService, ITourSharedService
     private readonly IMapper _mapper;
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IInternalBadgeService _badgeService;
+    private readonly IPremiumSharedService _premiumService;
+    private readonly ITourSponsorshipRepository _sponsorshipRepository;
 
-
-   public TourService(
+    public TourService(
     ITourRepository repository,
     IMapper mapper,
     ITourExecutionRepository execution,
     ITourPurchaseTokenSharedService purchaseToken,
     IEquipmentRepository equipmentRepository,
     IImageStorage imageStorage,
-    IInternalBadgeService badgeService)
-{
-    _tourRepository = repository;
-    _mapper = mapper;
-    _tourExecutionRepository = execution;
-    _purchaseTokenService = purchaseToken;
-    _equipmentRepository = equipmentRepository;
-    _imageStorage = imageStorage;
-    _badgeService = badgeService;
-}
+    IInternalBadgeService badgeService,
+    IPremiumSharedService premiumService,
+    ITourSponsorshipRepository sponsorshipRepository)
+    {
+        _tourRepository = repository;
+        _mapper = mapper;
+        _tourExecutionRepository = execution;
+        _purchaseTokenService = purchaseToken;
+        _equipmentRepository = equipmentRepository;
+        _imageStorage = imageStorage;
+        _badgeService = badgeService;
+        _premiumService = premiumService;
+        _sponsorshipRepository = sponsorshipRepository;
+    }
 
     public List<RequiredEquipmentDto> GetRequiredEquipment(long tourId)
     {
@@ -74,8 +80,14 @@ public class TourService : ITourService, ITourSharedService
 
     public PagedResult<TourDto> GetPagedByAuthor(long authorId, int page, int pageSize)
     {
+        var sponsoredTourIds = _sponsorshipRepository.GetActiveSponsoredTourIds().ToHashSet();
         var result = _tourRepository.GetPagedByAuthor(authorId, page, pageSize);
-        var items = result.Results.Select(_mapper.Map<TourDto>).ToList();
+        var items = result.Results.Select(tour =>
+        {
+            var dto = _mapper.Map<TourDto>(tour);
+            dto.IsSponsored = sponsoredTourIds.Contains(tour.Id);
+            return dto;
+        }).ToList();
         return new PagedResult<TourDto>(items, result.TotalCount);
     }
 
@@ -85,6 +97,13 @@ public class TourService : ITourService, ITourSharedService
         var filtered = result.Where(t => ids.Contains(t.Id)).ToList();
         var items = filtered.Select(_mapper.Map<TourDto>).ToList();
         return items;
+    }
+
+    public List<TourDto> GetPurchased(long touristId)
+    {
+        var purchaseTokens = _purchaseTokenService.GetByTourist(touristId);
+        var tourIds = purchaseTokens.Select(pt => pt.TourId).Distinct().ToArray();
+        return GetMultiple(tourIds);
     }
 
     public PagedResult<TourDto> SearchByLocation(TourSearchDto searchDto, int page, int pageSize)
@@ -309,11 +328,20 @@ public class TourService : ITourService, ITourSharedService
     // for tourists
     public PagedResult<TourDto> GetPagedPublished(int page, int pageSize)
     {
-        var result = _tourRepository.GetPagedByStatus(TourStatus.Published, page, pageSize);
+        var sponsoredTourIds = _sponsorshipRepository.GetActiveSponsoredTourIds().ToHashSet();
 
-        var items = result.Results.Select(tour =>
+        var allPublished = _tourRepository.GetAll()
+            .Where(t => t.Status == TourStatus.Published)
+            .OrderByDescending(t => sponsoredTourIds.Contains(t.Id))
+            .ToList();
+
+        int totalCount = allPublished.Count;
+        var paged = allPublished.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+        var items = paged.Select(tour =>
         {
             var dto = _mapper.Map<TourDto>(tour);
+            dto.IsSponsored = sponsoredTourIds.Contains(tour.Id);
 
             foreach (var kp in dto.KeyPoints)
             {
@@ -323,7 +351,7 @@ public class TourService : ITourService, ITourSharedService
             return dto;
         }).ToList();
 
-        return new PagedResult<TourDto>(items, result.TotalCount);
+        return new PagedResult<TourDto>(items, totalCount);
     }
 
     public TourDto GetPublished(long id)
@@ -536,4 +564,54 @@ public class TourService : ITourService, ITourSharedService
         return tour.AuthorId == userId;
     }
 
+    public TourDto SpinPremiumWheel(long userId)
+    {
+        if (!_premiumService.IsPremium(userId))
+            throw new UnauthorizedAccessException("Premium required.");
+
+        if (_purchaseTokenService.HasUsedPremiumWheelThisMonth(userId))
+                throw new InvalidOperationException(
+                "Premium wheel already used this month.");
+
+        var tours = _tourRepository.GetAll()
+            .Where(t => t.Status == TourStatus.Published)
+            .ToList();
+
+        if (!tours.Any())
+            throw new InvalidOperationException("No tours available.");
+
+        var random = new Random();
+        var tour = tours[random.Next(tours.Count)];
+
+        _purchaseTokenService.CreateFreeTokenFromWheel(
+            tour.Id,
+            userId
+        );
+
+        return _mapper.Map<TourDto>(tour);
+    }
+
+    public Dictionary<long, int> GetDurationsByTransport(IEnumerable<long> tourIds, string transportType)
+    {
+        var tours = _tourRepository.GetAll().Where(t => tourIds.Contains(t.Id)).ToList();
+
+        var result = new Dictionary<long, int>();
+
+        if (!Enum.TryParse<TransportTypeEnum>(transportType, out var parsedTransport))
+        {
+            return new Dictionary<long, int>();
+        }
+
+        foreach (var tour in tours)
+        {
+            var duration = tour.Durations.FirstOrDefault(d => d.TransportType == parsedTransport);
+
+            if (duration != null)
+            {
+                result[tour.Id] = duration.DurationMinutes;
+            }
+        }
+
+        return result;
+    }
 }

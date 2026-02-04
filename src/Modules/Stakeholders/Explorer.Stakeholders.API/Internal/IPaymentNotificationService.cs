@@ -10,5 +10,6 @@ namespace Explorer.Stakeholders.API.Internal
     public interface IPaymentNotificationService
     {
         NotificationDto Create(NotificationDto notification);
+        void CreateGiftReceivedNotification(long recipientId, long tourId, string tourName, string donorName, string message);
     }
 }

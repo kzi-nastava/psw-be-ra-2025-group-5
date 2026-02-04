@@ -37,21 +37,62 @@ public class ShoppingCartController : ControllerBase
         {
             var result = _ShoppingCartService.AddOrderItem(touristId, tourId);
             return Ok(result);
-        } catch (InvalidOperationException ex) { return Conflict(ex.Message); }
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+    [HttpPost("{touristId:long}/gift-items")]
+    public ActionResult<ShoppingCartDto> AddGiftItem(
+        long touristId,
+        [FromBody] AddGiftItemDto request)
+    {
+        try
+        {
+            var result = _ShoppingCartService.AddGiftItem(
+                touristId,
+                request.RecipientId,
+                request.TourId,
+                request.GiftMessage);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
     }
 
     [HttpDelete("{touristId:long}/items/{tourId:long}")]
-    public ActionResult<ShoppingCartDto> RemoveOrderItem(long touristId, long tourId)
+    public ActionResult<ShoppingCartDto> RemoveOrderItem(
+        long touristId,
+        long tourId,
+        [FromQuery] long? recipientId = null)
     {
-        var result = _ShoppingCartService.RemoveOrderItem(touristId, tourId);
-        return Ok(result);
+        try
+        {
+            var result = _ShoppingCartService.RemoveOrderItem(touristId, tourId, recipientId);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{touristId:long}/checkout")]
     public ActionResult<ShoppingCartDto> Checkout(long touristId)
     {
-        var result = _ShoppingCartService.Checkout(touristId);
-        return Ok(result);
+        try
+        {
+            var result = _ShoppingCartService.Checkout(touristId);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{touristId:long}/apply-coupon")]

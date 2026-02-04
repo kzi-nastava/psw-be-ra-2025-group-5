@@ -63,4 +63,20 @@ public class BadgeDbRepository : IBadgeRepository
     {
         return _dbSet.Where(b => b.Type == type).ToList();
     }
+
+    public List<Badge> GetByRole(BadgeRole role)
+    {
+        return _dbSet.Where(b => b.Role == role || b.Role == BadgeRole.Both).ToList();
+    }
+
+    public List<Badge> GetByRank(BadgeRank rank)
+    {
+        return _dbSet.Where(b => b.Rank == rank).ToList();
+    }
+
+    public List<Badge> GetByName(string name)
+    {
+        return _dbSet.Where(b => b.Name.ToLower().Contains(name.ToLower())).ToList();
+    }
 }
+

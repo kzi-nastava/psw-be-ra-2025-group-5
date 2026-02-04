@@ -12,11 +12,14 @@ namespace Explorer.Payments.API.Public
     {
         BundleDto Get(long id);
         List<BundleDto> GetByAuthor(long authorId);
+        List<BundleDto> GetAllPublished();
         BundleDto Create(BundleDto bundle);
         BundleDto Update(BundleDto bundle);
         void Delete(long id);
         BundleDto PublishBundle(long bundleId);
         BundleDto ArchiveBundle(long bundleId);
         double GetTotalToursPrice(long bundleId);
+        BundleDto PurchaseBundle(long bundleId, long touristId);
+        List<BundleDto> GetPurchasedBundles(long touristId);
     }
 }

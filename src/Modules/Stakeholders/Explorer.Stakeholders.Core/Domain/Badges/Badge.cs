@@ -23,6 +23,13 @@ public enum BadgeType
     ClubMember = 8
 }
 
+public enum BadgeRole
+{
+    Both = 0,      // Za oba (Author i Tourist)
+    Tourist = 1,   // Samo za turiste
+    Author = 2     // Samo za autore
+}
+
 public class Badge : Entity
 {
     public string Name { get; private set; }
@@ -31,10 +38,11 @@ public class Badge : Entity
     public BadgeRank Rank { get; private set; }
     public BadgeType Type { get; private set; }
     public int RequiredValue { get; private set; }
+    public BadgeRole Role { get; private set; }
 
     private Badge() { }
 
-    public Badge(string name, string description, string imagePath, BadgeRank rank, BadgeType type, int requiredValue)
+    public Badge(string name, string description, string imagePath, BadgeRank rank, BadgeType type, int requiredValue, BadgeRole role = BadgeRole.Both)
     {
         Name = name;
         Description = description;
@@ -42,6 +50,7 @@ public class Badge : Entity
         Rank = rank;
         Type = type;
         RequiredValue = requiredValue;
+        Role = role;
 
         Validate();
     }
@@ -54,3 +63,4 @@ public class Badge : Entity
         if (RequiredValue < 0) throw new ArgumentException("RequiredValue cannot be negative");
     }
 }
+

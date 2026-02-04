@@ -30,6 +30,7 @@ public class ToursContext : DbContext
     public DbSet<TourManualProgress> TourManualProgress { get; set; }
     public DbSet<TourSearchHistory> TourSearchHistory { get; set; }
     public DbSet<TourRequest> TourRequests { get; set; }
+    public DbSet<TourSponsorship> TourSponsorships { get; set; }
 
     public ToursContext(DbContextOptions<ToursContext> options) : base(options) {}
 

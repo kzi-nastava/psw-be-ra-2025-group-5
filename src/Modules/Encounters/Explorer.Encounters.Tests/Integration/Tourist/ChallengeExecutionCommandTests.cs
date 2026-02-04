@@ -73,7 +73,7 @@ public class ChallengeExecutionCommandTests : BaseEncountersIntegrationTest, IDi
     {
         // Arrange
         var controller = CreateController(_scope);
-        long draftChallengeId = -3; // Draft challenge from b-challenges.sql (Status = 0)
+        long draftChallengeId = -3;
 
         // Act & Assert
         Should.Throw<InvalidOperationException>(() => controller.StartChallenge(draftChallengeId));
@@ -213,6 +213,68 @@ public class ChallengeExecutionCommandTests : BaseEncountersIntegrationTest, IDi
         storedExec2.CompletedAt.ShouldNotBeNull();
     }
 
+    [Fact]
+    public void Time_based_challenge_starts_when_end_date_not_passed()
+    {
+        // Arrange
+        var controller = CreateController(_scope);
+        long timeBasedChallengeId = -6;
+
+        // Act
+        var result = ((ObjectResult)controller.StartChallenge(timeBasedChallengeId).Result)
+            ?.Value as ChallengeExecutionDto;
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.ChallengeId.ShouldBe(timeBasedChallengeId);
+        result.Status.ShouldBe("InProgress");
+        result.CompletedAt.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Time_based_challenge_cannot_be_started_twice_by_same_tourist()
+    {
+        // Arrange
+        var controller = CreateController(_scope);
+        long timeBasedChallengeId = -6;
+
+        // Act
+        controller.StartChallenge(timeBasedChallengeId);
+
+        // Assert
+        Should.Throw<InvalidOperationException>(
+            () => controller.StartChallenge(timeBasedChallengeId)
+        );
+    }
+
+    [Fact]
+    public void Community_challenge_allows_up_to_daily_participant_limit()
+    {
+        // Arrange
+        var controller1 = CreateController(_scope, "-21");
+        var controller2 = CreateController(_scope, "-23");
+
+        long communityChallengeId = -7; // DailyParticipantLimit = 2
+
+        // Act
+        var exec1 = ((ObjectResult)controller1.StartChallenge(communityChallengeId).Result)
+            ?.Value as ChallengeExecutionDto;
+
+        var exec2 = ((ObjectResult)controller2.StartChallenge(communityChallengeId).Result)
+            ?.Value as ChallengeExecutionDto;
+
+        // Assert
+        exec1.ShouldNotBeNull();
+        exec2.ShouldNotBeNull();
+
+        var executionsToday = _dbContext.ChallengeExecutions
+            .Where(e =>
+                e.ChallengeId == communityChallengeId &&
+                e.StartedAt.Date == DateTime.UtcNow.Date)
+            .ToList();
+
+        executionsToday.Count.ShouldBe(2);
+    }
 
     private static ChallengeExecutionController CreateController(IServiceScope scope, string touristId = "-21")
     {

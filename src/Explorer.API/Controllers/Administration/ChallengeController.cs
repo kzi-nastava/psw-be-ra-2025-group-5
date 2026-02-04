@@ -43,7 +43,9 @@ public class ChallengeController : ControllerBase
                 Type = challenge.Type,
                 CreatedById = challenge.CreatedById,
                 RequiredParticipants = challenge.RequiredParticipants,
-                RadiusInMeters = challenge.RadiusInMeters
+                RadiusInMeters = challenge.RadiusInMeters,
+                EndChallenge = challenge.EndChallenge,
+                DailyParticipantLimit = challenge.DailyParticipantLimit
             };
 
             return Ok(_challengeService.Create(challengeDto, challenge.Image));
@@ -80,7 +82,9 @@ public class ChallengeController : ControllerBase
                 Type = challenge.Type,
                 CreatedById = challenge.CreatedById,
                 RequiredParticipants = challenge.RequiredParticipants,
-                RadiusInMeters = challenge.RadiusInMeters
+                RadiusInMeters = challenge.RadiusInMeters,
+                EndChallenge = challenge.EndChallenge,
+                DailyParticipantLimit = challenge.DailyParticipantLimit
             };
 
             return Ok(_challengeService.Update(challengeDto, challenge.Image));
