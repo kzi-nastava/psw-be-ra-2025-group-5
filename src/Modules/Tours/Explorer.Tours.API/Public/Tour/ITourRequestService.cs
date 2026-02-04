@@ -17,5 +17,7 @@ namespace Explorer.Tours.API.Public.Tour
         TourRequestDto Update(long id, TourRequestDto request);
         void Delete(long id);
         TourRequestDto Get(long id);
+        TourRequestDto Accept(long id, long authorId);
+        TourRequestDto Decline(long id, long authorId);
     }
 }

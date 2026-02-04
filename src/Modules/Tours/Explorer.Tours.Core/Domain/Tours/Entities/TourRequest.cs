@@ -36,5 +36,22 @@ namespace Explorer.Tours.Core.Domain.Tours.Entities
             Tags = tags ?? new List<string>();
             Status = TourRequestStatus.Pending;
         }
+
+        public void Accept()
+        {
+            if (Status != TourRequestStatus.Pending)
+                throw new InvalidOperationException();
+
+            Status = TourRequestStatus.Accepted;
+        }
+
+        public void Decline()
+        {
+            if (Status != TourRequestStatus.Pending)
+                throw new InvalidOperationException();
+
+            Status = TourRequestStatus.Rejected;
+        }
+
     }
 }
