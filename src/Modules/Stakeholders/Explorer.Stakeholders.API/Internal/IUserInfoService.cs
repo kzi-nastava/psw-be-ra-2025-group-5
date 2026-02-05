@@ -10,5 +10,7 @@ namespace Explorer.Stakeholders.API.Internal
     public interface IUserInfoService
     {
         List<ProfileDto> GetTourists();
+        List<ProfileDto> GetAuthors();
+        ProfileDto GetProfileByUserId(long userId);
     }
 }

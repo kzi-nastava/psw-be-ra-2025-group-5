@@ -30,7 +30,7 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
                 {
                     Name = "Planinari",
                     Description = "Opis",
-                    CreatorId = 1
+                    CreatorId = -21
                 },
                 new List<IFormFile> { CreateTestImage() }
             );
@@ -41,7 +41,7 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
                     Id = created.Id,
                     Name = "Planinari Updated",
                     Description = "Novi opis",
-                    CreatorId = 1
+                    CreatorId = -21
                 },
                 new List<IFormFile> { CreateTestImage() }
             );

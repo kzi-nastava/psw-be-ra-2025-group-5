@@ -6,6 +6,7 @@ using Explorer.Stakeholders.API.Public.Notifications;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Clubs;
 using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces.Users;
 using Explorer.Stakeholders.API.Dtos.Notifications;
+using Explorer.Stakeholders.API.Public.Badges;
 
 namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
 {
@@ -15,18 +16,21 @@ namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
         private readonly IClubJoinRequestRepository _requestRepository;
         private readonly INotificationService _notificationService;
         private readonly IPersonRepository _personRepository;
+        private readonly IBadgeAwardService _badgeService;
 
 
         public ClubJoinRequestService(
        IClubRepository clubRepository,
        IClubJoinRequestRepository requestRepository,
        INotificationService notificationService,
-       IPersonRepository personRepository)
+       IPersonRepository personRepository,
+       IBadgeAwardService badgeService)
         {
             _clubRepository = clubRepository;
             _requestRepository = requestRepository;
             _notificationService = notificationService;
             _personRepository = personRepository;
+            _badgeService = badgeService;
         }
 
 
@@ -108,6 +112,8 @@ namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
                 Type = "ClubJoin",
                 ClubId = clubId
             });
+
+            _badgeService.OnClubJoined(touristId);
         }
 
         public void RejectRequest(long clubId, long touristId, long ownerId)

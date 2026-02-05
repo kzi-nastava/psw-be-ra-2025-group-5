@@ -2,6 +2,7 @@
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos.Equipments;
 using Explorer.Tours.API.Public.Administration;
+using Explorer.Tours.API.Public.Tour;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,14 @@ namespace Explorer.API.Controllers.Tours.Tourist;
 public class TouristEquipmentController : ControllerBase
 {
     private readonly ITouristEquipmentService _touristEquipmentService;
+    private readonly ITourService _tourService;
 
-    public TouristEquipmentController(ITouristEquipmentService touristEquipmentService)
+    public TouristEquipmentController(
+        ITouristEquipmentService touristEquipmentService,
+        ITourService tourService)  
     {
         _touristEquipmentService = touristEquipmentService;
+        _tourService = tourService;
     }
 
     [HttpGet]
@@ -51,4 +56,12 @@ public class TouristEquipmentController : ControllerBase
         _touristEquipmentService.Delete(id, touristId);
         return Ok();
     }
+
+    [HttpGet("tour/{tourId:long}/required-equipment")]
+    public ActionResult<List<RequiredEquipmentDto>> GetRequiredEquipmentForTour(long tourId)
+    {
+        var requiredEquipment = _tourService.GetRequiredEquipment(tourId);
+        return Ok(requiredEquipment);
+    }
+
 }

@@ -54,7 +54,9 @@ public class ChallengeDbRepository : IChallengeRepository
                 entity.Type,
                 entity.RequiredParticipants,
                 entity.RadiusInMeters,
-                entity.ImageUrl
+                entity.ImageUrl,
+                entity.EndChallenge,
+                entity.DailyParticipantLimit
             );
             DbContext.SaveChanges();
             return existingChallenge;

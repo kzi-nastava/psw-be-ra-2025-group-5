@@ -52,6 +52,7 @@ public class ToursProfile : Profile
                 dto.Description,
                 Enum.Parse<TourDifficulty>(dto.Difficulty, true),
                 dto.Tags,
+                DateTime.UtcNow,
                 dto.Price
             ));
 
@@ -115,5 +116,20 @@ public class ToursProfile : Profile
             .ReverseMap()
             .ForMember(d => d.RequiredEquipment, opt => opt.Ignore())
             .ForMember(d => d.ThumbnailPath, opt => opt.Ignore());
+
+        CreateMap<TourRequest, TourRequestDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.Difficulty, opt => opt.MapFrom(src => src.Difficulty.ToString()));
+
+        CreateMap<TourRequestDto, TourRequest>()
+            .ConstructUsing(dto => new TourRequest(
+                dto.TouristId,
+                dto.AuthorId,
+                Enum.Parse<TourDifficulty>(dto.Difficulty, true),
+                new Location(dto.Location.Latitude, dto.Location.Longitude),
+                dto.Description,
+                dto.MaxPrice,
+                dto.Tags
+            ));
     }
 }

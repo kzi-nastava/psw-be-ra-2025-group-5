@@ -30,12 +30,12 @@ namespace Explorer.Stakeholders.Tests.Integration.TouristClub
                 {
                     Name = "Planinari",
                     Description = "Opis",
-                    CreatorId = 1
+                    CreatorId = -21
                 },
                 new List<IFormFile> { CreateTestImage() }
             );
 
-            service.Delete(1, created.Id);
+            service.Delete(-21, created.Id);
 
             dbContext.ChangeTracker.Clear();
             var stored = dbContext.Clubs.Find(created.Id);

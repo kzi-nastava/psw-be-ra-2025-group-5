@@ -145,8 +145,11 @@ public class ShoppingCartCommandTests : BasePaymentsIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<PaymentsContext>();
         var controller = CreateController(scope);
 
-        // Act & Assert
-        Should.Throw<InvalidOperationException>(() => controller.RemoveOrderItem(-4, -1));
+        var result = controller.RemoveOrderItem(-4, -1, null);
+
+        result.Result.ShouldBeOfType<BadRequestObjectResult>();
+        var badRequest = result.Result as BadRequestObjectResult;
+        badRequest.Value.ToString().ShouldContain("Item not found in the cart");
     }
 
     [Fact]
@@ -211,8 +214,13 @@ public class ShoppingCartCommandTests : BasePaymentsIntegrationTest
         var dbContext = scope.ServiceProvider.GetRequiredService<PaymentsContext>();
         var controller = CreateController(scope);
 
-        // Act & Assert
-        Should.Throw<InvalidOperationException>(() => controller.Checkout(-2));
+        // Act
+        var result = controller.Checkout(-2);
+
+        // Assert
+        result.Result.ShouldBeOfType<BadRequestObjectResult>();
+        var badRequest = result.Result as BadRequestObjectResult;
+        badRequest.Value.ToString().ShouldContain("already own");
     }
 
     private static ShoppingCartController CreateController(IServiceScope scope)

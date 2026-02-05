@@ -33,5 +33,12 @@ namespace Explorer.API.Controllers.Tours.Author
             return Ok(result);
         }
 
+        [HttpGet("reviews-list")]
+        public ActionResult<IReadOnlyCollection<TourReviewStatsItemDto>> GetAuthorReviews([FromQuery] long userId, [FromQuery] string period = "all")
+        {
+            var result = _tourAnalyticsService.GetAuthorReviews(userId, period);
+            return Ok(result);
+        }
+
     }
 }

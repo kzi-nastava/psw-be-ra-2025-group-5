@@ -84,7 +84,8 @@ public class TourController : ControllerBase
     [HttpPost]
     public ActionResult<TourDto> Create([FromBody] CreateTourDto tour)
     {
-        return Ok(_tourService.Create(tour));
+        long userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        return Ok(_tourService.Create(tour, userId));
     }
 
     [HttpPut("{id:long}")]
@@ -228,5 +229,12 @@ public class TourController : ControllerBase
         };
 
         return PhysicalFile(filePath, mime);
+    }
+
+    [HttpGet("creation-quota")]
+    public ActionResult<TourCreationQuotaDto> GetCreationQuota()
+    {
+        long userId = long.Parse(User.Claims.First(c => c.Type == "id").Value);
+        return Ok(_tourService.GetCreationQuota(userId));
     }
 }

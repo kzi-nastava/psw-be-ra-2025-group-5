@@ -105,6 +105,7 @@ namespace Explorer.Tours.Tests.Integration.TouristPreferences
                     description: "desc",
                     difficulty: Core.Domain.Tours.TourDifficulty.Easy,
                     tags: new List<string>(),
+                    DateTime.UtcNow,
                     price: 0
                 );
 

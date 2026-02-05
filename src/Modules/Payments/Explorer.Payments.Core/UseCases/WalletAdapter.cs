@@ -20,12 +20,29 @@ namespace Explorer.Payments.Core.UseCases
 
         public void CreateWalletForPerson(long personId)
         {
-            var existingWallet = _walletRepository.GetByTouristId(personId);
+            var existingWallet = _walletRepository.GetByUserId(personId);
             if (existingWallet != null)
                 return;
 
             var wallet = new Wallet(personId);
             _walletRepository.Create(wallet);
+        }
+
+        public void DebitWallet(long userId, double amount)
+        {
+            var wallet = _walletRepository.GetByUserId(userId);
+            if (wallet == null)
+                throw new InvalidOperationException("Wallet not found for this user.");
+
+            wallet.Debit(amount);
+            _walletRepository.Update(wallet);
+        }
+
+        public double GetWalletBalance(long userId)
+        {
+            var wallet = _walletRepository.GetByUserId(userId);
+            if (wallet == null) return 0;
+            return wallet.Balance;
         }
     }
 }

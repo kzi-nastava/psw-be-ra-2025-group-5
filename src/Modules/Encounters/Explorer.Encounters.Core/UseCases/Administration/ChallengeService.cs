@@ -3,6 +3,7 @@ using Explorer.BuildingBlocks.Core.FileStorage;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public.Administration;
+using Explorer.Encounters.API.Public.Tourist;
 using Explorer.Encounters.Core.Domain;
 using Explorer.Encounters.Core.Domain.RepositoryInterfaces;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +46,9 @@ public class ChallengeService : IChallengeService
                 result.Type,
                 result.RequiredParticipants,
                 result.RadiusInMeters,
-                imagePath
+                imagePath,
+                result.EndChallenge,
+                result.DailyParticipantLimit
             );
             _challengeRepository.Update(result);
         }
@@ -67,7 +70,9 @@ public class ChallengeService : IChallengeService
             result.Type,
             result.RequiredParticipants,
             result.RadiusInMeters,
-            imagePath
+            imagePath,
+            result.EndChallenge,
+            result.DailyParticipantLimit
         );
         _challengeRepository.Update(result);
         return _mapper.Map<ChallengeResponseDto>(result);
@@ -109,7 +114,9 @@ public class ChallengeService : IChallengeService
             challenge.Type,
             challenge.RequiredParticipants,
             challenge.RadiusInMeters,
-            challenge.ImageUrl
+            challenge.ImageUrl,
+            challenge.EndChallenge,
+            challenge.DailyParticipantLimit
         );
 
         _challengeRepository.Update( challenge );
@@ -134,7 +141,9 @@ public class ChallengeService : IChallengeService
             challenge.Type,
             challenge.RequiredParticipants,
             challenge.RadiusInMeters,
-            challenge.ImageUrl
+            challenge.ImageUrl,
+            challenge.EndChallenge,
+            challenge.DailyParticipantLimit
         );
 
         _challengeRepository.Update(challenge);
@@ -150,4 +159,45 @@ public class ChallengeService : IChallengeService
         string path = _imageStorage.SaveImage("challenges", challengeId, bytes, file.ContentType);
         return path;
     }
+
+    public List<ChallengeResponseDto> GetAllAvailableForTourist(long touristId, IChallengeExecutionService executionService)
+    {
+        var today = DateTime.UtcNow.Date;
+        var allActive = _challengeRepository.GetAll()
+            .Where(c => c.Status == ChallengeStatus.Active)
+            .ToList();
+
+        var userExecutions = executionService.GetByTourist(touristId)
+            .Where(e => e.Status == "InProgress" || e.Status == "Completed")
+            .Select(e => e.ChallengeId)
+            .ToHashSet();
+
+        var available = allActive
+            .Where(c =>
+            {
+                // 1. Time-based valid
+                if (c.Type == ChallengeType.TimeBased && c.EndChallenge.HasValue && c.EndChallenge.Value.Date < today)
+                    return false;
+
+                // 2. Ve? zapo?eti ili završeni
+                if (userExecutions.Contains(c.Id))
+                    return false;
+
+                // 3. Community daily limit
+                if (c.Type == ChallengeType.Community && c.DailyParticipantLimit.HasValue)
+                {
+                    var participantsToday = executionService.GetTodayParticipants(c.Id, today);
+                    if (participantsToday.Count >= c.DailyParticipantLimit.Value)
+                        return false;
+                }
+
+                return true;
+            })
+            .Select(_mapper.Map<ChallengeResponseDto>)
+            .ToList();
+
+        return available;
+    }
+
+
 }

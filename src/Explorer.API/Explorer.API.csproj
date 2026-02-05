@@ -42,4 +42,37 @@
     <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\images\badges\challenger_bronze.png" />
+    <None Include="wwwroot\images\badges\challenger_epic.png" />
+    <None Include="wwwroot\images\badges\challenger_gold.png" />
+    <None Include="wwwroot\images\badges\challenger_silver.png" />
+    <None Include="wwwroot\images\badges\community_member.png" />
+    <None Include="wwwroot\images\badges\completionist.png" />
+    <None Include="wwwroot\images\badges\creator_bronze.png" />
+    <None Include="wwwroot\images\badges\creator_epic.png" />
+    <None Include="wwwroot\images\badges\creator_gold.png" />
+    <None Include="wwwroot\images\badges\creator_silver.png" />
+    <None Include="wwwroot\images\badges\entrepreneur_bronze.png" />
+    <None Include="wwwroot\images\badges\entrepreneur_epic.png" />
+    <None Include="wwwroot\images\badges\entrepreneur_gold.png" />
+    <None Include="wwwroot\images\badges\entrepreneur_silver.png" />
+    <None Include="wwwroot\images\badges\explorer_bronze.png" />
+    <None Include="wwwroot\images\badges\explorer_epic.png" />
+    <None Include="wwwroot\images\badges\explorer_gold.png" />
+    <None Include="wwwroot\images\badges\explorer_silver.png" />
+    <None Include="wwwroot\images\badges\pathfinder_bronze.png" />
+    <None Include="wwwroot\images\badges\pathfinder_epic.png" />
+    <None Include="wwwroot\images\badges\pathfinder_gold.png" />
+    <None Include="wwwroot\images\badges\pathfinder_silver.png" />
+    <None Include="wwwroot\images\badges\storyteller_bronze.png" />
+    <None Include="wwwroot\images\badges\storyteller_epic.png" />
+    <None Include="wwwroot\images\badges\storyteller_gold.png" />
+    <None Include="wwwroot\images\badges\storyteller_silver.png" />
+    <None Include="wwwroot\images\badges\veteran_bronze.png" />
+    <None Include="wwwroot\images\badges\veteran_epic.png" />
+    <None Include="wwwroot\images\badges\veteran_gold.png" />
+    <None Include="wwwroot\images\badges\veteran_silver.png" />
+  </ItemGroup>
+
 </Project>

@@ -8,6 +8,7 @@ using Explorer.Stakeholders.Core.UseCases.Administration.Users;
 using Explorer.Stakeholders.API.Dtos.Notifications;
 using Explorer.Stakeholders.API.Dtos.Users;
 using Explorer.Stakeholders.Core.Domain.Users;
+using Explorer.Stakeholders.API.Public.Badges;
 
 namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
 {
@@ -17,13 +18,20 @@ namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
         private readonly INotificationService _notificationService;
         private readonly IClubInviteRepository _clubInviteRepository;
         private readonly IUserService _userService;
+        private readonly IBadgeAwardService _badgeService;
 
-        public ClubInviteService(IClubRepository clubRepository, INotificationService notificationService, IClubInviteRepository clubInviteRepository, IUserService userService)
+        public ClubInviteService(
+            IClubRepository clubRepository, 
+            INotificationService notificationService, 
+            IClubInviteRepository clubInviteRepository, 
+            IUserService userService,
+            IBadgeAwardService badgeService)
         {
             _clubRepository = clubRepository;
             _notificationService = notificationService;
             _clubInviteRepository = clubInviteRepository;
             _userService = userService;
+            _badgeService = badgeService;
         }
 
         public void InviteTourist(long clubId, long touristId, long ownerId)
@@ -84,6 +92,8 @@ namespace Explorer.Stakeholders.Core.UseCases.ClubMembership
 
             var notification = _notificationService.GetById(invite.NotificationId);
             _notificationService.Delete(notification.Id);
+            
+            _badgeService.OnClubJoined(touristId);
         }
 
         public void RejectInvite(long inviteId, long touristId)

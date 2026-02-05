@@ -26,9 +26,9 @@ namespace Explorer.Payments.Infrastructure.Database.Repositories
             return _dbSet.ToList();
         }
 
-        public Wallet GetByTouristId(long userId)
+        public Wallet GetByUserId(long userId)
         {
-            return _dbSet.FirstOrDefault(w => w.TouristId == userId);
+            return _dbSet.FirstOrDefault(w => w.UserId == userId);
         }
 
         public Wallet Create(Wallet entity)
@@ -50,6 +50,11 @@ namespace Explorer.Payments.Infrastructure.Database.Repositories
                 throw new NotFoundException(e.Message);
             }
             return entity;
+        }
+
+        public Wallet GetByTouristId(long touristId)
+        {
+            return _dbSet.FirstOrDefault(w => w.UserId == touristId);
         }
     }
 }

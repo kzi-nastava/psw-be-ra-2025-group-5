@@ -1,34 +1,36 @@
-﻿using Explorer.BuildingBlocks.Core.Domain;
-using Explorer.Payments.Core.Domain.Shared;
-using System.Text.Json.Serialization;
+﻿using System;
 
 namespace Explorer.Payments.Core.Domain;
 
-public class OrderItem : ValueObject
+public class OrderItem
 {
-    public long TourId { get; }
-    public string TourName { get; }
+    public long TourId { get; set; }
+    public string TourName { get; set; }
     public double ItemPrice { get; set; }
+    public long? RecipientId { get; set; }  
+    public string? GiftMessage { get; set; }
 
-    [JsonConstructor]
-    public OrderItem(long tourId, string tourName, double itemPrice)
+    public OrderItem() { }
+
+    public OrderItem(long tourId, string tourName, double itemPrice, long? recipientId = null, string? giftMessage = null)
     {
         TourId = tourId;
         TourName = tourName;
         ItemPrice = itemPrice;
-
-        Validate();
+        RecipientId = recipientId;
+        GiftMessage = giftMessage;
     }
 
-    public void Validate()
+    public bool IsGift => RecipientId.HasValue;
+
+    public override bool Equals(object? obj)
     {
-        Guard.AgainstZero(TourId, nameof(TourId));
-        Guard.AgainstNullOrWhiteSpace(TourName, nameof(TourName));
-        Guard.AgainstNegative(ItemPrice, nameof(ItemPrice));
+        if (obj is not OrderItem other) return false;
+        return TourId == other.TourId && RecipientId == other.RecipientId;
     }
 
-    protected override IEnumerable<object> GetEqualityComponents()
+    public override int GetHashCode()
     {
-        yield return TourId;
+        return HashCode.Combine(TourId, RecipientId);
     }
 }
