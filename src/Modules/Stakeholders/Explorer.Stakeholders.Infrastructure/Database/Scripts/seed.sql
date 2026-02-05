@@ -14,6 +14,7 @@ DELETE FROM stakeholders."UserStatistics";
 DELETE FROM stakeholders."UserBadges";
 DELETE FROM stakeholders."UserPremiums";
 DELETE FROM stakeholders."Streaks";
+DELETE FROM stakeholders."Diaries";
 
 INSERT INTO stakeholders."Users" ("Id", "Username", "Password", "Email", "Role", "IsActive") VALUES
 (0,  'admin',   'admin',   'admin@gmail.com', 0, true),
