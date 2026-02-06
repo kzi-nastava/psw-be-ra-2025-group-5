@@ -14,5 +14,6 @@ namespace Explorer.Payments.API.Dtos
         public long AuthorId { get; set; }
         public string Status { get; set; }
         public List<long> TourIds { get; set; }
+        public List<string>? TourNames { get; set; }
     }
 }

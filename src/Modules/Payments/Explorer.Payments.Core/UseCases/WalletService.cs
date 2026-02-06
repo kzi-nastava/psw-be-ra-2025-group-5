@@ -1,4 +1,4 @@
-﻿using Explorer.Payments.API.Dtos.Wallet;
+using Explorer.Payments.API.Dtos.Wallet;
 using Explorer.Payments.API.Public;
 using Explorer.Payments.Core.Domain.RepositoryInterfaces;
 using Explorer.Stakeholders.API.Dtos.Notifications;
@@ -89,10 +89,11 @@ namespace Explorer.Payments.Core.UseCases
             return payments.Select(p => new PaymentDto
             {
                 TouristId = p.TouristId,
-                TourId = (long)p.TourId,
-                Price = Convert.ToDecimal(p.Price), 
-                PaidAt = p.CreatedAt,             
-                Status = null                       
+                TourId = p.TourId,
+                BundleId = p.BundleId,
+                Price = Convert.ToDecimal(p.Price),
+                PaidAt = p.CreatedAt,
+                Status = null
             }).ToList();
         }
 
