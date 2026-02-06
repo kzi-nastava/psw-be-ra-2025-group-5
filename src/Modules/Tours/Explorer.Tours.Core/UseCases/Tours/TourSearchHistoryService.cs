@@ -42,6 +42,14 @@ public class TourSearchHistoryService : ITourSearchHistoryService
         return history.Select(_mapper.Map<TourSearchHistoryDto>).ToList();
     }
 
+    public List<string> GetMostFrequentTags(long userId, int topCount = 5)
+    {
+        var history = _repository.GetByUser(userId, 50);
+        var allTags = history.SelectMany(h => h.Tags ?? new List<string>()).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+        var grouped = allTags.GroupBy(t => t.ToLowerInvariant()).OrderByDescending(g => g.Count()).Take(topCount).ToList();
+        return grouped.Select(g => g.First()).ToList();
+    }
+
     public void DeleteSearch(long id)
     {
         _repository.Delete(id);

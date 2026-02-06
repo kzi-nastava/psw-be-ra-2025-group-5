@@ -1,4 +1,4 @@
-﻿DELETE FROM tours."Equipment";
+DELETE FROM tours."Equipment";
 DELETE FROM tours."Tours";
 DELETE FROM tours."Monument";
 DELETE FROM tours."TouristEquipment";
@@ -10,3 +10,4 @@ DELETE FROM tours."KeyPointCompletions";
 DELETE FROM tours."KeyPoints";
 DELETE FROM tours."TourReviews";
 DELETE FROM tours."TourManualProgress";
+DELETE FROM tours."TourSearchHistory";
