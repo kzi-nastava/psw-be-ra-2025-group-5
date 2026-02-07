@@ -188,15 +188,61 @@ public class TourController : ControllerBase
     [HttpGet("{tourId:long}/thumbnail/{*fileName}")]
     public IActionResult GetThumbnail(long tourId, string fileName)
     {
-        var filePath = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "UserUploads",
-            "tours",
-            tourId.ToString(),
-            fileName);
+        string filePath;
+
+        Console.WriteLine($"[THUMBNAIL DEBUG] Original fileName: '{fileName}'");
+
+        // Normalize path - remove leading slash and normalize separators
+        var normalizedFileName = fileName.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+        Console.WriteLine($"[THUMBNAIL DEBUG] Normalized fileName: '{normalizedFileName}'");
+
+        // Check if this is a static image path (starts with "images/")
+        if (normalizedFileName.StartsWith($"images{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+        {
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                normalizedFileName);
+            Console.WriteLine($"[THUMBNAIL DEBUG] Using STATIC path (full): '{filePath}'");
+        }
+        else
+        {
+            // Try UserUploads first (for manually uploaded images)
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "UserUploads",
+                "tours",
+                tourId.ToString(),
+                normalizedFileName);
+            Console.WriteLine($"[THUMBNAIL DEBUG] Trying UPLOADED path: '{filePath}'");
+
+            // If not found in UserUploads, try wwwroot/images/tours (for seed images)
+            if (!System.IO.File.Exists(filePath))
+            {
+                var staticPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "images",
+                    "tours",
+                    normalizedFileName);
+                Console.WriteLine($"[THUMBNAIL DEBUG] Not found in uploads, trying STATIC path: '{staticPath}'");
+
+                if (System.IO.File.Exists(staticPath))
+                {
+                    filePath = staticPath;
+                    Console.WriteLine($"[THUMBNAIL DEBUG] Found in STATIC!");
+                }
+            }
+        }
+
+        Console.WriteLine($"[THUMBNAIL DEBUG] Final path: '{filePath}'");
+        Console.WriteLine($"[THUMBNAIL DEBUG] File exists: {System.IO.File.Exists(filePath)}");
 
         if (!System.IO.File.Exists(filePath))
+        {
+            Console.WriteLine($"[THUMBNAIL DEBUG] FILE NOT FOUND, returning 404");
             return NotFound();
+        }
 
         var ext = Path.GetExtension(fileName).ToLower();
         var mime = ext switch
@@ -207,6 +253,7 @@ public class TourController : ControllerBase
             _ => "application/octet-stream"
         };
 
+        Console.WriteLine($"[THUMBNAIL DEBUG] Serving file with MIME: {mime}");
         return PhysicalFile(filePath, mime);
     }
     
@@ -214,10 +261,61 @@ public class TourController : ControllerBase
     [HttpGet("{keyPointId:long}/keypoints/images/{*fileName}")]
     public IActionResult GetImage(long keyPointId, string fileName)
     {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads", "keypoints", keyPointId.ToString(), fileName);
+        string filePath;
+
+        Console.WriteLine($"[KEYPOINT DEBUG] Original fileName: '{fileName}'");
+
+        // Normalize path - remove leading slash and normalize separators
+        var normalizedFileName = fileName.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+        Console.WriteLine($"[KEYPOINT DEBUG] Normalized fileName: '{normalizedFileName}'");
+
+        // Check if this is a static image path (starts with "images/")
+        if (normalizedFileName.StartsWith($"images{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+        {
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                normalizedFileName);
+            Console.WriteLine($"[KEYPOINT DEBUG] Using STATIC path (full): '{filePath}'");
+        }
+        else
+        {
+            // Try UserUploads first (for manually uploaded images)
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "UserUploads",
+                "keypoints",
+                keyPointId.ToString(),
+                normalizedFileName);
+            Console.WriteLine($"[KEYPOINT DEBUG] Trying UPLOADED path: '{filePath}'");
+
+            // If not found in UserUploads, try wwwroot/images/keypoints (for seed images)
+            if (!System.IO.File.Exists(filePath))
+            {
+                var staticPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "images",
+                    "keypoints",
+                    normalizedFileName);
+                Console.WriteLine($"[KEYPOINT DEBUG] Not found in uploads, trying STATIC path: '{staticPath}'");
+
+                if (System.IO.File.Exists(staticPath))
+                {
+                    filePath = staticPath;
+                    Console.WriteLine($"[KEYPOINT DEBUG] Found in STATIC!");
+                }
+            }
+        }
+
+        Console.WriteLine($"[KEYPOINT DEBUG] Final path: '{filePath}'");
+        Console.WriteLine($"[KEYPOINT DEBUG] File exists: {System.IO.File.Exists(filePath)}");
 
         if (!System.IO.File.Exists(filePath))
+        {
+            Console.WriteLine($"[KEYPOINT DEBUG] FILE NOT FOUND, returning 404");
             return NotFound();
+        }
 
         var ext = Path.GetExtension(fileName).ToLower();
         var mime = ext switch
@@ -228,6 +326,7 @@ public class TourController : ControllerBase
             _ => "application/octet-stream"
         };
 
+        Console.WriteLine($"[KEYPOINT DEBUG] Serving file with MIME: {mime}");
         return PhysicalFile(filePath, mime);
     }
 

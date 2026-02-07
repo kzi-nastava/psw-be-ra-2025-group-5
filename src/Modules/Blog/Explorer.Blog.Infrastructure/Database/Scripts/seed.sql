@@ -8,7 +8,6 @@ INSERT INTO blog."BlogPosts" ("Id", "AuthorId", "Title", "Description", "Created
 (2, 2, 'Top 10 Cities in Europe', 'A list of must-see places for every tourist.', '2023-10-15 09:00:00', '2023-11-05 10:00:00', 'Active'),
 (3, 3, 'Packing Tips', 'How to pack everything you need for 7 days into a small backpack.', '2023-10-20 14:00:00', NULL, 'Published'),
 (4, 1, 'Hidden Beaches of the Adriatic', 'Places you must not miss if you love peace and quiet.', '2023-11-01 16:00:00', NULL, 'Published'),
-(5, 4, 'Himalayan Diary (Draft)', 'The first part of the ascent adventure (still under construction).', '2023-11-10 11:00:00', NULL, 'Draft'),
 (6, 3, 'Camping Equipment - Review', 'Review of new equipment and price comparison.', '2023-11-15 13:00:00', '2023-11-16 13:00:00', 'ReadOnly');
 
 INSERT INTO blog."BlogImages" ("Id", "BlogPostId", "ImagePath", "ContentType", "Order") VALUES

@@ -90,7 +90,28 @@ namespace Explorer.API.Controllers.Social
         [HttpGet("{clubId:long}/images/{*fileName}")]
         public IActionResult GetImage(long clubId, string fileName)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads", "club", clubId.ToString(), fileName);
+            string filePath;
+
+            // Normalize path - remove leading slash and normalize separators
+            var normalizedFileName = fileName.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+
+            // Check if this is a static image path (like profile pictures)
+            if (normalizedFileName.StartsWith($"images{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            {
+                filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    normalizedFileName);
+            }
+            else
+            {
+                filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "UserUploads",
+                    "club",
+                    clubId.ToString(),
+                    normalizedFileName);
+            }
 
             if (!System.IO.File.Exists(filePath))
                 return NotFound();
