@@ -579,6 +579,11 @@ public class TourService : ITourService, ITourSharedService
         return tour.AuthorId == userId;
     }
 
+    public bool IsWheelAvailable(long userId)
+    {
+        return _premiumService.IsPremium(userId) && !_purchaseTokenService.HasUsedPremiumWheelThisMonth(userId);
+    }
+
     public TourDto SpinPremiumWheel(long userId)
     {
         if (!_premiumService.IsPremium(userId))

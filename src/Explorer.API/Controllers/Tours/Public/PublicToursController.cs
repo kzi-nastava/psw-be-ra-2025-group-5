@@ -66,6 +66,24 @@ namespace Explorer.API.Controllers.Tours
             return Ok(result);
         }
 
+        [HttpGet("premium-wheel/availability")]
+        public ActionResult<bool> IsWheelAvailable()
+        {
+            var idClaim = User.FindFirst("id");
+            if (idClaim == null) return Unauthorized();
+
+            try
+            {
+                var userId = long.Parse(idClaim.Value);
+                var result = _tourService.IsWheelAvailable(userId);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [Authorize] 
         [HttpPost("premium-wheel")]
         public ActionResult<TourDto> SpinWheel()
@@ -85,8 +103,5 @@ namespace Explorer.API.Controllers.Tours
                 return Forbid(ex.Message);
             }
         }
-
-
     }
-
 }

@@ -57,6 +57,7 @@ public interface ITourService
 
     List<RequiredEquipmentDto> GetRequiredEquipment(long tourId);
 
+    bool IsWheelAvailable(long userId);
     TourDto SpinPremiumWheel(long userId);
 
     TourCreationQuotaDto GetCreationQuota(long userId);
