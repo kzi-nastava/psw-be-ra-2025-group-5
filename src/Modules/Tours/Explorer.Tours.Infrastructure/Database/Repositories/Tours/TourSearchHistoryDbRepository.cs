@@ -23,12 +23,16 @@ public class TourSearchHistoryDbRepository : ITourSearchHistoryRepository
         return searchHistory;
     }
 
-    public List<TourSearchHistory> GetByUser(long userId)
+    public List<TourSearchHistory> GetByUser(long userId, int? limit = null)
     {
-        return _dbSet
+        IQueryable<TourSearchHistory> query = _dbSet
             .Where(h => h.UserId == userId)
-            .OrderByDescending(h => h.CreatedAt)
-            .ToList();
+            .OrderByDescending(h => h.CreatedAt);
+
+        if (limit.HasValue)
+            query = query.Take(limit.Value);
+
+        return query.ToList();
     }
 
     public void Delete(long id)
