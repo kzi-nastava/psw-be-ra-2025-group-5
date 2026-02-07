@@ -25,13 +25,13 @@ public class ProfileController : ControllerBase
     [HttpGet("{userId}")]
     public ActionResult<ProfileDto> GetProfile(long userId)
     {
-        var loggedInUserId = long.Parse(User.FindFirst("id").Value);
+        var idClaim = User.FindFirst("id");
+        if (idClaim == null)
+            return Unauthorized();
 
+        var loggedInUserId = long.Parse(idClaim.Value);
         if (loggedInUserId != userId)
-        {
             return Forbid();
-        }
-
 
         try
         {
