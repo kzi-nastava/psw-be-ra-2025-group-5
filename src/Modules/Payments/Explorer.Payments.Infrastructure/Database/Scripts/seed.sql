@@ -50,40 +50,36 @@ VALUES (5, 5, '[]');
 
 -- Tour Purchase Tokens (tourists who have purchased tours)
 -- Tourist 1 purchased Ancient Greece tour
-INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (1, 4, 1, false, '2024-06-15 10:30:00');
 
 -- Tourist 2 purchased London and Venice tours
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (2, 3, 2, false, '2024-05-20 14:15:00');
+VALUES (1, 3, 2, false, '2024-05-20 14:15:00');
 
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (3, 12, 2, false, '2024-06-01 09:45:00');
+VALUES (2, 12, 2, false, '2024-06-01 09:45:00');
 
 -- Tourist 3 purchased Egyptian Pyramids and Petra tours
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (4, 10, 3, false, '2024-04-10 11:20:00');
+VALUES (3, 10, 3, false, '2024-04-10 11:20:00');
 
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (5, 15, 3, false, '2024-06-05 16:30:00');
+VALUES (4, 15, 3, false, '2024-06-05 16:30:00');
 
 -- Tourist 4 purchased Space Centers and Chicago tour
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (6, 13, 4, false, '2024-07-10 08:00:00');
+VALUES (5, 13, 4, false, '2024-07-10 08:00:00');
 
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (7, 21, 4, false, '2024-08-01 10:15:00');
+VALUES (6, 21, 4, false, '2024-08-01 10:15:00');
 
 -- Tourist 5 purchased New York and Amazon tours, got one free
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (9, 2, 5, false, '2024-08-25 12:00:00');
+VALUES (7, 2, 5, false, '2024-08-25 12:00:00');
 
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (10, 9, 5, true, '2024-08-25 12:05:00');
+VALUES (8, 9, 5, true, '2024-08-25 12:05:00');
 
 -- Tourist 1 also purchased Iceland tour
-INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (11, 27, 1, false, '2024-03-05 14:30:00');
 
 -- Tourist 3 purchased Machu Picchu
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")

@@ -47,25 +47,25 @@ INSERT INTO stakeholders."People"(
 VALUES
 -- 5 Tourists
 (1, 1, 'Frodo', 'Baggins', 'frodo.baggins@shire.com', 'Adventurer from the Shire seeking the next great journey', 'Not all those who wander are lost', '/images/profiles/frodo.jpg', 0, 0, '2023-03-15T10:00:00Z'),
-(2, 2, 'Hermione', 'Granger', 'hermione.granger@hogwarts.edu', 'Always eager to learn about new places and cultures', 'Knowledge is the greatest treasure', '/images/profiles/hermiona.jpeg', 0, 0, '2023-05-20T10:00:00Z'),
+(2, 2, 'Hermione', 'Granger', 'hermione.granger@hogwarts.edu', 'Always eager to learn about new places and cultures', 'Knowledge is the greatest treasure', '/images/profiles/hermione.jpg', 0, 0, '2023-05-20T10:00:00Z'),
 (3, 3, 'Luke', 'Skywalker', 'luke.skywalker@rebelalliance.org', 'Exploring the galaxy one planet at a time', 'Adventure awaits in every corner', '/images/profiles/luke.jpg', 0, 0, '2023-08-10T10:00:00Z'),
 (4, 4, 'Walter', 'White', 'walter.white@graymatter.com', 'Chemistry teacher turned adventure seeker exploring new destinations', 'I am the one who travels', '/images/profiles/walter.jpg', 0, 0, '2024-01-12T10:00:00Z'),
 (5, 5, 'Jesse', 'Pinkman', 'jesse.pinkman@capncook.com', 'Young traveler with enthusiasm for discovering exciting places', 'Science and adventure, yeah!', '/images/profiles/jesse.png', 0, 0, '2024-03-25T10:00:00Z'),
 -- 14 Authors
-(6, 6, 'James', 'Bond', 'james.bond@mi6.gov.uk', 'International tour guide specializing in exotic destinations', 'Travel with style and sophistication', '/images/profiles/hermiona.jpeg', 0, 0, '2022-01-15T10:00:00Z'),
+(6, 6, 'James', 'Bond', 'james.bond@mi6.gov.uk', 'International tour guide specializing in exotic destinations', 'Travel with style and sophistication', '/images/profiles/james.jpg', 0, 0, '2022-01-15T10:00:00Z'),
 (7, 7, 'Bruce', 'Wayne', 'bruce.wayne@wayneenterprises.com', 'Philanthropist creating exclusive nighttime city tours', 'Discover the hidden beauty of cities after dark', '/images/profiles/bruce.jpg', 0, 0, '2022-03-20T10:00:00Z'),
 (8, 8, 'Peter', 'Parker', 'peter.parker@dailybugle.com', 'Your friendly neighborhood tour guide', 'With great power comes great responsibility', '/images/profiles/peter.jpg', 0, 0, '2022-06-10T10:00:00Z'),
-(9, 9, 'Diana', 'Prince', 'diana.prince@themyscira.org', 'Cultural historian sharing ancient wonders and mythology', 'Preserving history for future generations', NULL, 0, 0, '2022-08-05T10:00:00Z'),
-(10, 10, 'Natasha', 'Romanoff', 'natasha.romanoff@shield.gov', 'Former intelligence agent creating adventure tours', 'Every journey tells a story', '/images/profiles/natasha.jpeg', 0, 0, '2023-01-18T10:00:00Z'),
+(9, 9, 'Diana', 'Prince', 'diana.prince@themyscira.org', 'Cultural historian sharing ancient wonders and mythology', 'Preserving history for future generations', '/images/profiles/diana.jpg', 0, 0, '2022-08-05T10:00:00Z'),
+(10, 10, 'Natasha', 'Romanoff', 'natasha.romanoff@shield.gov', 'Former intelligence agent creating adventure tours', 'Every journey tells a story', '/images/profiles/natasha.jpg', 0, 0, '2023-01-18T10:00:00Z'),
 (11, 11, 'Steve', 'Rogers', 'steve.rogers@avengers.org', 'Traditional values meet modern adventures', 'Never give up on your dreams', '/images/profiles/steve.jpg', 0, 0, '2023-04-22T10:00:00Z'),
 (12, 12, 'Indiana', 'Jones', 'indiana.jones@university.edu', 'Archaeologist offering historical adventure tours', 'History comes alive through exploration', '/images/profiles/jones.jpg', 0, 0, '2023-07-14T10:00:00Z'),
-(13, 13, 'Ellen', 'Ripley', 'ellen.ripley@weyland.com', 'Space explorer bringing cosmic perspective to Earth tours', 'Explore beyond the boundaries', '/images/profiles/ellen.jpg', 0, 0, '2023-09-30T10:00:00Z'),
-(14, 14, 'Rick', 'Deckard', 'rick.deckard@lapd.gov', 'Detective creating mystery-solving city tours', 'Every city has secrets to discover', NULL, 0, 0, '2024-02-11T10:00:00Z'),
-(15, 15, 'John', 'McClane', 'john.mcclane@nypd.gov', 'Action-packed urban exploration specialist', 'Adventure is around every corner', '/images/profiles/john.jpg', 0, 0, '2024-04-17T10:00:00Z'),
-(16, 16, 'Lara', 'Croft', 'lara.croft@croftmanor.uk', 'Archaeologist offering extreme adventure tours', 'Fortune favors the bold', '/images/profiles/lara.jpg', 0, 0, '2024-06-23T10:00:00Z'),
-(17, 17, 'Ethan', 'Hunt', 'ethan.hunt@imf.gov', 'Adventure specialist creating unforgettable experiences', 'Every journey is a new mission', NULL, 0, 0, '2024-08-08T10:00:00Z'),
-(18, 18, 'Max', 'Rockatansky', 'max.rockatansky@roadwarrior.com', 'Desert survival expert offering wilderness tours', 'Survive and thrive in any environment', NULL, 0, 0, '2024-10-19T10:00:00Z'),
-(19, 19, 'Trinity', 'Trinity', 'trinity@matrix.net', 'Technology expert creating innovative digital city tours', 'Embrace the future of travel', NULL, 0, 0, '2024-12-05T10:00:00Z');
+(13, 13, 'Ellen', 'Ripley', 'ellen.ripley@weyland.com', 'Space explorer bringing cosmic perspective to Earth tours', 'Explore beyond the boundaries', '/images/profiles/ellen.jpeg', 0, 0, '2023-09-30T10:00:00Z'),
+(14, 14, 'Rick', 'Deckard', 'rick.deckard@lapd.gov', 'Detective creating mystery-solving city tours', 'Every city has secrets to discover', '/images/profiles/rick.jpg', 0, 0, '2024-02-11T10:00:00Z'),
+(15, 15, 'John', 'McClane', 'john.mcclane@nypd.gov', 'Action-packed urban exploration specialist', 'Adventure is around every corner', '/images/profiles/john.jpeg', 0, 0, '2024-04-17T10:00:00Z'),
+(16, 16, 'Lara', 'Croft', 'lara.croft@croftmanor.uk', 'Archaeologist offering extreme adventure tours', 'Fortune favors the bold', '/images/profiles/lara.jpeg', 0, 0, '2024-06-23T10:00:00Z'),
+(17, 17, 'Ethan', 'Hunt', 'ethan.hunt@imf.gov', 'Adventure specialist creating unforgettable experiences', 'Every journey is a new mission', '/images/profiles/ethan.jpg', 0, 0, '2024-08-08T10:00:00Z'),
+(18, 18, 'Max', 'Rockatansky', 'max.rockatansky@roadwarrior.com', 'Desert survival expert offering wilderness tours', 'Survive and thrive in any environment', '/images/profiles/max.jpg', 0, 0, '2024-10-19T10:00:00Z'),
+(19, 19, 'Trinity', 'Trinity', 'trinity@matrix.net', 'Technology expert creating innovative digital city tours', 'Embrace the future of travel', '/images/profiles/trinity.jpg', 0, 0, '2024-12-05T10:00:00Z');
 
 INSERT INTO stakeholders."ProfileFollows"("FollowerId", "FollowingId") VALUES
 (1, 6), (1, 12), (2, 9), (2, 16), (3, 11), (3, 6), (4, 12), (4, 13), (4, 5), (5, 7), (5, 8), (5, 4);

@@ -629,9 +629,6 @@ INSERT INTO tours."TourReviews" ("Grade", "Comment", "ReviewTime", "Progress", "
 VALUES (5, 'The Riverwalk at night is magical! All the bridges lit up create an amazing atmosphere.', NOW(), 100, 3, 1, 'lukeskywalker');
 
 INSERT INTO tours."TourReviews" ("Grade", "Comment", "ReviewTime", "Progress", "TouristID", "TourID", "TouristUsername")
-VALUES (5, 'Best architecture tour I have taken! Chicago Art Deco buildings are stunning at night.', NOW(), 100, 4, 1, 'walterwhite');
-
-INSERT INTO tours."TourReviews" ("Grade", "Comment", "ReviewTime", "Progress", "TouristID", "TourID", "TouristUsername")
 VALUES (5, 'Yo! The 360 Chicago TILT experience was insane! Leaning over the city at night - mind blown!', NOW(), 100, 5, 1, 'jessepinkman');
 
 INSERT INTO tours."TourReviews" ("Grade", "Comment", "ReviewTime", "Progress", "TouristID", "TourID", "TouristUsername")
