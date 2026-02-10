@@ -129,7 +129,28 @@ public class ChallengeController : ControllerBase
     [HttpGet("{chId:long}/images/{*fileName}")]
     public IActionResult GetImage(long chId, string fileName)
     {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UserUploads", "challenges", chId.ToString(), fileName);
+        string filePath;
+
+        // Normalize path - remove leading slash and normalize separators
+        var normalizedFileName = fileName.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+
+        // Check if this is a static image path (like profile pictures)
+        if (normalizedFileName.StartsWith($"images{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+        {
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                normalizedFileName);
+        }
+        else
+        {
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "UserUploads",
+                "challenges",
+                chId.ToString(),
+                normalizedFileName);
+        }
 
         if (!System.IO.File.Exists(filePath))
             return NotFound();
