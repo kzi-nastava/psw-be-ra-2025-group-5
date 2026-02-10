@@ -74,9 +74,6 @@ VALUES (6, 13, 4, false, '2024-07-10 08:00:00');
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
 VALUES (7, 21, 4, false, '2024-08-01 10:15:00');
 
-INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
-VALUES (8, 1, 4, false, '2024-09-15 19:45:00');
-
 -- Tourist 5 purchased New York and Amazon tours, got one free
 INSERT INTO payments."TourPurchaseTokens" ("Id", "TourId", "TouristId", "IsFree", "PurchasedAt")
 VALUES (9, 2, 5, false, '2024-08-25 12:00:00');

@@ -133,7 +133,7 @@ INSERT INTO stakeholders."Diaries"("Id", "Name", "CreatedAt", "Country", "City",
 INSERT INTO stakeholders."Streaks"(
     "Id", "UserId", "StartDate", "LastActivity", "LongestStreak")
 VALUES
-(3, 4, '2026-01-20', '2026-02-10', 118); -- Walter has 118 days streak
+(1, 4, '2026-01-20', '2026-02-10', 118); -- Walter has 118 days streak
 
 INSERT INTO stakeholders."UserPremiums"
 	("Id", "UserId", "ValidUntil")
@@ -311,3 +311,4 @@ SELECT setval(pg_get_serial_sequence('stakeholders."Planners"', 'Id'), (SELECT C
 SELECT setval(pg_get_serial_sequence('stakeholders."PlannerDay"', 'Id'), (SELECT COALESCE(MAX("Id"),1) FROM stakeholders."PlannerDay"));
 SELECT setval(pg_get_serial_sequence('stakeholders."PlannerTimeBlock"', 'Id'), (SELECT COALESCE(MAX("Id"),1) FROM stakeholders."PlannerTimeBlock"));
 SELECT setval(pg_get_serial_sequence('stakeholders."Diaries"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Diaries"));
+SELECT setval(pg_get_serial_sequence('stakeholders."Streaks"', 'Id'), (SELECT COALESCE(MAX("Id"),0) FROM stakeholders."Streaks"));
